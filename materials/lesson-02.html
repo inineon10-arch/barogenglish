@@ -449,6 +449,7 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   }
 
+  /* ===== 완료 화면 ===== */
   .end-card {
     position: absolute;
     width: calc(100% - 24px);
@@ -548,6 +549,13 @@
     transform: scale(0.96);
     box-shadow: 0 2px 8px rgba(45,91,227,0.2);
   }
+  .restart-btn .arrow {
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .restart-btn:hover .arrow {
+    transform: rotate(-180deg);
+  }
   .end-hint {
     font-size: 0.65rem;
     color: var(--muted);
@@ -567,6 +575,7 @@
     .end-subtitle { font-size: 0.78rem; }
     .end-content { gap: 10px; padding: 14px 18px; }
   }
+
   @media (max-height: 700px) {
     .meaning-text { font-size: 1.6rem; }
     .word-text { font-size: 2.1rem; }
@@ -588,11 +597,11 @@
 
   <div class="header">
     <div class="header-left">
-      <div class="name">바로그영어 · 이태형</div>
+      <div class="name">바로그영어</div>
       <div class="title">오답 단어장</div>
     </div>
     <div class="header-right">
-      <div class="index-display"><span id="cur">1</span> <span>/ <span id="tot">8</span></span></div>
+      <div class="index-display"><span id="cur">1</span> <span>/ <span id="tot">10</span></span></div>
       <div style="display:flex;align-items:center;gap:8px;">
         <button class="random-btn" id="btn-random" type="button" title="랜덤 순서로 섞기">🔀 랜덤</button>
         <div class="mode-chip">
@@ -623,56 +632,109 @@
 </div>
 
 <script>
+// src: 'A' = , 'B' = 
 const cards = [
-  { num:8, word:'anticipate', pos:'동사', type:'blank',
-    correct:'예상하다, 기대하다', student:'',
-    tip:'anti(앞) + cipate(잡다) → 미리 잡다 = 예상하다',
-    example:'We <em>anticipate</em> a big crowd at the event.',
-    src:'A' },
+  { num:1, word:'arrest', pos:'동사/명사', type:'wrong',
+    correct:'체포하다', student:'주장하다',
+    tip:'assert(주장하다)와 혼동 ⚠️ arrest = 체포',
+    example:'The police <em>arrested</em> the thief.' },
 
-  { num:16, word:'souvenir', pos:'명사', type:'wrong',
-    correct:'기념품', student:'선물',
-    tip:'souvenir = 여행지에서 사오는 기념품 (선물과 다름!)',
-    example:'She bought a <em>souvenir</em> at the museum.',
-    src:'A' },
+  { num:2, word:'marine', pos:'형용사', type:'blank',
+    correct:'바다의, 해양의', student:'',
+    tip:'marine life = 해양 생물',
+    example:'<em>Marine</em> animals live in the sea.' },
 
-  { num:44, word:'aquarium', pos:'명사', type:'wrong',
-    correct:'수족관', student:'다양한 생물',
-    tip:'aqua(물) + arium(장소) → 물고기 있는 장소 = 수족관',
-    example:'We visited the <em>aquarium</em> on Saturday.',
-    src:'A' },
+  { num:3, word:'conference', pos:'명사', type:'wrong',
+    correct:'회의, 학회', student:'확인하다',
+    tip:'confirm(확인하다)와 혼동 ⚠️',
+    example:'She attended an international <em>conference</em>.' },
 
-  { num:46, word:'vocation', pos:'명사', type:'blank',
-    correct:'직업, 소명', student:'',
-    tip:'voc(부르다) + ation → 하늘이 부른 일 = 소명/직업',
-    example:'Teaching is her true <em>vocation</em>.',
-    src:'A' },
+  { num:4, word:'contrast', pos:'명사/동사', type:'blank',
+    correct:'대조, 대비', student:'',
+    tip:'두 대상을 비교하며 차이 강조',
+    example:'There is a sharp <em>contrast</em> between them.' },
 
-  { num:2, word:'intense', pos:'형용사', type:'wrong',
-    correct:'강렬한, 극심한', student:'강도',
-    tip:'intense = 정도가 매우 강한 (강렬한, 극심한)',
-    example:'The heat was <em>intense</em> during summer.',
-    src:'B' },
+  { num:5, word:'delicate', pos:'형용사', type:'wrong',
+    correct:'섬세한, 연약한', student:'명백한',
+    tip:'delicate = 약하고 섬세한 느낌',
+    example:'The vase is very <em>delicate</em>.' },
 
-  { num:17, word:'pesticide', pos:'명사', type:'blank',
-    correct:'살충제, 농약', student:'',
-    tip:'pest(해충) + cide(죽이다) → 해충 죽이는 약 = 살충제',
-    example:'Farmers use <em>pesticide</em> to protect crops.',
-    src:'B' },
+  { num:6, word:'innocent', pos:'형용사', type:'wrong',
+    correct:'무죄의, 순진한', student:'순백한',
+    tip:'죄가 없는 상태',
+    example:'He was proven <em>innocent</em>.' },
 
-  { num:21, word:'delicate', pos:'형용사', type:'blank',
-    correct:'섬세한, 연약한', student:'',
-    tip:'delicate = 다루기 조심스러운 → 섬세한, 연약한',
-    example:'The <em>delicate</em> flower needs gentle care.',
-    src:'B' },
+  { num:7, word:'secure', pos:'형용사/동사', type:'wrong',
+    correct:'안전한, 확보하다', student:'구조하다',
+    tip:'rescue(구조하다)와 혼동 ⚠️',
+    example:'We need to <em>secure</em> enough funding.' },
 
-  { num:27, word:'soak', pos:'동사', type:'blank',
-    correct:'담그다, 흡수하다', student:'',
-    tip:'soak = 액체에 푹 담그다 / 스며들다',
-    example:'<em>Soak</em> the beans in water overnight.',
-    src:'B' },
+  { num:8, word:'confront', pos:'동사', type:'wrong',
+    correct:'직면하다, 맞서다', student:'맞이하다',
+    tip:'문제·위험과 정면으로 마주함',
+    example:'You must <em>confront</em> reality.' },
+
+  { num:9, word:'occur', pos:'동사', type:'wrong',
+    correct:'발생하다', student:'고발하다',
+    tip:'accuse(고발하다)와 혼동 ⚠️ occur = happen',
+    example:'The accident <em>occurred</em> yesterday.' },
+
+  { num:10, word:'intense', pos:'형용사', type:'wrong',
+    correct:'강렬한, 극심한', student:'정도',
+    tip:'강도가 매우 센 상태',
+    example:'He felt <em>intense</em> pressure.' },
+
+  { num:11, word:'pesticide', pos:'명사', type:'blank',
+    correct:'농약, 살충제', student:'',
+    tip:'pest(해충) + cide(죽이다)',
+    example:'Farmers use <em>pesticides</em> carefully.' },
+
+  { num:12, word:'loss', pos:'명사', type:'wrong',
+    correct:'손실, 상실', student:'잃다',
+    tip:'lose(잃다)의 명사형',
+    example:'The company suffered a huge <em>loss</em>.' },
+
+  { num:13, word:'generate', pos:'동사', type:'wrong',
+    correct:'만들다, 발생시키다', student:'일반적인',
+    tip:'general(일반적인)과 혼동 ⚠️',
+    example:'The machine <em>generates</em> electricity.' },
+
+  { num:14, word:'trail', pos:'명사', type:'wrong',
+    correct:'오솔길, 자국, 흔적', student:'시도',
+    tip:'trial(시도)과 철자 혼동 ⚠️',
+    example:'We followed the forest <em>trail</em>.' },
+
+  { num:15, word:'fatal', pos:'형용사', type:'blank',
+    correct:'치명적인', student:'',
+    tip:'죽음과 연결되는 위험',
+    example:'It was a <em>fatal</em> accident.' },
+
+  { num:16, word:'diminish', pos:'동사', type:'wrong',
+    correct:'줄다, 감소하다', student:'사라지다',
+    tip:'완전히 없어지는 게 아니라 감소',
+    example:'The pain gradually <em>diminished</em>.' },
+
+  { num:17, word:'biology', pos:'명사', type:'wrong',
+    correct:'생물학', student:'일대기',
+    tip:'biography(일대기)와 혼동 ⚠️',
+    example:'She studies <em>biology</em> at school.' },
+
+  { num:18, word:'material', pos:'명사/형용사', type:'wrong',
+    correct:'재료, 물질', student:'금속의',
+    tip:'material = 원료/재료',
+    example:'Wood is a natural <em>material</em>.' },
+
+  { num:19, word:'seal', pos:'명사/동사', type:'wrong',
+    correct:'물개, 봉인하다', student:'바다의',
+    tip:'marine(바다의)와 혼동 ⚠️',
+    example:'Please <em>seal</em> the envelope.' },
+
+  { num:20, word:'leak', pos:'동사/명사', type:'wrong',
+    correct:'새다, 누출', student:'결핍',
+    tip:'lack(결핍)과 혼동 ⚠️',
+    example:'Water began to <em>leak</em> from the pipe.' }
 ];
-
+ 
 let idx = 0;
 let startFace = 'word';
 let showingBack = false;
@@ -684,13 +746,14 @@ function setStartFace(mode) {
   showingBack = false;
   document.getElementById('btn-meaning').classList.toggle('active', mode === 'meaning');
   document.getElementById('btn-word').classList.toggle('active', mode === 'word');
-  if (idx >= cards.length) return;
+  if (idx >= cards.length) return; // 완료 화면에서는 카드 다시 렌더링 안 함
   renderCard(0);
 }
 
 document.getElementById('btn-meaning').addEventListener('click', () => setStartFace('meaning'));
 document.getElementById('btn-word').addEventListener('click', () => setStartFace('word'));
 
+// 랜덤 버튼
 const originalCards = [...cards];
 let isShuffled = false;
 
@@ -707,6 +770,7 @@ document.getElementById('btn-random').addEventListener('click', function() {
   if (isAnimating) return;
   haptic(20);
   if (!isShuffled) {
+    // 섞기
     const shuffled = shuffleArray(cards);
     cards.length = 0;
     shuffled.forEach(c => cards.push(c));
@@ -714,6 +778,7 @@ document.getElementById('btn-random').addEventListener('click', function() {
     this.classList.add('shuffled');
     this.textContent = '🔀 랜덤ON';
   } else {
+    // 원래 순서로
     cards.length = 0;
     originalCards.forEach(c => cards.push(c));
     isShuffled = false;
@@ -755,23 +820,14 @@ function updateDots() {
 
 function buildCardHTML(card) {
   const srcClass = card.src === 'A' ? 'b-src1' : 'b-src2';
-  const srcLabel = card.src === 'A' ? 'Day 02/03' : 'Day 01/22~30';
-  const isBlank = card.type === 'blank';
-  const badgeType = isBlank
-    ? `<span class="badge b-blank">미작성</span>`
-    : `<span class="badge b-wrong">오답</span>`;
+  const srcLabel = card.src === 'A' ? 'Day 23/24' : 'Day 13~22';
 
-  const studentHTML = isBlank
-    ? `<div class="student-row">
-        <span class="student-label">내 답</span>
-        <span class="blank-ans">— 작성 안 함 —</span>
-      </div>`
-    : `<div class="student-row">
-        <span class="student-label">내 답</span>
-        <span class="student-ans">${card.student}</span>
-      </div>`;
+  const badgeType = `<span class="badge b-wrong">오답</span>`;
 
-  const lineClass = isBlank ? 'line-blank' : 'line-wrong';
+  const studentHTML = `<div class="student-row">
+    <span class="student-label">내 답</span>
+    <span class="student-ans">${card.student}</span>
+  </div>`;
 
   const badgesHTML = `
     <div class="badges">
@@ -837,10 +893,11 @@ function buildCardHTML(card) {
 
   const frontHTML = startFace === 'meaning' ? MEANING_FACE : WORD_FACE;
   const backHTML  = startFace === 'meaning' ? MEANING_BACK : WORD_BACK;
-  return { frontHTML, backHTML, lineClass };
+  return { frontHTML, backHTML };
 }
 
 function buildEndHTML() {
+  const totalCount = cards.length;
   return `
     <div class="end-face">
       <div class="end-line"></div>
@@ -851,11 +908,11 @@ function buildEndHTML() {
           <div class="end-title">학습을 모두 마쳤어요!</div>
         </div>
         <div class="end-subtitle">
-          오답 단어 ${cards.length}개를 모두 복습했어요.<br>
+          오답 단어 ${totalCount}개를 모두 복습했어요.<br>
           한 번 더 반복하면 더욱 확실해져요 ✨
         </div>
         <button class="restart-btn" id="restart-btn" type="button">
-          <span>↻</span>
+          <span class="arrow">↻</span>
           <span>다시 시작하기</span>
         </button>
         <div class="end-hint">→ 스와이프하면 마지막 카드로 돌아가요</div>
@@ -877,12 +934,12 @@ function renderCard(direction) {
     el.innerHTML = buildEndHTML();
   } else {
     const card = cards[idx];
-    const { frontHTML, backHTML, lineClass } = buildCardHTML(card);
+    const { frontHTML, backHTML } = buildCardHTML(card);
     el.className = 'flash-card no-transition';
     el.dataset.front = 'true';
     el.innerHTML = `
       <div class="card-face">
-        <div class="card-line ${lineClass}"></div>
+        <div class="card-line line-wrong"></div>
         <div class="card-content">
           ${showingBack ? backHTML : frontHTML}
         </div>
@@ -899,7 +956,9 @@ function renderCard(direction) {
 
   if (isEnd) {
     const btn = el.querySelector('#restart-btn');
-    if (btn) btn.addEventListener('click', restart);
+    if (btn) {
+      btn.addEventListener('click', restart);
+    }
   }
 
   requestAnimationFrame(() => {
@@ -934,7 +993,7 @@ function restart() {
 
 function flipCard(el) {
   if (!el || isAnimating) return;
-  if (idx >= cards.length) return;
+  if (idx >= cards.length) return; // 완료 화면에서는 뒤집기 비활성
   if (!el.querySelector('.card-face')) return;
   showingBack = !showingBack;
   const card = cards[idx];
@@ -968,7 +1027,7 @@ function initInteraction() {
 
   function getCard() { return vp.querySelector('.flash-card, .end-card'); }
 
-  function startTracking(x, y) {
+  function startTracking(x, y, target) {
     if (isAnimating) return false;
     tracking = true; hasMoved = false; lockedDirection = null;
     startX = x; lastX = x; startY = y; lastY = y; startTime = Date.now();
@@ -983,8 +1042,13 @@ function initInteraction() {
     lastX = x; lastY = y;
     if (lockedDirection === null) {
       if (Math.abs(dx) > DIR_LOCK_THRESHOLD || Math.abs(dy) > DIR_LOCK_THRESHOLD) {
-        lockedDirection = Math.abs(dx) > Math.abs(dy) * 1.1 ? 'h' :
-                          Math.abs(dy) > Math.abs(dx) * 1.1 ? 'v' : 'h';
+        if (Math.abs(dx) > Math.abs(dy) * 1.1) {
+          lockedDirection = 'h';
+        } else if (Math.abs(dy) > Math.abs(dx) * 1.1) {
+          lockedDirection = 'v';
+        } else {
+          lockedDirection = 'h'; // 대각선이면 수평으로
+        }
       }
     }
     if (lockedDirection === 'h') {
@@ -1017,14 +1081,16 @@ function initInteraction() {
   function endTracking(endX, endY) {
     if (!tracking && lockedDirection !== 'h' && lockedDirection !== 'v') { lockedDirection = null; return; }
     tracking = false;
-    ['ind-prev','ind-next','ind-up','ind-down'].forEach(id => {
-      document.getElementById(id).style.opacity = '0';
-    });
+    document.getElementById('ind-prev').style.opacity = '0';
+    document.getElementById('ind-next').style.opacity = '0';
+    document.getElementById('ind-up').style.opacity = '0';
+    document.getElementById('ind-down').style.opacity = '0';
     const card = getCard();
     if (card) card.classList.remove('dragging');
     const dx = endX - startX, dy = endY - startY, dt = Date.now() - startTime;
 
     if (lockedDirection === 'v' && hasMoved) {
+      // 수직 스와이프 → 뒤집기
       const isFastV = dt < SWIPE_TIME && Math.abs(dy) > V_SWIPE_VELOCITY_DIST;
       const isFarV  = Math.abs(dy) > V_SWIPE_DIST;
       if (card) card.style.transform = '';
@@ -1074,9 +1140,10 @@ function initInteraction() {
       card.style.transform = 'translateX(0)';
       setTimeout(() => { if (card) card.style.transition = ''; }, 280);
     }
-    ['ind-prev','ind-next','ind-up','ind-down'].forEach(id => {
-      document.getElementById(id).style.opacity = '0';
-    });
+    document.getElementById('ind-prev').style.opacity = '0';
+    document.getElementById('ind-next').style.opacity = '0';
+    document.getElementById('ind-up').style.opacity = '0';
+    document.getElementById('ind-down').style.opacity = '0';
   }
 
   const supportsPointer = window.PointerEvent !== undefined;
@@ -1084,7 +1151,7 @@ function initInteraction() {
     vp.addEventListener('pointerdown', function(e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (pointerId !== null) return;
-      if (!startTracking(e.clientX, e.clientY)) return;
+      if (!startTracking(e.clientX, e.clientY, e.target)) return;
       pointerId = e.pointerId;
     });
     vp.addEventListener('pointermove', function(e) {
@@ -1104,7 +1171,7 @@ function initInteraction() {
   } else {
     vp.addEventListener('touchstart', function(e) {
       if (e.touches.length !== 1) return;
-      startTracking(e.touches[0].clientX, e.touches[0].clientY);
+      startTracking(e.touches[0].clientX, e.touches[0].clientY, e.target);
     }, { passive: true });
     vp.addEventListener('touchmove', function(e) {
       if (!tracking || e.touches.length !== 1) return;
@@ -1117,7 +1184,7 @@ function initInteraction() {
     vp.addEventListener('touchcancel', cancelTracking, { passive: true });
     let mouseDown = false;
     vp.addEventListener('mousedown', function(e) {
-      if (!startTracking(e.clientX, e.clientY)) return;
+      if (!startTracking(e.clientX, e.clientY, e.target)) return;
       mouseDown = true;
     });
     window.addEventListener('mousemove', function(e) { if (!mouseDown) return; moveTracking(e.clientX, e.clientY, e); });
