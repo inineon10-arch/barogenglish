@@ -7,603 +7,111 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f5f0eb">
-<title>오답 단어장</title>
+<meta name="referrer" content="no-referrer">
+<title>오답 단어장 – 조문정</title>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f0eb;
-    --card: #ffffff;
-    --accent: #2d5be3;
-    --accent2: #e3502d;
-    --wrong-col: #d94040;
-    --blank-col: #d97a20;
-    --text: #1a1a2e;
-    --text2: #6b6b80;
-    --muted: #b0aab8;
-    --border: #e2dcd8;
-    --tip-bg: #eef3ff;
-    --tip-border: #b8ccff;
-    --ex-bg: #faf8f5;
-    --green: #1a9e6f;
-    --pill-wrong: #fff0f0;
-    --pill-blank: #fff5e8;
+    --bg:#f5f0eb;--card:#ffffff;--accent:#2d5be3;--accent2:#e3502d;
+    --wrong-col:#d94040;--text:#1a1a2e;--text2:#6b6b80;--muted:#b0aab8;
+    --border:#e2dcd8;--tip-bg:#eef3ff;--ex-bg:#faf8f5;--green:#1a9e6f;--pill-wrong:#fff0f0;
   }
-
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-  }
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--bg);
-    font-family: 'Gowun Dodum', sans-serif;
-    color: var(--text);
-    overflow: hidden;
-    -webkit-text-size-adjust: 100%;
-    overscroll-behavior: none;
-    touch-action: pan-y;
-  }
-
-  #app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    height: 100dvh;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-
-  .header {
-    flex-shrink: 0;
-    padding: 12px 16px 8px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  .header-left { min-width: 0; flex: 1; }
-  .header-left .name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .header-left .title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-top: 2px;
-    letter-spacing: -0.5px;
-  }
-  .header-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-  .index-display {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .index-display span { color: var(--muted); font-weight: 400; }
-
-  .prog-wrap { flex-shrink: 0; padding: 0 16px 10px; }
-  .prog-dots {
-    display: flex;
-    justify-content: space-between;
-    gap: 3px;
-  }
-  .pdot {
-    flex: 1;
-    height: 4px;
-    border-radius: 3px;
-    background: var(--border);
-    transition: background 0.3s;
-  }
-  .pdot.done { background: var(--accent); }
-  .pdot.current { background: var(--accent); opacity: 0.4; }
-
-  .card-viewport {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 0;
-    touch-action: pan-y;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .flash-card {
-    position: absolute;
-    width: calc(100% - 24px);
-    max-width: 430px;
-    height: calc(100% - 10px);
-    max-height: 620px;
-    will-change: transform, opacity;
-    cursor: pointer;
-    touch-action: pan-y;
-  }
-
-  .card-face {
-    width: 100%;
-    height: 100%;
-    background: var(--card);
-    border-radius: 22px;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 8px 40px rgba(45,91,227,0.08), 0 2px 8px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .card-line {
-    height: 4px;
-    flex-shrink: 0;
-    border-radius: 22px 22px 0 0;
-  }
-  .line-wrong { background: linear-gradient(90deg, var(--wrong-col) 0%, #ff9980 100%); }
-  .line-blank { background: linear-gradient(90deg, var(--blank-col) 0%, #ffd080 100%); }
-
-  .card-content {
-    flex: 1;
-    padding: 16px 18px 12px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-  }
-
-  .face-meaning, .face-word {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-  }
-
-  .scroll-area {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-  }
-  .scroll-area::-webkit-scrollbar { width: 3px; }
-  .scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; flex-shrink: 0; }
-  .badge {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: 20px;
-  }
-  .b-num { background: var(--border); color: var(--text2); }
-  .b-wrong { background: var(--pill-wrong); color: var(--wrong-col); border: 1px solid #ffcccc; }
-  .b-blank { background: var(--pill-blank); color: var(--blank-col); border: 1px solid #ffddb0; }
-  .b-pos { background: #f0f0ff; color: var(--accent); border: 1px solid #d0d8ff; }
-  .b-src1 { background: #f0fff8; color: #1a9e6f; border: 1px solid #b0e8cc; }
-  .b-src2 { background: #f5f0ff; color: #6a3fb5; border: 1px solid #d0b8ff; }
-
-  .meaning-center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 8px;
-    padding: 10px 0;
-    min-height: 120px;
-  }
-  .meaning-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.58rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .meaning-text {
-    font-size: 1.85rem;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.3;
-    letter-spacing: -0.5px;
-  }
-
-  .word-center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 6px;
-    padding: 10px 0;
-    min-height: 120px;
-  }
-  .word-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.58rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .word-text {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -1px;
-    line-height: 1.1;
-    word-break: break-word;
-  }
-  .word-pos { font-size: 0.76rem; color: var(--text2); margin-top: 2px; }
-
-  .student-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-    padding: 8px 12px;
-    background: var(--pill-wrong);
-    border-radius: 10px;
-    border: 1px solid #ffcccc;
-    flex-shrink: 0;
-  }
-  .student-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--wrong-col);
-    flex-shrink: 0;
-  }
-  .student-ans {
-    font-size: 0.82rem;
-    color: var(--wrong-col);
-    text-decoration: line-through;
-    text-decoration-color: rgba(217,64,64,0.5);
-  }
-  .blank-ans { font-size: 0.78rem; color: var(--muted); font-style: italic; }
-
-  .tip-box {
-    background: var(--tip-bg);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 12px 12px 0;
-    padding: 9px 13px;
-    font-size: 0.74rem;
-    color: #3a5ab0;
-    line-height: 1.6;
-    margin-top: 10px;
-    flex-shrink: 0;
-  }
-  .tip-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 5px;
-  }
-  .example-box {
-    background: var(--ex-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 9px 13px;
-    font-size: 0.72rem;
-    color: var(--text2);
-    line-height: 1.65;
-    font-style: italic;
-    margin-top: 7px;
-    flex-shrink: 0;
-  }
-  .example-box em { color: var(--accent2); font-style: normal; font-weight: 600; }
-
-  .tap-hint {
-    text-align: center;
-    font-size: 0.62rem;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-    padding-top: 8px;
-    padding-bottom: 2px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-  }
-  .tap-hint::before, .tap-hint::after {
-    content: '';
-    display: inline-block;
-    width: 18px;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .nav-hint {
-    flex-shrink: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 20px 10px;
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.63rem;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
-  .nav-arrow { font-size: 0.95rem; color: var(--border); }
-  .nav-center { font-size: 0.63rem; color: var(--muted); }
-
-  .flash-card {
-    transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s;
-  }
-  .flash-card.no-transition { transition: none !important; }
-  .flash-card.dragging { transition: none !important; }
-
-  .swipe-indicator {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 8px 16px;
-    border-radius: 10px;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 20;
-    transition: opacity 0.1s;
-  }
-  .ind-prev { left: 16px; color: var(--accent); background: rgba(45,91,227,0.08); border: 1.5px solid rgba(45,91,227,0.2); }
-  .ind-next { right: 16px; color: var(--text2); background: rgba(0,0,0,0.05); border: 1.5px solid var(--border); }
-  .ind-up { top: 16px; left: 50%; transform: translateX(-50%); color: var(--green); background: rgba(26,158,111,0.08); border: 1.5px solid rgba(26,158,111,0.2); }
-  .ind-down { bottom: 16px; left: 50%; transform: translateX(-50%); color: var(--text2); background: rgba(0,0,0,0.05); border: 1.5px solid var(--border); }
-  .swipe-indicator.ind-up, .swipe-indicator.ind-down {
-    top: auto; bottom: auto;
-    transform: none;
-  }
-  .ind-up { top: 16px !important; left: 50% !important; transform: translateX(-50%) !important; }
-  .ind-down { bottom: 16px !important; left: 50% !important; transform: translateX(-50%) !important; }
-
-  .random-btn {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 8px 13px;
-    border-radius: 18px;
-    border: 1.5px solid var(--accent2);
-    background: transparent;
-    color: var(--accent2);
-    cursor: pointer;
-    transition: all 0.2s;
-    min-height: 36px;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .random-btn:active { transform: scale(0.93); background: var(--pill-wrong); }
-  .random-btn.shuffled {
-    background: var(--accent2);
-    color: #fff;
-  }
-
-  .mode-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    background: var(--border);
-    border-radius: 22px;
-    padding: 3px;
-  }
-  .mode-btn {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    padding: 8px 12px;
-    border-radius: 18px;
-    border: none;
-    background: transparent;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.2s;
-    min-height: 36px;
-    min-width: 60px;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-  .mode-btn:active { transform: scale(0.95); }
-  .mode-btn.active {
-    background: var(--card);
-    color: var(--accent);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  }
-
-  /* ===== 완료 화면 ===== */
-  .end-card {
-    position: absolute;
-    width: calc(100% - 24px);
-    max-width: 430px;
-    height: calc(100% - 10px);
-    max-height: 620px;
-    will-change: transform, opacity;
-    touch-action: pan-y;
-    transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.32s;
-  }
-  .end-card.no-transition { transition: none !important; }
-  .end-card.dragging { transition: none !important; }
-  .end-face {
-    width: 100%;
-    height: 100%;
-    background: var(--card);
-    border-radius: 22px;
-    border: 1.5px solid var(--border);
-    box-shadow: 0 8px 40px rgba(45,91,227,0.08), 0 2px 8px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-  }
-  .end-line {
-    height: 4px;
-    flex-shrink: 0;
-    border-radius: 22px 22px 0 0;
-    background: linear-gradient(90deg, var(--accent) 0%, #6a8eff 50%, var(--green) 100%);
-  }
-  .end-content {
-    flex: 1;
-    padding: 24px 22px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 18px;
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-  .end-emoji {
-    font-size: 3.4rem;
-    line-height: 1;
-    animation: pop 0.6s cubic-bezier(.175,.885,.32,1.275);
-  }
-  @keyframes pop {
-    0% { transform: scale(0); opacity: 0; }
-    60% { transform: scale(1.15); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .end-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .end-title {
-    font-size: 1.55rem;
-    font-weight: 400;
-    color: var(--text);
-    line-height: 1.35;
-    letter-spacing: -0.5px;
-    margin-top: -6px;
-  }
-  .end-subtitle {
-    font-size: 0.85rem;
-    color: var(--text2);
-    line-height: 1.6;
-  }
-  .restart-btn {
-    margin-top: 6px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    padding: 14px 32px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(45,91,227,0.25);
-    transition: transform 0.15s, box-shadow 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: pan-y;
-    min-height: 48px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .restart-btn:active {
-    transform: scale(0.96);
-    box-shadow: 0 2px 8px rgba(45,91,227,0.2);
-  }
-  .restart-btn .arrow {
-    display: inline-block;
-    transition: transform 0.2s;
-  }
-  .restart-btn:hover .arrow {
-    transform: rotate(-180deg);
-  }
-  .end-hint {
-    font-size: 0.65rem;
-    color: var(--muted);
-    letter-spacing: 0.3px;
-    margin-top: 2px;
-  }
-  .pdot.done.all { background: var(--green); }
-
-  @media (max-height: 700px) {
-    .end-emoji { font-size: 2.8rem; }
-    .end-title { font-size: 1.35rem; }
-    .end-content { gap: 14px; padding: 18px 20px; }
-  }
-  @media (max-height: 600px) {
-    .end-emoji { font-size: 2.4rem; }
-    .end-title { font-size: 1.2rem; }
-    .end-subtitle { font-size: 0.78rem; }
-    .end-content { gap: 10px; padding: 14px 18px; }
-  }
-
-  @media (max-height: 700px) {
-    .meaning-text { font-size: 1.6rem; }
-    .word-text { font-size: 2.1rem; }
-    .meaning-center, .word-center { min-height: 100px; padding: 6px 0; }
-    .badges { margin-bottom: 8px; }
-    .tip-box, .example-box { font-size: 0.7rem; padding: 8px 11px; }
-  }
-  @media (max-height: 600px) {
-    .header { padding: 8px 16px 6px; }
-    .header-left .title { font-size: 1.05rem; }
-    .meaning-text { font-size: 1.4rem; }
-    .word-text { font-size: 1.85rem; }
-    .nav-hint { padding: 6px 20px 8px; }
-  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+  html,body{width:100%;height:100%;background:var(--bg);font-family:'Gowun Dodum',sans-serif;color:var(--text);overflow:hidden;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:pan-y;}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+  .header{flex-shrink:0;padding:12px 16px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+  .header-left{min-width:0;flex:1;}
+  .header-left .name{font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);}
+  .header-left .title{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--text);margin-top:2px;letter-spacing:-0.5px;}
+  .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+  .index-display{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:var(--text);}
+  .index-display span{color:var(--muted);font-weight:400;}
+  .prog-wrap{flex-shrink:0;padding:0 16px 10px;}
+  .prog-dots{display:flex;justify-content:space-between;gap:3px;}
+  .pdot{flex:1;height:4px;border-radius:3px;background:var(--border);transition:background 0.3s;}
+  .pdot.done{background:var(--accent);}
+  .pdot.current{background:var(--accent);opacity:0.4;}
+  .pdot.done.all{background:var(--green);}
+  .card-viewport{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .flash-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:calc(100% - 10px);max-height:620px;will-change:transform,opacity;cursor:pointer;touch-action:none;transition:transform 0.32s cubic-bezier(.4,0,.2,1),opacity 0.32s;}
+  .flash-card.no-transition{transition:none!important;}
+  .flash-card.dragging{transition:none!important;}
+  .card-face{width:100%;height:100%;background:var(--card);border-radius:22px;border:1.5px solid var(--border);box-shadow:0 8px 40px rgba(45,91,227,0.08),0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;overflow:hidden;position:relative;}
+  .card-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--wrong-col) 0%,#ff9980 100%);}
+  .card-content{flex:1;padding:16px 18px 12px;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+  .face-meaning,.face-word{display:flex;flex-direction:column;height:100%;min-height:0;}
+  .scroll-area{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:none;overscroll-behavior:contain;scrollbar-width:thin;}
+  .scroll-area::-webkit-scrollbar{width:3px;}
+  .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;flex-shrink:0;}
+  .badge{font-family:'Space Grotesk',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+  .b-num{background:var(--border);color:var(--text2);}
+  .b-wrong{background:var(--pill-wrong);color:var(--wrong-col);border:1px solid #ffcccc;}
+  .b-blank{background:#fff5e8;color:#d97a20;border:1px solid #ffddb0;}
+  .b-pos{background:#f0f0ff;color:var(--accent);border:1px solid #d0d8ff;}
+  .meaning-center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px;padding:10px 0;min-height:120px;}
+  .meaning-label{font-family:'Space Grotesk',sans-serif;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+  .meaning-text{font-size:1.85rem;font-weight:400;color:var(--text);line-height:1.3;letter-spacing:-0.5px;}
+  .word-center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;padding:10px 0;min-height:120px;}
+  .word-label{font-family:'Space Grotesk',sans-serif;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+  .word-text{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;color:var(--text);letter-spacing:-1px;line-height:1.1;word-break:break-word;}
+  .word-pos{font-size:0.76rem;color:var(--text2);margin-top:2px;}
+  .student-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;background:var(--pill-wrong);border-radius:10px;border:1px solid #ffcccc;flex-shrink:0;}
+  .student-label{font-family:'Space Grotesk',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--wrong-col);flex-shrink:0;}
+  .student-ans{font-size:0.82rem;color:var(--wrong-col);text-decoration:line-through;text-decoration-color:rgba(217,64,64,0.5);}
+  .blank-label{font-size:0.78rem;color:var(--muted);font-style:italic;}
+  .tip-box{background:var(--tip-bg);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:9px 13px;font-size:0.86rem;color:#3a5ab0;line-height:1.6;margin-top:10px;flex-shrink:0;}
+  .tip-title{font-family:'Space Grotesk',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+  .example-box{background:var(--ex-bg);border:1px solid var(--border);border-radius:12px;padding:9px 13px;font-size:0.84rem;color:var(--text2);line-height:1.65;font-style:italic;margin-top:7px;flex-shrink:0;}
+  .example-box em{color:var(--accent2);font-style:normal;font-weight:600;}
+  .tap-hint{text-align:center;font-size:0.62rem;color:var(--muted);letter-spacing:0.5px;padding-top:8px;padding-bottom:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .tap-hint::before,.tap-hint::after{content:'';display:inline-block;width:18px;height:1px;background:var(--border);}
+  .nav-hint{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:8px 20px 10px;}
+  .nav-item{display:flex;align-items:center;gap:5px;font-size:0.63rem;color:var(--muted);}
+  .nav-arrow{font-size:0.95rem;color:var(--border);}
+  .nav-center{font-size:0.63rem;color:var(--muted);}
+  .swipe-indicator{position:absolute;font-family:'Space Grotesk',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border-radius:10px;opacity:0;pointer-events:none;z-index:20;transition:opacity 0.1s;}
+  .ind-prev{top:50%;left:16px;transform:translateY(-50%);color:var(--accent);background:rgba(45,91,227,0.08);border:1.5px solid rgba(45,91,227,0.2);}
+  .ind-next{top:50%;right:16px;transform:translateY(-50%);color:var(--text2);background:rgba(0,0,0,0.05);border:1.5px solid var(--border);}
+  .ind-up{top:16px;left:50%;transform:translateX(-50%);color:var(--green);background:rgba(26,158,111,0.08);border:1.5px solid rgba(26,158,111,0.2);}
+  .ind-down{bottom:16px;left:50%;transform:translateX(-50%);color:var(--text2);background:rgba(0,0,0,0.05);border:1.5px solid var(--border);}
+  .random-btn{font-family:'Space Grotesk',sans-serif;font-size:0.6rem;font-weight:700;padding:8px 13px;border-radius:18px;border:1.5px solid var(--accent2);background:transparent;color:var(--accent2);cursor:pointer;transition:all 0.2s;min-height:36px;touch-action:manipulation;display:inline-flex;align-items:center;gap:4px;}
+  .random-btn:active{transform:scale(0.93);}
+  .random-btn.shuffled{background:var(--accent2);color:#fff;}
+  .mode-chip{display:inline-flex;align-items:center;gap:2px;background:var(--border);border-radius:22px;padding:3px;}
+  .mode-btn{font-family:'Space Grotesk',sans-serif;font-size:0.6rem;font-weight:600;padding:8px 12px;border-radius:18px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;min-height:36px;min-width:60px;touch-action:manipulation;}
+  .mode-btn.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+  .end-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:calc(100% - 10px);max-height:620px;touch-action:pan-y;transition:transform 0.32s cubic-bezier(.4,0,.2,1),opacity 0.32s;}
+  .end-card.no-transition{transition:none!important;}
+  .end-face{width:100%;height:100%;background:var(--card);border-radius:22px;border:1.5px solid var(--border);box-shadow:0 8px 40px rgba(45,91,227,0.08);display:flex;flex-direction:column;overflow:hidden;}
+  .end-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--accent) 0%,#6a8eff 50%,var(--green) 100%);}
+  .end-content{flex:1;padding:24px 22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;}
+  .end-emoji{font-size:3.4rem;line-height:1;animation:pop 0.6s cubic-bezier(.175,.885,.32,1.275);}
+  @keyframes pop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
+  .end-label{font-family:'Space Grotesk',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);}
+  .end-title{font-size:1.55rem;font-weight:400;color:var(--text);line-height:1.35;margin-top:-6px;}
+  .end-subtitle{font-size:0.85rem;color:var(--text2);line-height:1.6;}
+  .restart-btn{background:var(--accent);color:#fff;border:none;border-radius:16px;padding:14px 32px;font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(45,91,227,0.25);min-height:48px;display:inline-flex;align-items:center;gap:8px;touch-action:pan-y;}
+  .end-hint{font-size:0.65rem;color:var(--muted);}
+  .tts-btn{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.9);border:1.5px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:1.05rem;transition:all 0.18s;touch-action:manipulation;flex-shrink:0;z-index:10;backdrop-filter:blur(4px);}
+  .tts-btn:active{transform:scale(0.88);background:var(--tip-bg);border-color:var(--accent);color:var(--accent);}
+  .tts-btn.playing{border-color:var(--accent);color:var(--accent);background:var(--tip-bg);animation:pulse-tts 0.8s ease-in-out infinite alternate;}
+  @keyframes pulse-tts{from{box-shadow:0 0 0 0 rgba(45,91,227,0.15)}to{box-shadow:0 0 0 6px rgba(45,91,227,0)}}
+  @media(max-height:700px){.meaning-text{font-size:1.6rem}.word-text{font-size:1.9rem}.meaning-center,.word-center{min-height:90px;padding:6px 0}.tip-box,.example-box{font-size:0.78rem;padding:8px 11px}}
+  @media(max-height:600px){.header{padding:8px 16px 6px}.meaning-text{font-size:1.4rem}.word-text{font-size:1.7rem}.nav-hint{padding:6px 20px 8px}}
 </style>
 </head>
 <body>
 <div id="app">
-
   <div class="header">
     <div class="header-left">
-      <div class="name">바로그영어</div>
+      <div class="name">바로그영어 · 조문정</div>
       <div class="title">오답 단어장</div>
     </div>
     <div class="header-right">
-      <div class="index-display"><span id="cur">1</span> <span>/ <span id="tot">10</span></span></div>
+      <div class="index-display"><span id="cur">1</span><span> / <span id="tot">12</span></span></div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <button class="random-btn" id="btn-random" type="button" title="랜덤 순서로 섞기">🔀 랜덤</button>
+        <button class="random-btn" id="btn-random" type="button">🔀 랜덤</button>
         <div class="mode-chip">
           <button class="mode-btn active" id="btn-word" type="button">단어→뜻</button>
           <button class="mode-btn" id="btn-meaning" type="button">뜻→단어</button>
@@ -611,615 +119,106 @@
       </div>
     </div>
   </div>
-
-  <div class="prog-wrap">
-    <div class="prog-dots" id="prog-dots"></div>
-  </div>
-
+  <div class="prog-wrap"><div class="prog-dots" id="prog-dots"></div></div>
   <div class="card-viewport" id="viewport">
     <div class="swipe-indicator ind-prev" id="ind-prev">← 이전</div>
     <div class="swipe-indicator ind-next" id="ind-next">다음 →</div>
     <div class="swipe-indicator ind-up" id="ind-up">↑ 뒤집기</div>
     <div class="swipe-indicator ind-down" id="ind-down">↓ 뒤집기</div>
   </div>
-
   <div class="nav-hint">
     <div class="nav-item"><span class="nav-arrow">→</span> 이전 단어</div>
     <div class="nav-center">탭·위아래스와이프 = 뒤집기</div>
     <div class="nav-item">다음 단어 <span class="nav-arrow">←</span></div>
   </div>
-
 </div>
-
 <script>
-// src: 'A' = , 'B' = 
 const cards = [
-  { num:1, word:'arrest', pos:'동사/명사', type:'wrong',
-    correct:'체포하다', student:'주장하다',
-    tip:'assert(주장하다)와 혼동 ⚠️ arrest = 체포',
-    example:'The police <em>arrested</em> the thief.' },
-
-  { num:2, word:'marine', pos:'형용사', type:'blank',
-    correct:'바다의, 해양의', student:'',
-    tip:'marine life = 해양 생물',
-    example:'<em>Marine</em> animals live in the sea.' },
-
-  { num:3, word:'conference', pos:'명사', type:'wrong',
-    correct:'회의, 학회', student:'확인하다',
-    tip:'confirm(확인하다)와 혼동 ⚠️',
-    example:'She attended an international <em>conference</em>.' },
-
-  { num:4, word:'contrast', pos:'명사/동사', type:'blank',
-    correct:'대조, 대비', student:'',
-    tip:'두 대상을 비교하며 차이 강조',
-    example:'There is a sharp <em>contrast</em> between them.' },
-
-  { num:5, word:'delicate', pos:'형용사', type:'wrong',
-    correct:'섬세한, 연약한', student:'명백한',
-    tip:'delicate = 약하고 섬세한 느낌',
-    example:'The vase is very <em>delicate</em>.' },
-
-  { num:6, word:'innocent', pos:'형용사', type:'wrong',
-    correct:'무죄의, 순진한', student:'순백한',
-    tip:'죄가 없는 상태',
-    example:'He was proven <em>innocent</em>.' },
-
-  { num:7, word:'secure', pos:'형용사/동사', type:'wrong',
-    correct:'안전한, 확보하다', student:'구조하다',
-    tip:'rescue(구조하다)와 혼동 ⚠️',
-    example:'We need to <em>secure</em> enough funding.' },
-
-  { num:8, word:'confront', pos:'동사', type:'wrong',
-    correct:'직면하다, 맞서다', student:'맞이하다',
-    tip:'문제·위험과 정면으로 마주함',
-    example:'You must <em>confront</em> reality.' },
-
-  { num:9, word:'occur', pos:'동사', type:'wrong',
-    correct:'발생하다', student:'고발하다',
-    tip:'accuse(고발하다)와 혼동 ⚠️ occur = happen',
-    example:'The accident <em>occurred</em> yesterday.' },
-
-  { num:10, word:'intense', pos:'형용사', type:'wrong',
-    correct:'강렬한, 극심한', student:'정도',
-    tip:'강도가 매우 센 상태',
-    example:'He felt <em>intense</em> pressure.' },
-
-  { num:11, word:'pesticide', pos:'명사', type:'blank',
-    correct:'농약, 살충제', student:'',
-    tip:'pest(해충) + cide(죽이다)',
-    example:'Farmers use <em>pesticides</em> carefully.' },
-
-  { num:12, word:'loss', pos:'명사', type:'wrong',
-    correct:'손실, 상실', student:'잃다',
-    tip:'lose(잃다)의 명사형',
-    example:'The company suffered a huge <em>loss</em>.' },
-
-  { num:13, word:'generate', pos:'동사', type:'wrong',
-    correct:'만들다, 발생시키다', student:'일반적인',
-    tip:'general(일반적인)과 혼동 ⚠️',
-    example:'The machine <em>generates</em> electricity.' },
-
-  { num:14, word:'trail', pos:'명사', type:'wrong',
-    correct:'오솔길, 자국, 흔적', student:'시도',
-    tip:'trial(시도)과 철자 혼동 ⚠️',
-    example:'We followed the forest <em>trail</em>.' },
-
-  { num:15, word:'fatal', pos:'형용사', type:'blank',
-    correct:'치명적인', student:'',
-    tip:'죽음과 연결되는 위험',
-    example:'It was a <em>fatal</em> accident.' },
-
-  { num:16, word:'diminish', pos:'동사', type:'wrong',
-    correct:'줄다, 감소하다', student:'사라지다',
-    tip:'완전히 없어지는 게 아니라 감소',
-    example:'The pain gradually <em>diminished</em>.' },
-
-  { num:17, word:'biology', pos:'명사', type:'wrong',
-    correct:'생물학', student:'일대기',
-    tip:'biography(일대기)와 혼동 ⚠️',
-    example:'She studies <em>biology</em> at school.' },
-
-  { num:18, word:'material', pos:'명사/형용사', type:'wrong',
-    correct:'재료, 물질', student:'금속의',
-    tip:'material = 원료/재료',
-    example:'Wood is a natural <em>material</em>.' },
-
-  { num:19, word:'seal', pos:'명사/동사', type:'wrong',
-    correct:'물개, 봉인하다', student:'바다의',
-    tip:'marine(바다의)와 혼동 ⚠️',
-    example:'Please <em>seal</em> the envelope.' },
-
-  { num:20, word:'leak', pos:'동사/명사', type:'wrong',
-    correct:'새다, 누출', student:'결핍',
-    tip:'lack(결핍)과 혼동 ⚠️',
-    example:'Water began to <em>leak</em> from the pipe.' }
+  { num:6, word:'respect', pos:'명사·동사', type:'wrong',
+    correct:'존경, 존경하다', student:'용의자',
+    tip:'용의자\'를 뜻하는 suspect와 발음이 비슷하니 주의해서 암기하세요.',
+    example:'You should show <em>respect</em> for your elders.' },
+  { num:7, word:'pesticide', pos:'명사', type:'blank',
+    correct:'살충제, 농약', student:'(무응답)',
+    tip:'해충을 의미하는 \'pest\'와 죽인다는 의미의 \'-cide\'가 합쳐진 단어예요.',
+    example:'Farmers often use <em>pesticide</em> to protect their crops from insects.' },
+  { num:16, word:'excess', pos:'명사·형용사', type:'wrong',
+    correct:'초과, 초과한', student:'접근하다',
+    tip:'접근\'을 의미하는 access와 철자가 비슷하니 구분해서 외워두세요.',
+    example:'An <em>excess</em> of salt in your diet can be unhealthy.' },
+  { num:32, word:'leak', pos:'동사·명사', type:'wrong',
+    correct:'새다, 누출', student:'부족하다',
+    tip:'부족하다\'는 뜻의 lack와 발음이 비슷하니 혼동하지 않도록 주의하세요.',
+    example:'The pipe has a small <em>leak</em> and is dripping water.' },
+  { num:35, word:'estimate', pos:'동사·명사', type:'wrong',
+    correct:'추정하다, 추정치', student:'추적하다',
+    tip:'추정하다\'는 어림잡아 계산하는 것이고, \'추적하다\'는 뒤를 쫓는(track) 것이에요.',
+    example:'Can you <em>estimate</em> the total cost of the project?' },
+  { num:37, word:'yield', pos:'동사·명사', type:'wrong',
+    correct:'생산하다, 양보하다, 수확량', student:'운동장',
+    tip:'운동장\'을 뜻하는 field와 발음이 비슷하니 주의해서 암기하세요.',
+    example:'This farm has a high <em>yield</em> of corn this year.' },
+  { num:38, word:'fascinate', pos:'동사', type:'blank',
+    correct:'매혹하다, 마음을 사로잡다', student:'(무응답)',
+    tip:'패션(fashion)쇼가 사람들을 \'매혹시킨다\'고 연상하며 암기해 보세요.',
+    example:'The stories of ancient civilizations always <em>fascinate</em> me.' },
+  { num:40, word:'geography', pos:'명사', type:'wrong',
+    correct:'지리, 지리학', student:'지형',
+    tip:'지형\'은 topography, \'지리\'는 geography로, 더 넓은 개념을 의미해요.',
+    example:'In school, we learn about the <em>geography</em> of different countries.' },
+  { num:42, word:'material', pos:'명사', type:'wrong',
+    correct:'재료, 물질', student:'재료의',
+    tip:'material은 \'재료\'라는 명사이고, \'~의\'가 붙으면 형용사가 되니 품사를 주의하세요.',
+    example:'This table is made from a very strong <em>material</em>.' },
+  { num:18, word:'deceive', pos:'동사', type:'wrong',
+    correct:'속이다', student:'받다',
+    tip:'발음이 비슷한 \'receive(받다)\'와 헷갈리지 않도록 주의하세요.',
+    example:'He tried to <em>deceive</em> the police by giving a false alibi.' },
+  { num:29, word:'peasant', pos:'명사', type:'blank',
+    correct:'소작농', student:'(무응답)',
+    tip:'pleasant(즐거운)\'와 철자가 비슷하니, \'농부\'의 이미지를 떠올리며 암기하세요.',
+    example:'The <em>peasant</em> worked hard in the fields from dawn till dusk.' },
+  { num:34, word:'agriculture', pos:'명사', type:'wrong',
+    correct:'농업', student:'건축의',
+    tip:'agri\'는 \'땅\'을 뜻해요. \'architecture(건축)\'와 혼동하지 마세요.',
+    example:'The country\'s economy is heavily based on <em>agriculture</em>.' }
 ];
- 
-let idx = 0;
-let startFace = 'word';
-let showingBack = false;
-let isAnimating = false;
-
-function setStartFace(mode) {
-  if (isAnimating) return;
-  startFace = mode;
-  showingBack = false;
-  document.getElementById('btn-meaning').classList.toggle('active', mode === 'meaning');
-  document.getElementById('btn-word').classList.toggle('active', mode === 'word');
-  if (idx >= cards.length) return; // 완료 화면에서는 카드 다시 렌더링 안 함
-  renderCard(0);
+let idx=0,startFace='word',showingBack=false,isAnimating=false;
+document.getElementById('btn-meaning').addEventListener('click',()=>{if(isAnimating)return;startFace='meaning';showingBack=false;document.getElementById('btn-meaning').classList.add('active');document.getElementById('btn-word').classList.remove('active');if(idx<cards.length)renderCard(0);});
+document.getElementById('btn-word').addEventListener('click',()=>{if(isAnimating)return;startFace='word';showingBack=false;document.getElementById('btn-word').classList.add('active');document.getElementById('btn-meaning').classList.remove('active');if(idx<cards.length)renderCard(0);});
+const originalCards=[...cards];let isShuffled=false;
+function shuffleArray(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+document.getElementById('btn-random').addEventListener('click',function(){if(isAnimating)return;haptic(20);if(!isShuffled){const s=shuffleArray(cards);cards.length=0;s.forEach(c=>cards.push(c));isShuffled=true;this.classList.add('shuffled');this.textContent='🔀 랜덤ON';}else{cards.length=0;originalCards.forEach(c=>cards.push(c));isShuffled=false;this.classList.remove('shuffled');this.textContent='🔀 랜덤';}idx=0;showingBack=false;buildDots();renderCard(0);});
+let currentAudio=null;
+function speakWord(btn,word){if(currentAudio){currentAudio.pause();currentAudio=null;document.querySelectorAll('.tts-btn.playing').forEach(b=>b.classList.remove('playing'));if(btn.dataset.playing==='true'){btn.dataset.playing='';return;}}btn.classList.add('playing');btn.dataset.playing='true';const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;const audio=new Audio(url);currentAudio=audio;audio.onended=()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;};audio.onerror=()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;};audio.play().catch(()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;});}
+function buildDots(){const wrap=document.getElementById('prog-dots');wrap.innerHTML='';cards.forEach((_,i)=>{const d=document.createElement('div');d.className='pdot';d.id=`dot-${i}`;wrap.appendChild(d);});updateDots();}
+function updateDots(){const isEnd=idx>=cards.length;cards.forEach((_,i)=>{const d=document.getElementById(`dot-${i}`);if(!d)return;d.className='pdot'+(isEnd?' done all':i<idx?' done':i===idx?' current':'');});document.getElementById('cur').textContent=isEnd?'✓':(idx+1);document.getElementById('tot').textContent=cards.length;}
+function buildCardHTML(card){
+  const isBlank=card.student==='(무응답)';
+  const badgeType=isBlank?`<span class="badge b-blank">미응답</span>`:`<span class="badge b-wrong">오답</span>`;
+  const studentHTML=`<div class="student-row"><span class="student-label">내 답</span>${isBlank?`<span class="blank-label">— 미응답</span>`:`<span class="student-ans">${card.student}</span>`}</div>`;
+  const badges=`<div class="badges"><span class="badge b-num">No.${card.num}</span>${badgeType}<span class="badge b-pos">${card.pos}</span></div>`;
+  const ttsWord=card.word.replace(/'/g,"&#39;");
+  const ttsBtn=`<button class="tts-btn" onclick="event.stopPropagation();speakWord(this,'${ttsWord}');" type="button">🔊</button>`;
+  const MFACE=`<div class="face-meaning">${badges}<div class="meaning-center"><div class="meaning-label">뜻</div><div class="meaning-text">${card.correct}</div></div><div class="tap-hint">탭해서 영단어 보기</div></div>`;
+  const MBACK=`<div class="face-meaning">${badges}<div class="scroll-area"><div class="word-center" style="min-height:90px"><div class="word-label">영단어</div><div class="word-text">${card.word}</div><div class="word-pos">${card.pos}</div></div>${studentHTML}<div class="tip-box"><div class="tip-title">💡 암기 팁</div>${card.tip}</div><div class="example-box">${card.example}</div></div><div class="tap-hint">탭해서 뜻 보기</div></div>`;
+  const WFACE=`<div class="face-word">${badges}<div class="word-center"><div class="word-label">영단어</div><div class="word-text">${card.word}</div><div class="word-pos">${card.pos}</div></div><div class="tap-hint">탭해서 뜻 보기</div></div>`;
+  const WBACK=`<div class="face-word">${badges}<div class="scroll-area"><div class="word-center" style="min-height:80px"><div class="word-label">영단어</div><div class="word-text" style="font-size:1.6rem">${card.word}</div></div><div class="meaning-label" style="text-align:center;margin-bottom:6px">뜻</div><div class="meaning-text" style="text-align:center;font-size:1.35rem;margin-bottom:10px">${card.correct}</div>${studentHTML}<div class="tip-box"><div class="tip-title">💡 암기 팁</div>${card.tip}</div><div class="example-box">${card.example}</div></div><div class="tap-hint">탭해서 영단어 보기</div></div>`;
+  return{frontHTML:startFace==='meaning'?MFACE:WFACE,backHTML:startFace==='meaning'?MBACK:WBACK,ttsBtn};
 }
-
-document.getElementById('btn-meaning').addEventListener('click', () => setStartFace('meaning'));
-document.getElementById('btn-word').addEventListener('click', () => setStartFace('word'));
-
-// 랜덤 버튼
-const originalCards = [...cards];
-let isShuffled = false;
-
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-document.getElementById('btn-random').addEventListener('click', function() {
-  if (isAnimating) return;
-  haptic(20);
-  if (!isShuffled) {
-    // 섞기
-    const shuffled = shuffleArray(cards);
-    cards.length = 0;
-    shuffled.forEach(c => cards.push(c));
-    isShuffled = true;
-    this.classList.add('shuffled');
-    this.textContent = '🔀 랜덤ON';
-  } else {
-    // 원래 순서로
-    cards.length = 0;
-    originalCards.forEach(c => cards.push(c));
-    isShuffled = false;
-    this.classList.remove('shuffled');
-    this.textContent = '🔀 랜덤';
-  }
-  idx = 0;
-  showingBack = false;
-  buildDots();
-  renderCard(0);
-});
-
-function buildDots() {
-  const wrap = document.getElementById('prog-dots');
-  wrap.innerHTML = '';
-  cards.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'pdot';
-    d.id = `dot-${i}`;
-    wrap.appendChild(d);
-  });
-  updateDots();
-}
-
-function updateDots() {
-  const isEnd = idx >= cards.length;
-  cards.forEach((_, i) => {
-    const d = document.getElementById(`dot-${i}`);
-    if (!d) return;
-    if (isEnd) {
-      d.className = 'pdot done all';
-    } else {
-      d.className = 'pdot' + (i < idx ? ' done' : i === idx ? ' current' : '');
-    }
-  });
-  document.getElementById('cur').textContent = isEnd ? '✓' : (idx + 1);
-  document.getElementById('tot').textContent = cards.length;
-}
-
-function buildCardHTML(card) {
-  const srcClass = card.src === 'A' ? 'b-src1' : 'b-src2';
-  const srcLabel = card.src === 'A' ? 'Day 23/24' : 'Day 13~22';
-
-  const badgeType = `<span class="badge b-wrong">오답</span>`;
-
-  const studentHTML = `<div class="student-row">
-    <span class="student-label">내 답</span>
-    <span class="student-ans">${card.student}</span>
-  </div>`;
-
-  const badgesHTML = `
-    <div class="badges">
-      <span class="badge b-num">No.${card.num}</span>
-      ${badgeType}
-      <span class="badge b-pos">${card.pos}</span>
-      <span class="badge ${srcClass}">${srcLabel}</span>
-    </div>`;
-
-  const MEANING_FACE = `
-    <div class="face-meaning">
-      ${badgesHTML}
-      <div class="meaning-center">
-        <div class="meaning-label">뜻</div>
-        <div class="meaning-text">${card.correct}</div>
-      </div>
-      <div class="tap-hint">탭해서 영단어 보기</div>
-    </div>`;
-
-  const MEANING_BACK = `
-    <div class="face-meaning">
-      ${badgesHTML}
-      <div class="scroll-area">
-        <div class="word-center" style="min-height:100px">
-          <div class="word-label">영단어</div>
-          <div class="word-text">${card.word}</div>
-          <div class="word-pos">${card.pos}</div>
-        </div>
-        ${studentHTML}
-        <div class="tip-box"><div class="tip-title">💡 암기 팁</div>${card.tip}</div>
-        <div class="example-box">${card.example}</div>
-      </div>
-      <div class="tap-hint">탭해서 뜻 보기</div>
-    </div>`;
-
-  const WORD_FACE = `
-    <div class="face-word">
-      ${badgesHTML}
-      <div class="word-center">
-        <div class="word-label">영단어</div>
-        <div class="word-text">${card.word}</div>
-        <div class="word-pos">${card.pos}</div>
-      </div>
-      <div class="tap-hint">탭해서 뜻 보기</div>
-    </div>`;
-
-  const WORD_BACK = `
-    <div class="face-word">
-      ${badgesHTML}
-      <div class="scroll-area">
-        <div class="word-center" style="min-height:80px">
-          <div class="word-label">영단어</div>
-          <div class="word-text" style="font-size:1.7rem">${card.word}</div>
-        </div>
-        <div class="meaning-label" style="text-align:center;margin-bottom:6px">뜻</div>
-        <div class="meaning-text" style="text-align:center;font-size:1.4rem;margin-bottom:10px">${card.correct}</div>
-        ${studentHTML}
-        <div class="tip-box"><div class="tip-title">💡 암기 팁</div>${card.tip}</div>
-        <div class="example-box">${card.example}</div>
-      </div>
-      <div class="tap-hint">탭해서 영단어 보기</div>
-    </div>`;
-
-  const frontHTML = startFace === 'meaning' ? MEANING_FACE : WORD_FACE;
-  const backHTML  = startFace === 'meaning' ? MEANING_BACK : WORD_BACK;
-  return { frontHTML, backHTML };
-}
-
-function buildEndHTML() {
-  const totalCount = cards.length;
-  return `
-    <div class="end-face">
-      <div class="end-line"></div>
-      <div class="end-content">
-        <div class="end-emoji">🎉</div>
-        <div>
-          <div class="end-label">All Done</div>
-          <div class="end-title">학습을 모두 마쳤어요!</div>
-        </div>
-        <div class="end-subtitle">
-          오답 단어 ${totalCount}개를 모두 복습했어요.<br>
-          한 번 더 반복하면 더욱 확실해져요 ✨
-        </div>
-        <button class="restart-btn" id="restart-btn" type="button">
-          <span class="arrow">↻</span>
-          <span>다시 시작하기</span>
-        </button>
-        <div class="end-hint">→ 스와이프하면 마지막 카드로 돌아가요</div>
-      </div>
-    </div>`;
-}
-
-let cardEl = null;
-
-function renderCard(direction) {
-  const vp = document.getElementById('viewport');
-  const old = vp.querySelector('.flash-card, .end-card');
-
-  const isEnd = idx >= cards.length;
-  const el = document.createElement('div');
-
-  if (isEnd) {
-    el.className = 'end-card no-transition';
-    el.innerHTML = buildEndHTML();
-  } else {
-    const card = cards[idx];
-    const { frontHTML, backHTML } = buildCardHTML(card);
-    el.className = 'flash-card no-transition';
-    el.dataset.front = 'true';
-    el.innerHTML = `
-      <div class="card-face">
-        <div class="card-line line-wrong"></div>
-        <div class="card-content">
-          ${showingBack ? backHTML : frontHTML}
-        </div>
-      </div>`;
-  }
-
-  if (direction !== 0) {
-    el.style.transform = `translateX(${direction > 0 ? '100%' : '-100%'})`;
-    isAnimating = true;
-  }
-
-  vp.appendChild(el);
-  cardEl = el;
-
-  if (isEnd) {
-    const btn = el.querySelector('#restart-btn');
-    if (btn) {
-      btn.addEventListener('click', restart);
-    }
-  }
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      el.classList.remove('no-transition');
-      el.style.transform = 'translateX(0)';
-    });
-  });
-
-  if (old) {
-    old.classList.remove('no-transition');
-    old.style.transform = `translateX(${direction > 0 ? '-100%' : '100%'})`;
-    old.style.opacity = '0.3';
-    setTimeout(() => {
-      if (old.parentNode) old.remove();
-      isAnimating = false;
-    }, 350);
-  } else {
-    isAnimating = false;
-  }
-
-  updateDots();
-}
-
-function restart() {
-  if (isAnimating) return;
-  idx = 0;
-  showingBack = false;
-  haptic(15);
-  renderCard(-1);
-}
-
-function flipCard(el) {
-  if (!el || isAnimating) return;
-  if (idx >= cards.length) return; // 완료 화면에서는 뒤집기 비활성
-  if (!el.querySelector('.card-face')) return;
-  showingBack = !showingBack;
-  const card = cards[idx];
-  const { frontHTML, backHTML } = buildCardHTML(card);
-  const content = el.querySelector('.card-content');
-  const face = el.querySelector('.card-face');
-
-  face.style.transition = 'transform 0.15s ease';
-  face.style.transform = 'scale(0.97)';
-  setTimeout(() => {
-    content.innerHTML = showingBack ? backHTML : frontHTML;
-    face.style.transform = 'scale(1)';
-  }, 80);
-  setTimeout(() => { face.style.transition = ''; }, 230);
-}
-
-function haptic(ms = 8) {
-  try { if (window.navigator && navigator.vibrate) navigator.vibrate(ms); } catch(_) {}
-}
-
-function initInteraction() {
-  const vp = document.getElementById('viewport');
-  if (!vp) return;
-
-  let startX = 0, startY = 0, startTime = 0;
-  let lastX = 0, lastY = 0, tracking = false, hasMoved = false;
-  let lockedDirection = null, pointerId = null;
-  const DIR_LOCK_THRESHOLD = 8, TAP_THRESHOLD = 8;
-  const SWIPE_DIST = 60, SWIPE_VELOCITY_DIST = 30, SWIPE_TIME = 350;
-  const V_SWIPE_DIST = 45, V_SWIPE_VELOCITY_DIST = 25;
-
-  function getCard() { return vp.querySelector('.flash-card, .end-card'); }
-
-  function startTracking(x, y, target) {
-    if (isAnimating) return false;
-    tracking = true; hasMoved = false; lockedDirection = null;
-    startX = x; lastX = x; startY = y; lastY = y; startTime = Date.now();
-    const card = getCard();
-    if (card) card.classList.add('dragging');
-    return true;
-  }
-
-  function moveTracking(x, y, ev) {
-    if (!tracking) return;
-    const dx = x - startX, dy = y - startY;
-    lastX = x; lastY = y;
-    if (lockedDirection === null) {
-      if (Math.abs(dx) > DIR_LOCK_THRESHOLD || Math.abs(dy) > DIR_LOCK_THRESHOLD) {
-        if (Math.abs(dx) > Math.abs(dy) * 1.1) {
-          lockedDirection = 'h';
-        } else if (Math.abs(dy) > Math.abs(dx) * 1.1) {
-          lockedDirection = 'v';
-        } else {
-          lockedDirection = 'h'; // 대각선이면 수평으로
-        }
-      }
-    }
-    if (lockedDirection === 'h') {
-      if (ev && ev.cancelable && ev.type === 'touchmove') ev.preventDefault();
-      hasMoved = true;
-      const card = getCard();
-      if (card) {
-        let factor = 0.55;
-        if ((dx > 0 && idx === 0) || (dx < 0 && idx >= cards.length)) factor = 0.25;
-        card.style.transform = `translateX(${dx * factor}px)`;
-      }
-      const t = Math.min(Math.abs(dx) / 70, 1);
-      const ip = document.getElementById('ind-prev'), ix = document.getElementById('ind-next');
-      if (dx > 5) { ip.style.opacity = String(t * 0.9); ix.style.opacity = '0'; }
-      else if (dx < -5) { ix.style.opacity = String(t * 0.9); ip.style.opacity = '0'; }
-      else { ip.style.opacity = '0'; ix.style.opacity = '0'; }
-    } else if (lockedDirection === 'v') {
-      if (ev && ev.cancelable && ev.type === 'touchmove') ev.preventDefault();
-      hasMoved = true;
-      const card = getCard();
-      if (card) card.style.transform = `translateY(${dy * 0.25}px)`;
-      const t = Math.min(Math.abs(dy) / 50, 1);
-      const iu = document.getElementById('ind-up'), id2 = document.getElementById('ind-down');
-      if (dy < -5) { iu.style.opacity = String(t * 0.9); id2.style.opacity = '0'; }
-      else if (dy > 5) { id2.style.opacity = String(t * 0.9); iu.style.opacity = '0'; }
-      else { iu.style.opacity = '0'; id2.style.opacity = '0'; }
-    }
-  }
-
-  function endTracking(endX, endY) {
-    if (!tracking && lockedDirection !== 'h' && lockedDirection !== 'v') { lockedDirection = null; return; }
-    tracking = false;
-    document.getElementById('ind-prev').style.opacity = '0';
-    document.getElementById('ind-next').style.opacity = '0';
-    document.getElementById('ind-up').style.opacity = '0';
-    document.getElementById('ind-down').style.opacity = '0';
-    const card = getCard();
-    if (card) card.classList.remove('dragging');
-    const dx = endX - startX, dy = endY - startY, dt = Date.now() - startTime;
-
-    if (lockedDirection === 'v' && hasMoved) {
-      // 수직 스와이프 → 뒤집기
-      const isFastV = dt < SWIPE_TIME && Math.abs(dy) > V_SWIPE_VELOCITY_DIST;
-      const isFarV  = Math.abs(dy) > V_SWIPE_DIST;
-      if (card) card.style.transform = '';
-      if (isFastV || isFarV) {
-        if (idx < cards.length) { haptic(8); flipCard(card); }
-      } else {
-        if (card) {
-          card.style.transition = 'transform 0.25s cubic-bezier(.4,0,.2,1)';
-          card.style.transform = 'translateY(0)';
-          setTimeout(() => { if (card) card.style.transition = ''; }, 280);
-        }
-      }
-      lockedDirection = null;
-      return;
-    }
-
-    const wasHoriz = lockedDirection === 'h' && hasMoved;
-    const isFastSwipe = wasHoriz && dt < SWIPE_TIME && Math.abs(dx) > SWIPE_VELOCITY_DIST;
-    const isFarSwipe  = wasHoriz && Math.abs(dx) > SWIPE_DIST;
-
-    if (wasHoriz && (isFastSwipe || isFarSwipe)) {
-      if (card) card.style.transform = '';
-      if (dx > 0 && idx > 0) { idx--; showingBack = false; haptic(10); renderCard(-1); }
-      else if (dx < 0 && idx < cards.length) { idx++; showingBack = false; haptic(10); renderCard(1); }
-      else if (card) {
-        card.style.transition = 'transform 0.3s cubic-bezier(.175,.885,.32,1.275)';
-        card.style.transform = 'translateX(0)';
-        setTimeout(() => { if (card) card.style.transition = ''; }, 350);
-      }
-    } else {
-      if (card && wasHoriz) {
-        card.style.transition = 'transform 0.25s cubic-bezier(.4,0,.2,1)';
-        card.style.transform = 'translateX(0)';
-        setTimeout(() => { if (card) card.style.transition = ''; }, 280);
-      } else if (card) { card.style.transform = ''; }
-      if (lockedDirection === null && Math.abs(dx) < TAP_THRESHOLD && Math.abs(dy) < TAP_THRESHOLD) flipCard(card);
-    }
-    lockedDirection = null;
-  }
-
-  function cancelTracking() {
-    tracking = false; hasMoved = false; lockedDirection = null;
-    const card = getCard();
-    if (card) {
-      card.classList.remove('dragging');
-      card.style.transition = 'transform 0.25s';
-      card.style.transform = 'translateX(0)';
-      setTimeout(() => { if (card) card.style.transition = ''; }, 280);
-    }
-    document.getElementById('ind-prev').style.opacity = '0';
-    document.getElementById('ind-next').style.opacity = '0';
-    document.getElementById('ind-up').style.opacity = '0';
-    document.getElementById('ind-down').style.opacity = '0';
-  }
-
-  const supportsPointer = window.PointerEvent !== undefined;
-  if (supportsPointer) {
-    vp.addEventListener('pointerdown', function(e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      if (pointerId !== null) return;
-      if (!startTracking(e.clientX, e.clientY, e.target)) return;
-      pointerId = e.pointerId;
-    });
-    vp.addEventListener('pointermove', function(e) {
-      if (e.pointerId !== pointerId) return;
-      moveTracking(e.clientX, e.clientY, e);
-    });
-    vp.addEventListener('pointerup', function(e) {
-      if (e.pointerId !== pointerId) return;
-      pointerId = null;
-      endTracking(e.clientX, e.clientY);
-    });
-    vp.addEventListener('pointercancel', function(e) {
-      if (e.pointerId !== pointerId) return;
-      pointerId = null;
-      cancelTracking();
-    });
-  } else {
-    vp.addEventListener('touchstart', function(e) {
-      if (e.touches.length !== 1) return;
-      startTracking(e.touches[0].clientX, e.touches[0].clientY, e.target);
-    }, { passive: true });
-    vp.addEventListener('touchmove', function(e) {
-      if (!tracking || e.touches.length !== 1) return;
-      moveTracking(e.touches[0].clientX, e.touches[0].clientY, e);
-    }, { passive: false });
-    vp.addEventListener('touchend', function(e) {
-      if (!e.changedTouches || e.changedTouches.length === 0) return;
-      endTracking(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-    }, { passive: true });
-    vp.addEventListener('touchcancel', cancelTracking, { passive: true });
-    let mouseDown = false;
-    vp.addEventListener('mousedown', function(e) {
-      if (!startTracking(e.clientX, e.clientY, e.target)) return;
-      mouseDown = true;
-    });
-    window.addEventListener('mousemove', function(e) { if (!mouseDown) return; moveTracking(e.clientX, e.clientY, e); });
-    window.addEventListener('mouseup', function(e) { if (!mouseDown) return; mouseDown = false; endTracking(e.clientX, e.clientY); });
-  }
-}
-
-document.addEventListener('keydown', e => {
-  if (isAnimating) return;
-  if (e.key === 'ArrowRight' && idx > 0) { idx--; showingBack = false; renderCard(-1); }
-  else if (e.key === 'ArrowLeft' && idx < cards.length) { idx++; showingBack = false; renderCard(1); }
-  else if (e.key === ' ' || e.key === 'Enter') {
-    e.preventDefault();
-    if (idx >= cards.length) { restart(); }
-    else if (cardEl) { flipCard(cardEl); }
-  }
-});
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function(e) {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) e.preventDefault();
-  lastTouchEnd = now;
-}, { passive: false });
-
-function fixVH() {
-  document.documentElement.style.setProperty('--app-vh', `${window.innerHeight * 0.01}px`);
-}
-window.addEventListener('resize', fixVH);
-window.addEventListener('orientationchange', fixVH);
-fixVH();
-
-buildDots();
-initInteraction();
-renderCard(0);
+function buildEndHTML(){return`<div class="end-face"><div class="end-line"></div><div class="end-content"><div class="end-emoji">🎉</div><div><div class="end-label">All Done</div><div class="end-title">학습을 모두 마쳤어요!</div></div><div class="end-subtitle">오답 단어 ${cards.length}개를 모두 복습했어요.<br>한 번 더 반복하면 더욱 확실해져요 ✨</div><button class="restart-btn" id="restart-btn" type="button"><span>↻</span><span>다시 시작하기</span></button><div class="end-hint">→ 스와이프하면 마지막 카드로 돌아가요</div></div></div>`;}
+let cardEl=null;
+function autoPlayTTS(card){if(!card||idx>=cards.length)return;const word=cards[idx].word;const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;if(currentAudio){currentAudio.pause();currentAudio=null;document.querySelectorAll('.tts-btn.playing').forEach(b=>{b.classList.remove('playing');b.dataset.playing='';});}const audio=new Audio(url);currentAudio=audio;const btn=card.querySelector('.tts-btn');if(btn){btn.classList.add('playing');btn.dataset.playing='true';}audio.onended=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}currentAudio=null;};audio.onerror=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}currentAudio=null;};audio.play().catch(()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}currentAudio=null;});}
+function renderCard(direction){const vp=document.getElementById('viewport');const old=vp.querySelector('.flash-card,.end-card');const isEnd=idx>=cards.length;const el=document.createElement('div');if(isEnd){el.className='end-card no-transition';el.innerHTML=buildEndHTML();}else{const{frontHTML,backHTML,ttsBtn}=buildCardHTML(cards[idx]);el.className='flash-card no-transition';el.innerHTML=`<div class="card-face"><div class="card-line"></div>${ttsBtn}<div class="card-content">${showingBack?backHTML:frontHTML}</div></div>`;}if(direction!==0){el.style.transform=`translateX(${direction>0?'100%':'-100%'})`;isAnimating=true;}vp.appendChild(el);cardEl=el;if(isEnd){const btn=el.querySelector('#restart-btn');if(btn)btn.addEventListener('click',restart);}requestAnimationFrame(()=>requestAnimationFrame(()=>{el.classList.remove('no-transition');el.style.transform='translateX(0)';if(!isEnd&&direction!==0&&startFace==='word')setTimeout(()=>autoPlayTTS(el),120);}));if(old){old.classList.remove('no-transition');old.style.transform=`translateX(${direction>0?'-100%':'100%'})`;old.style.opacity='0.3';setTimeout(()=>{if(old.parentNode)old.remove();isAnimating=false;},350);}else{isAnimating=false;if(!isEnd&&startFace==='word')setTimeout(()=>autoPlayTTS(el),120);}updateDots();}
+function restart(){if(isAnimating)return;idx=0;showingBack=false;haptic(15);renderCard(-1);}
+function flipCard(el){if(!el||isAnimating||idx>=cards.length||!el.querySelector('.card-face'))return;showingBack=!showingBack;const{frontHTML,backHTML}=buildCardHTML(cards[idx]);const content=el.querySelector('.card-content');const face=el.querySelector('.card-face');face.style.transition='transform 0.15s ease';face.style.transform='scale(0.97)';setTimeout(()=>{content.innerHTML=showingBack?backHTML:frontHTML;face.style.transform='scale(1)';},80);setTimeout(()=>{face.style.transition='';},230);}
+function haptic(ms=8){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(_){}}
+function initInteraction(){const vp=document.getElementById('viewport');let sX=0,sY=0,sT=0,tracking=false,hasMoved=false,locked=null,pid=null,scrollCtx=null;const DL=6,TT=8,SD=60,SV=30,ST=400,VD=30,VV=15;function getCard(){return vp.querySelector('.flash-card,.end-card');}function startT(x,y,t){if(isAnimating)return false;if(t&&t.closest&&t.closest('.tts-btn'))return false;tracking=true;hasMoved=false;locked=null;scrollCtx=null;sX=x;sY=y;sT=Date.now();const sa=t&&t.closest&&t.closest('.scroll-area');if(sa&&sa.scrollHeight>sa.clientHeight){scrollCtx={el:sa,lastY:y,max:sa.scrollHeight-sa.clientHeight};}const c=getCard();if(c)c.classList.add('dragging');return true;}function moveT(x,y,ev){if(!tracking)return;const dx=x-sX,dy=y-sY;if(locked===null){if(Math.abs(dx)>DL||Math.abs(dy)>DL){const wantV=Math.abs(dy)>=Math.abs(dx);if(wantV&&scrollCtx){const atTop=scrollCtx.el.scrollTop<=0,atBot=scrollCtx.el.scrollTop>=scrollCtx.max;if((dy>0&&!atTop)||(dy<0&&!atBot)){locked='scroll';}else{locked='v';}}else{locked=wantV?'v':'h';}}}if(locked==='scroll'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();scrollCtx.el.scrollTop-=(y-scrollCtx.lastY);scrollCtx.lastY=y;const atTop=scrollCtx.el.scrollTop<=0,atBot=scrollCtx.el.scrollTop>=scrollCtx.max;const cumDy=y-sY;if(((cumDy>0&&atTop)||(cumDy<0&&atBot))&&Math.abs(cumDy)>VD){locked='v';sY=y-VV*(cumDy>0?1:-1);return;}return;}if(locked==='h'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();hasMoved=true;const c=getCard();if(c)c.style.transform=`translateX(${dx*((dx>0&&idx===0)||(dx<0&&idx>=cards.length)?0.25:0.55)}px)`;const t=Math.min(Math.abs(dx)/70,1);if(dx>5){document.getElementById('ind-prev').style.opacity=String(t*0.9);document.getElementById('ind-next').style.opacity='0';}else if(dx<-5){document.getElementById('ind-next').style.opacity=String(t*0.9);document.getElementById('ind-prev').style.opacity='0';}else{document.getElementById('ind-prev').style.opacity='0';document.getElementById('ind-next').style.opacity='0';}}else if(locked==='v'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();hasMoved=true;const c=getCard();if(c)c.style.transform=`translateY(${dy*0.25}px)`;const t=Math.min(Math.abs(dy)/50,1);if(dy<-5){document.getElementById('ind-up').style.opacity=String(t*0.9);document.getElementById('ind-down').style.opacity='0';}else if(dy>5){document.getElementById('ind-down').style.opacity=String(t*0.9);document.getElementById('ind-up').style.opacity='0';}else{document.getElementById('ind-up').style.opacity='0';document.getElementById('ind-down').style.opacity='0';}}}function endT(ex,ey){if(!tracking&&locked!=='h'&&locked!=='v'){locked=null;return;}tracking=false;['ind-prev','ind-next','ind-up','ind-down'].forEach(id=>document.getElementById(id).style.opacity='0');const c=getCard();if(c)c.classList.remove('dragging');const dx=ex-sX,dy=ey-sY,dt=Date.now()-sT;if(locked==='v'&&hasMoved){if(c)c.style.transform='';if((dt<ST&&Math.abs(dy)>VV)||Math.abs(dy)>VD){if(idx<cards.length){haptic(8);flipCard(c);}}else if(c){c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';c.style.transform='translateY(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}locked=null;return;}const wh=locked==='h'&&hasMoved,fast=wh&&dt<ST&&Math.abs(dx)>SV,far=wh&&Math.abs(dx)>SD;if(wh&&(fast||far)){if(c)c.style.transform='';if(dx>0&&idx>0){idx--;showingBack=false;haptic(10);renderCard(-1);}else if(dx<0&&idx<cards.length){idx++;showingBack=false;haptic(10);renderCard(1);}else if(c){c.style.transition='transform 0.3s cubic-bezier(.175,.885,.32,1.275)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},350);}}else{if(c&&wh){c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}else if(c)c.style.transform='';if(locked===null&&Math.abs(dx)<TT&&Math.abs(dy)<TT)flipCard(c);}locked=null;}function cancelT(){tracking=false;hasMoved=false;locked=null;const c=getCard();if(c){c.classList.remove('dragging');c.style.transition='transform 0.25s';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}['ind-prev','ind-next','ind-up','ind-down'].forEach(id=>document.getElementById(id).style.opacity='0');}if(window.PointerEvent){vp.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;if(pid!==null)return;if(!startT(e.clientX,e.clientY,e.target))return;pid=e.pointerId;});vp.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;moveT(e.clientX,e.clientY,e);});vp.addEventListener('pointerup',e=>{if(e.pointerId!==pid)return;pid=null;endT(e.clientX,e.clientY);});vp.addEventListener('pointercancel',e=>{if(e.pointerId!==pid)return;pid=null;cancelT();});}else{vp.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;startT(e.touches[0].clientX,e.touches[0].clientY,e.target);},{passive:true});vp.addEventListener('touchmove',e=>{if(!tracking||e.touches.length!==1)return;moveT(e.touches[0].clientX,e.touches[0].clientY,e);},{passive:false});vp.addEventListener('touchend',e=>{if(!e.changedTouches||!e.changedTouches.length)return;endT(e.changedTouches[0].clientX,e.changedTouches[0].clientY);},{passive:true});vp.addEventListener('touchcancel',cancelT,{passive:true});let md=false;vp.addEventListener('mousedown',e=>{if(!startT(e.clientX,e.clientY,e.target))return;md=true;});window.addEventListener('mousemove',e=>{if(!md)return;moveT(e.clientX,e.clientY,e);});window.addEventListener('mouseup',e=>{if(!md)return;md=false;endT(e.clientX,e.clientY);});}}
+document.addEventListener('keydown',e=>{if(isAnimating)return;if(e.key==='ArrowRight'&&idx>0){idx--;showingBack=false;renderCard(-1);}else if(e.key==='ArrowLeft'&&idx<cards.length){idx++;showingBack=false;renderCard(1);}else if(e.key===' '||e.key==='Enter'){e.preventDefault();if(idx>=cards.length)restart();else if(cardEl)flipCard(cardEl);}});
+let lte=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lte<=300)e.preventDefault();lte=n;},{passive:false});
+window.addEventListener('resize',()=>document.documentElement.style.setProperty('--app-vh',`${window.innerHeight*0.01}px`));
+document.documentElement.style.setProperty('--app-vh',`${window.innerHeight*0.01}px`);
+buildDots();initInteraction();renderCard(0);
 </script>
 </body>
 </html>
