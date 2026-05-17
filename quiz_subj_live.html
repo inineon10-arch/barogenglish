@@ -165,12 +165,16 @@ const _end     = _params.get('end')     || _start;
 
 function showLoading(){
   document.getElementById('viewport').innerHTML=`
+    <div class="swipe-ind ind-prev" id="ind-prev">← 이전</div>
+    <div class="swipe-ind ind-next" id="ind-next">다음 →</div>
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-family:'Space Grotesk',sans-serif;">
       <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
       <div style="font-size:0.78rem;letter-spacing:1px;">문제 불러오는 중...</div>
     </div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;}
 function showError(msg){
   document.getElementById('viewport').innerHTML=`
+    <div class="swipe-ind ind-prev" id="ind-prev">← 이전</div>
+    <div class="swipe-ind ind-next" id="ind-next">다음 →</div>
     <div style="text-align:center;padding:24px;font-family:'Space Grotesk',sans-serif;">
       <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
       <div style="font-size:0.85rem;color:var(--wrong-col);margin-bottom:8px;font-weight:600;">데이터를 불러올 수 없어요</div>
@@ -457,16 +461,16 @@ function initSwipe(){
       const block=(dx<0&&!canNext())||(dx>0&&!canPrev());
       c.style.transform=`translateX(${dx*(block?0.15:0.55)}px)`;
       const t=Math.min(Math.abs(dx)/70,1);
-      document.getElementById('ind-prev').style.opacity=dx>8&&canPrev()?String(t*0.9):'0';
-      document.getElementById('ind-next').style.opacity=dx<-8&&canNext()?String(t*0.9):'0';
+      {const ip=document.getElementById('ind-prev');if(ip)ip.style.opacity=dx>8&&canPrev()?String(t*0.9):'0';}
+      {const ix=document.getElementById('ind-next');if(ix)ix.style.opacity=dx<-8&&canNext()?String(t*0.9):'0';}
     }
   }
   let sY=0;
   function end(ex){
     if(!tracking){tracking=false;return;}
     tracking=false;
-    document.getElementById('ind-prev').style.opacity='0';
-    document.getElementById('ind-next').style.opacity='0';
+    {const ip=document.getElementById('ind-prev');if(ip)ip.style.opacity='0';}
+    {const ix=document.getElementById('ind-next');if(ix)ix.style.opacity='0';}
     const c=cardEl;if(c)c.classList.remove('dragging');
     const dx=ex-sX;const far=Math.abs(dx)>SD;const fast=Math.abs(dx)>SV;
     if(locked==='h'&&(fast||far)){
@@ -483,8 +487,8 @@ function initSwipe(){
   }
   function cancel(){
     tracking=false;locked=null;
-    document.getElementById('ind-prev').style.opacity='0';
-    document.getElementById('ind-next').style.opacity='0';
+    {const ip=document.getElementById('ind-prev');if(ip)ip.style.opacity='0';}
+    {const ix=document.getElementById('ind-next');if(ix)ix.style.opacity='0';}
     const c=cardEl;if(c){c.classList.remove('dragging');c.style.transition='transform 0.25s';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}
   }
   if(window.PointerEvent){
