@@ -180,39 +180,6 @@ function updateHeader(student, startDate, endDate){
 
 let cards = [];
 let idx=0,startFace='word',showingBack=false,isAnimating=false;
-  { num:7, word:'pesticide', pos:'명사', type:'blank',
-    correct:'살충제, 농약', student:'(무응답)',
-    tip:'해충을 의미하는 \'pest\'와 죽인다는 의미의 \'-cide\'가 합쳐진 단어예요.',
-    example:'Farmers often use <em>pesticide</em> to protect their crops from insects.' },
-  { num:16, word:'excess', pos:'명사·형용사', type:'wrong',
-    correct:'초과, 초과한', student:'접근하다',
-    tip:'접근\'을 의미하는 access와 철자가 비슷하니 구분해서 외워두세요.',
-    example:'An <em>excess</em> of salt in your diet can be unhealthy.' },
-  { num:32, word:'leak', pos:'동사·명사', type:'wrong',
-    correct:'새다, 누출', student:'부족하다',
-    tip:'부족하다\'는 뜻의 lack와 발음이 비슷하니 혼동하지 않도록 주의하세요.',
-    example:'The pipe has a small <em>leak</em> and is dripping water.' },
-  { num:35, word:'estimate', pos:'동사·명사', type:'wrong',
-    correct:'추정하다, 추정치', student:'추적하다',
-    tip:'추정하다\'는 어림잡아 계산하는 것이고, \'추적하다\'는 뒤를 쫓는(track) 것이에요.',
-    example:'Can you <em>estimate</em> the total cost of the project?' },
-  { num:37, word:'yield', pos:'동사·명사', type:'wrong',
-    correct:'생산하다, 양보하다, 수확량', student:'운동장',
-    tip:'운동장\'을 뜻하는 field와 발음이 비슷하니 주의해서 암기하세요.',
-    example:'This farm has a high <em>yield</em> of corn this year.' },
-  { num:38, word:'fascinate', pos:'동사', type:'blank',
-    correct:'매혹하다, 마음을 사로잡다', student:'(무응답)',
-    tip:'패션(fashion)쇼가 사람들을 \'매혹시킨다\'고 연상하며 암기해 보세요.',
-    example:'The stories of ancient civilizations always <em>fascinate</em> me.' },
-  { num:40, word:'geography', pos:'명사', type:'wrong',
-    correct:'지리, 지리학', student:'지형',
-    tip:'지형\'은 topography, \'지리\'는 geography로, 더 넓은 개념을 의미해요.',
-    example:'In school, we learn about the <em>geography</em> of different countries.' },
-  { num:42, word:'material', pos:'명사', type:'wrong',
-    correct:'재료, 물질', student:'재료의',
-    tip:'material은 \'재료\'라는 명사이고, \'~의\'가 붙으면 형용사가 되니 품사를 주의하세요.',
-    example:'This table is made from a very strong <em>material</em>.' },
-let idx=0,startFace='word',showingBack=false,isAnimating=false;
 document.getElementById('btn-meaning').addEventListener('click',()=>{if(isAnimating)return;startFace='meaning';showingBack=false;document.getElementById('btn-meaning').classList.add('active');document.getElementById('btn-word').classList.remove('active');if(idx<cards.length)renderCard(0);});
 document.getElementById('btn-word').addEventListener('click',()=>{if(isAnimating)return;startFace='word';showingBack=false;document.getElementById('btn-word').classList.add('active');document.getElementById('btn-meaning').classList.remove('active');if(idx<cards.length)renderCard(0);});
 let currentAudio=null;
