@@ -4,436 +4,194 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BAROG · 학습 자료실</title>
-<meta name="description" content="바로그 영어 학원 학생들을 위한 학습 자료 모음입니다." />
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+KR:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-
 <style>
   :root {
-    --bg: #f5f1ea;
-    --bg-alt: #ebe5d9;
-    --ink: #1f2a30;
-    --ink-soft: #4a5560;
-    --ink-mute: #7a8590;
-    --accent: #6b4423;
-    --accent-soft: #a07855;
-    --line: #d6cfc0;
-    --card: #fbf8f2;
-    --shadow: 0 1px 2px rgba(31, 42, 48, 0.04), 0 8px 24px rgba(31, 42, 48, 0.06);
-    --shadow-hover: 0 2px 4px rgba(31, 42, 48, 0.06), 0 16px 40px rgba(31, 42, 48, 0.10);
-    --blue: #2d5be3;
-    --orange: #e3502d;
-    --green: #1a9e6f;
+    --bg: #f5f1ea; --bg-alt: #ebe5d9;
+    --ink: #1f2a30; --ink-soft: #4a5560; --ink-mute: #7a8590;
+    --accent: #6b4423; --accent-soft: #a07855;
+    --line: #d6cfc0; --card: #fbf8f2;
+    --shadow: 0 1px 2px rgba(31,42,48,.04), 0 8px 24px rgba(31,42,48,.06);
+    --shadow-hover: 0 2px 4px rgba(31,42,48,.06), 0 16px 40px rgba(31,42,48,.10);
+    --blue: #2d5be3; --orange: #e3502d; --green: #1a9e6f; --purple: #7036e3;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-
   body {
-    font-family: 'Noto Serif KR', 'Cormorant Garamond', Georgia, serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.7;
-    min-height: 100vh;
+    font-family: 'Noto Serif KR','Cormorant Garamond',Georgia,serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7; min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(ellipse at top left, rgba(160, 120, 85, 0.06), transparent 50%),
-      radial-gradient(ellipse at bottom right, rgba(107, 68, 35, 0.04), transparent 50%);
+      radial-gradient(ellipse at top left, rgba(160,120,85,.06), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(107,68,35,.04), transparent 50%);
   }
-
-  /* ==================== HEADER ==================== */
   .site-header {
     border-bottom: 1px solid var(--line);
-    background: rgba(245, 241, 234, 0.85);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: rgba(245,241,234,.85); backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
   }
   .header-inner {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 1.25rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    max-width: 1180px; margin: 0 auto; padding: 1.25rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.6rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .nav {
-    display: flex;
-    gap: 2rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-  }
-  .nav a {
-    color: var(--ink-soft);
-    text-decoration: none;
-    cursor: pointer;
-    padding-bottom: 2px;
-    border-bottom: 1px solid transparent;
-    transition: color 0.2s ease, border-color 0.2s ease;
-  }
-  .nav a:hover { color: var(--accent); }
-  .nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .logo { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; letter-spacing:.02em; color:var(--ink); text-decoration:none; }
+  .nav { display:flex; gap:2rem; font-family:'Inter',sans-serif; font-size:.9rem; }
+  .nav a { color:var(--ink-soft); text-decoration:none; cursor:pointer; padding-bottom:2px; border-bottom:1px solid transparent; transition:color .2s,border-color .2s; }
+  .nav a:hover { color:var(--accent); }
+  .nav a.active { color:var(--accent); border-bottom-color:var(--accent); }
 
-  /* ==================== HERO ==================== */
   .hero {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 6rem 2rem 5rem;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 3rem;
-    align-items: end;
-    border-bottom: 1px solid var(--line);
+    max-width:1180px; margin:0 auto; padding:6rem 2rem 5rem;
+    display:grid; grid-template-columns:1fr auto; gap:3rem; align-items:end;
+    border-bottom:1px solid var(--line);
   }
-  .hero h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2.8rem, 6vw, 4.5rem);
-    font-weight: 500;
-    line-height: 1.05;
-    letter-spacing: -0.01em;
-    margin-bottom: 1.5rem;
-  }
-  .hero h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
-  .hero-subtitle { font-size: 1.05rem; color: var(--ink-soft); max-width: 540px; line-height: 1.8; }
+  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.8rem,6vw,4.5rem); font-weight:500; line-height:1.05; letter-spacing:-.01em; margin-bottom:1.5rem; }
+  .hero h1 em { font-style:italic; color:var(--accent); font-weight:400; }
+  .hero-subtitle { font-size:1.05rem; color:var(--ink-soft); max-width:540px; line-height:1.8; }
 
-  /* ==================== TAB BAR ==================== */
-  .tab-bar {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 2.5rem 2rem 0;
-    display: flex;
-    border-bottom: 1px solid var(--line);
-  }
-  .tab-btn {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--ink-mute);
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    padding: 0.75rem 1.75rem;
-    margin-bottom: -1px;
-    cursor: pointer;
-    letter-spacing: 0.02em;
-    transition: color 0.2s ease, border-color 0.2s ease;
-  }
-  .tab-btn:hover { color: var(--ink-soft); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-bar { max-width:1180px; margin:0 auto; padding:2.5rem 2rem 0; display:flex; gap:.5rem; border-bottom:1px solid var(--line); }
+  .tab-btn { font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:var(--ink-mute); background:none; border:none; border-bottom:2px solid transparent; padding:.75rem 1.75rem; margin-bottom:-1px; cursor:pointer; letter-spacing:.02em; transition:color .2s,border-color .2s; }
+  .tab-btn:hover { color:var(--ink-soft); }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
 
-  /* ==================== SECTION ==================== */
-  .materials-section {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 4rem 2rem 6rem;
-    display: none;
-  }
-  .materials-section.visible { display: block; }
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--line);
-  }
-  .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 500;
-    letter-spacing: -0.005em;
-  }
-  .section-title em { font-style: italic; color: var(--accent); }
-  .section-count {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    color: var(--ink-mute);
-    letter-spacing: 0.05em;
-  }
+  .materials-section { max-width:1180px; margin:0 auto; padding:4rem 2rem 6rem; display:none; }
+  .materials-section.visible { display:block; }
+  .section-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3rem; padding-bottom:1.5rem; border-bottom:1px solid var(--line); }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:500; letter-spacing:-.005em; }
+  .section-title em { font-style:italic; color:var(--accent); }
+  .section-count { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--ink-mute); letter-spacing:.05em; }
 
-  /* Search */
-  .search-wrap { margin-bottom: 2.5rem; position: relative; max-width: 480px; }
-  .search-input {
-    width: 100%;
-    padding: 0.9rem 1.1rem 0.9rem 2.8rem;
-    font-family: 'Noto Serif KR', serif;
-    font-size: 0.95rem;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .search-input:focus {
-    border-color: var(--accent-soft);
-    box-shadow: 0 0 0 3px rgba(160, 120, 85, 0.1);
-  }
-  .search-input::placeholder { color: var(--ink-mute); font-style: italic; }
-  .search-icon {
-    position: absolute; left: 1rem; top: 50%;
-    transform: translateY(-50%);
-    color: var(--ink-mute); pointer-events: none;
-  }
+  .search-wrap { margin-bottom:2.5rem; position:relative; max-width:480px; }
+  .search-input { width:100%; padding:.9rem 1.1rem .9rem 2.8rem; font-family:'Noto Serif KR',serif; font-size:.95rem; background:var(--card); border:1px solid var(--line); border-radius:2px; color:var(--ink); outline:none; transition:border-color .2s,box-shadow .2s; }
+  .search-input:focus { border-color:var(--accent-soft); box-shadow:0 0 0 3px rgba(160,120,85,.1); }
+  .search-input::placeholder { color:var(--ink-mute); font-style:italic; }
+  .search-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--ink-mute); pointer-events:none; }
 
-  /* ==================== CARD (방식 B) ==================== */
-  .materials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1rem;
-  }
+  .materials-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; }
 
-  /* 카드는 이제 <div> (링크 아님) */
   .material-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    padding: 1.1rem 1rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    animation: fadeUp 0.5s ease both;
+    background:var(--card); border:1px solid var(--line); border-radius:2px;
+    padding:1.1rem 1rem 1rem; display:flex; flex-direction:column; gap:.45rem;
+    transition:transform .3s,box-shadow .3s,border-color .3s;
+    position:relative; overflow:hidden; box-shadow:var(--shadow);
+    animation:fadeUp .5s ease both;
   }
   .material-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 2px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s ease;
+    content:''; position:absolute; top:0; left:0; width:100%; height:2px;
+    background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform .4s;
   }
-  .material-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--accent-soft);
-  }
-  .material-card:hover::before { transform: scaleX(1); }
+  .material-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-hover); border-color:var(--accent-soft); }
+  .material-card:hover::before { transform:scaleX(1); }
 
-  .card-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 0.75rem;
-    color: var(--accent);
-    letter-spacing: 0.05em;
-  }
-  .card-title {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--ink);
-  }
-  .card-description {
-    font-size: 0.78rem;
-    color: var(--ink-soft);
-    line-height: 1.6;
-  }
+  /* 단어장 카드 - 보라 강조선 */
+  .material-card.vocab-card::before { background:var(--purple); }
+  .material-card.vocab-card:hover { border-color:rgba(112,54,227,.4); }
 
-  /* ── 3개 버튼 영역 ── */
-  .card-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--line);
-  }
+  .card-number { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.75rem; color:var(--accent); letter-spacing:.05em; }
+  .material-card.vocab-card .card-number { color:var(--purple); }
+  .card-title { font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:600; line-height:1.4; color:var(--ink); }
+  .card-description { font-size:.78rem; color:var(--ink-soft); line-height:1.6; }
 
+  .card-actions { display:flex; flex-direction:column; gap:6px; margin-top:8px; padding-top:10px; border-top:1px dashed var(--line); }
   .action-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1.5px solid;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    background: transparent;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 12px; border-radius:6px; border:1.5px solid;
+    font-family:'Inter',sans-serif; font-size:.72rem; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase; text-decoration:none;
+    cursor:pointer; transition:all .18s; background:transparent;
   }
-  .action-btn:hover { opacity: 0.82; transform: translateX(2px); }
-  .action-btn:active { transform: scale(0.97); }
+  .action-btn:hover { opacity:.82; transform:translateX(2px); }
+  .action-btn:active { transform:scale(.97); }
 
-  /* 플래시카드 — 파랑 */
-  .btn-flash {
-    color: var(--blue);
-    border-color: rgba(45, 91, 227, 0.35);
-    background: rgba(45, 91, 227, 0.04);
-  }
-  .btn-flash:hover { background: rgba(45, 91, 227, 0.09); border-color: var(--blue); }
+  .btn-flash { color:var(--blue); border-color:rgba(45,91,227,.35); background:rgba(45,91,227,.04); }
+  .btn-flash:hover { background:rgba(45,91,227,.09); border-color:var(--blue); }
+  .btn-quiz { color:var(--green); border-color:rgba(26,158,111,.35); background:rgba(26,158,111,.04); }
+  .btn-quiz:hover { background:rgba(26,158,111,.09); border-color:var(--green); }
+  .btn-vocab { color:var(--purple); border-color:rgba(112,54,227,.35); background:rgba(112,54,227,.04); }
+  .btn-vocab:hover { background:rgba(112,54,227,.09); border-color:var(--purple); }
 
-  /* 객관식 — 초록 */
-  .btn-mc {
-    color: var(--green);
-    border-color: rgba(26, 158, 111, 0.35);
-    background: rgba(26, 158, 111, 0.04);
-  }
-  .btn-mc:hover { background: rgba(26, 158, 111, 0.09); border-color: var(--green); }
+  .btn-label { display:flex; align-items:center; gap:6px; }
+  .btn-icon { font-size:.85rem; }
+  .btn-arrow { font-family:'Cormorant Garamond',serif; font-size:.95rem; opacity:.7; }
 
-  /* 주관식 — 주황 */
-  .btn-subj {
-    color: var(--orange);
-    border-color: rgba(227, 80, 45, 0.35);
-    background: rgba(227, 80, 45, 0.04);
-  }
-  .btn-subj:hover { background: rgba(227, 80, 45, 0.09); border-color: var(--orange); }
+  .no-results { grid-column:1/-1; text-align:center; padding:4rem 2rem; color:var(--ink-mute); font-style:italic; }
 
-  .btn-label { display: flex; align-items: center; gap: 6px; }
-  .btn-icon { font-size: 0.85rem; }
-  .btn-arrow { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; opacity: 0.7; }
+  .site-footer { border-top:1px solid var(--line); background:var(--bg-alt); padding:3rem 2rem; margin-top:4rem; }
+  .footer-inner { max-width:1180px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; }
+  .footer-text { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--ink-mute); }
+  .footer-text em { font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--accent); }
 
-  .no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--ink-mute);
-    font-style: italic;
-  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .hero > *, .section-header, .search-wrap { animation:fadeUp .8s ease both; }
 
-  /* ==================== FOOTER ==================== */
-  .site-footer {
-    border-top: 1px solid var(--line);
-    background: var(--bg-alt);
-    padding: 3rem 2rem;
-    margin-top: 4rem;
+  @media(max-width:768px) {
+    .header-inner{padding:1rem 1.25rem} .nav{gap:1.25rem;font-size:.85rem}
+    .hero{grid-template-columns:1fr;padding:4rem 1.25rem 3rem;gap:2rem}
+    .tab-bar{padding:1.5rem 1.25rem 0} .materials-section{padding:3rem 1.25rem 4rem}
+    .section-header{flex-direction:column;align-items:flex-start;gap:.5rem}
+    .materials-grid{grid-template-columns:repeat(2,1fr);gap:.75rem}
+    .material-card{padding:1rem .875rem .875rem} .footer-inner{flex-direction:column;text-align:center}
   }
-  .footer-inner {
-    max-width: 1180px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-  }
-  .footer-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    color: var(--ink-mute);
-  }
-  .footer-text em { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--accent); }
-
-  /* ==================== ANIMATIONS ==================== */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .hero > *, .section-header, .search-wrap { animation: fadeUp 0.8s ease both; }
-
-  /* ==================== RESPONSIVE ==================== */
-  @media (max-width: 768px) {
-    .header-inner { padding: 1rem 1.25rem; }
-    .nav { gap: 1.25rem; font-size: 0.85rem; }
-    .hero { grid-template-columns: 1fr; padding: 4rem 1.25rem 3rem; gap: 2rem; }
-    .tab-bar { padding: 1.5rem 1.25rem 0; }
-    .materials-section { padding: 3rem 1.25rem 4rem; }
-    .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-    .materials-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-    .material-card { padding: 1rem 0.875rem 0.875rem; }
-    .footer-inner { flex-direction: column; text-align: center; }
-  }
-
-  @media (max-width: 420px) {
-    .materials-grid { grid-template-columns: 1fr; }
-  }
+  @media(max-width:420px) { .materials-grid{grid-template-columns:1fr} }
 </style>
 </head>
-
 <body>
 
 <header class="site-header">
   <div class="header-inner">
     <a href="#" class="logo">BAROG English</a>
-    <nav class="nav">
-      <a id="nav-wrong" class="active">오답단어</a>
-    </nav>
+    <nav class="nav"><a id="nav-wrong" class="active">오답학습</a></nav>
   </div>
 </header>
 
 <section class="hero">
   <div>
-    <h1>Practice<br><em>makes</em>Perfect</h1>
-    <p class="hero-subtitle">오늘의 오답은 내일의 실력이 됩니다.</p>
+    <h1>Practice<br><em>makes</em> Perfect</h1>
+    <p class="hero-subtitle">틀린 문제를 내 것으로 만드는 학습을 시작하세요.</p>
   </div>
 </section>
 
 <div class="tab-bar">
-  <button class="tab-btn active" id="tab-wrong">오답단어</button>
+  <button class="tab-btn active" id="tab-wrong">오답학습</button>
 </div>
 
 <main class="materials-section visible" id="section-wrong">
   <div class="section-header">
-    <h2 class="section-title">오답단어 <em></em></h2>
+    <h2 class="section-title">오답학습 <em></em></h2>
     <div class="section-count" id="count-wrong">전체 자료</div>
   </div>
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
-    <input type="text" class="search-input" id="search-wrong" placeholder="날짜로 검색하세요." aria-label="오답단어 검색">
+    <input type="text" class="search-input" id="search-wrong" placeholder="날짜나 설명으로 검색하세요." aria-label="오답학습 검색">
   </div>
   <div class="materials-grid" id="grid-wrong"></div>
 </main>
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <div class="footer-text">
-      Barog English · <em>Crafted with care for our students</em>
-    </div>
+    <div class="footer-text">Barog English · <em>Crafted with care for our students</em></div>
   </div>
 </footer>
 
 <script>
-  /* =============================================================
-     ★ 설정: 학생 이름 (구글 시트 탭 이름과 정확히 일치해야 함)
-     ============================================================= */
-  const STUDENT = '조문정';  // ← 각 학생 홈페이지마다 이 이름만 바꾸면 됨
+  // ★ 학생 이름 설정
+  const STUDENT = '조문정';
 
-  /* =============================================================
-     ★ 오답단어 자료 목록
-     각 항목:
-       title       — 카드에 표시할 날짜 제목 (예: "5월 13일")
-       description — 부제 (예: "화요일")
-       start       — 시작 날짜 YYYY-MM-DD
-       end         — 종료 날짜 YYYY-MM-DD (하루면 start와 동일하게)
-     ============================================================= */
+  // ★ 오답 학습 목록 — 날짜/제목 추가 시 여기에 한 줄씩
   const wrongMaterials = [
-    { title: "5월 10일", description: "토요일", start: "2026-05-10", end: "2026-05-10" },
-    { title: "5월 16일",  description: "목요일", start: "2026-05-16", end: "2026-05-16" },
-    { title: "5월 14일",  description: "금요일", start: "2026-05-14", end: "2026-05-14" }
+    { title: "5월 10일", description: "화요시험", start: "2026-05-10", end: "2026-05-10" },
+    { title: "5월 16일",  description: "금요시험", start: "2026-05-16", end: "2026-05-16" },
+    { title: "5월 14일",  description: "수요시험", start: "2026-05-14", end: "2026-05-14" }
   ];
 
-  /* =============================================================
-     카드 렌더링
-     ============================================================= */
   function pad(n) { return String(n).padStart(2, '0'); }
 
   function makeUrl(page, item) {
-    const base = page; // 같은 폴더에 있으므로 파일명만
-    return `${base}?student=${encodeURIComponent(STUDENT)}&start=${item.start}&end=${item.end}`;
+    return `${page}?student=${encodeURIComponent(STUDENT)}&start=${item.start}&end=${item.end}`;
   }
 
   function renderMaterials(list) {
@@ -442,21 +200,21 @@
     grid.innerHTML = '';
 
     if (list.length === 0) {
-      grid.innerHTML = '<div class="no-results">자료가 없습니다.</div>';
+      grid.innerHTML = '<div class="no-results">자료를 찾을 수 없습니다.</div>';
       countDisplay.textContent = '자료 없음';
       return;
     }
 
-    countDisplay.textContent = `전체 ${list.length}개 자료`;
+    countDisplay.textContent = `전체 ${list.length + 1}개 자료`;
 
+    // 오답 카드들 (flashcard + 통합퀴즈)
     list.forEach((item, i) => {
       const card = document.createElement('div');
       card.className = 'material-card';
       card.style.animationDelay = `${0.05 * i}s`;
 
       const flashUrl = makeUrl('flashcard_live.html', item);
-      const mcUrl    = makeUrl('quiz_mc_live.html', item);
-      const subjUrl  = makeUrl('quiz_subj_live.html', item);
+      const quizUrl  = makeUrl('quiz_live.html', item) + '&mode=student';
 
       card.innerHTML = `
         <div class="card-number">No. ${pad(i + 1)}</div>
@@ -464,21 +222,34 @@
         <div class="card-description">${item.description}</div>
         <div class="card-actions">
           <a class="action-btn btn-flash" href="${flashUrl}">
-            <span class="btn-label"><span class="btn-icon">📇</span> 플래시카드</span>
+            <span class="btn-label"><span class="btn-icon">📗</span> 플래시카드</span>
             <span class="btn-arrow">→</span>
           </a>
-          <a class="action-btn btn-mc" href="${mcUrl}">
-            <span class="btn-label"><span class="btn-icon">🔤</span> 객관식 퀴즈</span>
-            <span class="btn-arrow">→</span>
-          </a>
-          <a class="action-btn btn-subj" href="${subjUrl}">
-            <span class="btn-label"><span class="btn-icon">✏️</span> 주관식 퀴즈</span>
+          <a class="action-btn btn-quiz" href="${quizUrl}">
+            <span class="btn-label"><span class="btn-icon">📝</span> 퀴즈 (객관식 + 주관식)</span>
             <span class="btn-arrow">→</span>
           </a>
         </div>
       `;
       grid.appendChild(card);
     });
+
+    // 단어장 퀴즈 카드 (항상 마지막에 고정)
+    const vocabCard = document.createElement('div');
+    vocabCard.className = 'material-card vocab-card';
+    vocabCard.style.animationDelay = `${0.05 * list.length}s`;
+    vocabCard.innerHTML = `
+      <div class="card-number">단어장</div>
+      <div class="card-title">단어장 플래시카드 & 퀴즈</div>
+      <div class="card-description">전체 오답 단어 50개 · 플래시카드 / 객관식 / 주관식 학습</div>
+      <div class="card-actions">
+        <a class="action-btn btn-vocab" href="quiz_live.html">
+          <span class="btn-label"><span class="btn-icon">📚</span> 단어장 퀴즈 시작</span>
+          <span class="btn-arrow">→</span>
+        </a>
+      </div>
+    `;
+    grid.appendChild(vocabCard);
   }
 
   function filterMaterials(list, keyword) {
