@@ -23,6 +23,9 @@
     --card: #fbf8f2;
     --shadow: 0 1px 2px rgba(31, 42, 48, 0.04), 0 8px 24px rgba(31, 42, 48, 0.06);
     --shadow-hover: 0 2px 4px rgba(31, 42, 48, 0.06), 0 16px 40px rgba(31, 42, 48, 0.10);
+    --blue: #2d5be3;
+    --orange: #e3502d;
+    --green: #1a9e6f;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,7 +52,6 @@
     top: 0;
     z-index: 100;
   }
-
   .header-inner {
     max-width: 1180px;
     margin: 0 auto;
@@ -58,7 +60,6 @@
     justify-content: space-between;
     align-items: center;
   }
-
   .logo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.6rem;
@@ -66,33 +67,23 @@
     letter-spacing: 0.02em;
     color: var(--ink);
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
   }
-
   .nav {
     display: flex;
     gap: 2rem;
     font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
-    font-weight: 400;
   }
   .nav a {
     color: var(--ink-soft);
     text-decoration: none;
-    transition: color 0.2s ease;
-    letter-spacing: 0.02em;
     cursor: pointer;
     padding-bottom: 2px;
     border-bottom: 1px solid transparent;
     transition: color 0.2s ease, border-color 0.2s ease;
   }
   .nav a:hover { color: var(--accent); }
-  .nav a.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
+  .nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
 
   /* ==================== HERO ==================== */
   .hero {
@@ -105,56 +96,25 @@
     align-items: end;
     border-bottom: 1px solid var(--line);
   }
-
   .hero h1 {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(2.8rem, 6vw, 4.5rem);
     font-weight: 500;
     line-height: 1.05;
     letter-spacing: -0.01em;
-    color: var(--ink);
     margin-bottom: 1.5rem;
   }
-  .hero h1 em {
-    font-style: italic;
-    color: var(--accent);
-    font-weight: 400;
-  }
+  .hero h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .hero-subtitle { font-size: 1.05rem; color: var(--ink-soft); max-width: 540px; line-height: 1.8; }
 
-  .hero-subtitle {
-    font-size: 1.05rem;
-    color: var(--ink-soft);
-    max-width: 540px;
-    line-height: 1.8;
-  }
-
-  .hero-meta {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
-    color: var(--ink-mute);
-    text-align: right;
-    line-height: 1.6;
-    border-left: 1px solid var(--line);
-    padding-left: 2rem;
-  }
-  .hero-meta strong {
-    display: block;
-    font-weight: 500;
-    color: var(--ink);
-    font-size: 0.9rem;
-    margin-bottom: 0.25rem;
-  }
-
-  /* ==================== TAB SWITCHER ==================== */
+  /* ==================== TAB BAR ==================== */
   .tab-bar {
     max-width: 1180px;
     margin: 0 auto;
     padding: 2.5rem 2rem 0;
     display: flex;
-    gap: 0;
     border-bottom: 1px solid var(--line);
   }
-
   .tab-btn {
     font-family: 'Noto Serif KR', serif;
     font-size: 1rem;
@@ -168,15 +128,11 @@
     cursor: pointer;
     letter-spacing: 0.02em;
     transition: color 0.2s ease, border-color 0.2s ease;
-    position: relative;
   }
   .tab-btn:hover { color: var(--ink-soft); }
-  .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* ==================== MATERIALS SECTION ==================== */
+  /* ==================== SECTION ==================== */
   .materials-section {
     max-width: 1180px;
     margin: 0 auto;
@@ -184,7 +140,6 @@
     display: none;
   }
   .materials-section.visible { display: block; }
-
   .section-header {
     display: flex;
     justify-content: space-between;
@@ -193,18 +148,13 @@
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--line);
   }
-
   .section-title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 2.2rem;
     font-weight: 500;
     letter-spacing: -0.005em;
   }
-  .section-title em {
-    font-style: italic;
-    color: var(--accent);
-  }
-
+  .section-title em { font-style: italic; color: var(--accent); }
   .section-count {
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
@@ -213,11 +163,7 @@
   }
 
   /* Search */
-  .search-wrap {
-    margin-bottom: 2.5rem;
-    position: relative;
-    max-width: 480px;
-  }
+  .search-wrap { margin-bottom: 2.5rem; position: relative; max-width: 480px; }
   .search-input {
     width: 100%;
     padding: 0.9rem 1.1rem 0.9rem 2.8rem;
@@ -236,49 +182,43 @@
   }
   .search-input::placeholder { color: var(--ink-mute); font-style: italic; }
   .search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
+    position: absolute; left: 1rem; top: 50%;
     transform: translateY(-50%);
-    color: var(--ink-mute);
-    pointer-events: none;
+    color: var(--ink-mute); pointer-events: none;
   }
 
-  /* Grid — smaller cards (minmax 200px → ~절반 크기) */
+  /* ==================== CARD (방식 B) ==================== */
   .materials-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
   }
 
+  /* 카드는 이제 <div> (링크 아님) */
   .material-card {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 2px;
-    padding: 1.1rem 1rem;
-    text-decoration: none;
-    color: var(--ink);
+    padding: 1.1rem 1rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.45rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow);
+    animation: fadeUp 0.5s ease both;
   }
-
   .material-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0;
-    width: 100%;
-    height: 2px;
+    width: 100%; height: 2px;
     background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.4s ease;
   }
-
   .material-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-hover);
@@ -293,46 +233,76 @@
     color: var(--accent);
     letter-spacing: 0.05em;
   }
-
   .card-title {
     font-family: 'Noto Serif KR', serif;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
     line-height: 1.4;
     color: var(--ink);
   }
-
   .card-description {
     font-size: 0.78rem;
     color: var(--ink-soft);
     line-height: 1.6;
-    flex-grow: 1;
   }
 
-  .card-footer {
+  /* ── 3개 버튼 영역 ── */
+  .card-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.25rem;
-    padding-top: 0.6rem;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 10px;
     border-top: 1px dashed var(--line);
   }
 
-  .card-tag {
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1.5px solid;
     font-family: 'Inter', sans-serif;
-    font-size: 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--ink-mute);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    background: transparent;
   }
+  .action-btn:hover { opacity: 0.82; transform: translateX(2px); }
+  .action-btn:active { transform: scale(0.97); }
 
-  .card-arrow {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-    color: var(--accent);
-    transition: transform 0.3s ease;
+  /* 플래시카드 — 파랑 */
+  .btn-flash {
+    color: var(--blue);
+    border-color: rgba(45, 91, 227, 0.35);
+    background: rgba(45, 91, 227, 0.04);
   }
-  .material-card:hover .card-arrow { transform: translateX(4px); }
+  .btn-flash:hover { background: rgba(45, 91, 227, 0.09); border-color: var(--blue); }
+
+  /* 객관식 — 초록 */
+  .btn-mc {
+    color: var(--green);
+    border-color: rgba(26, 158, 111, 0.35);
+    background: rgba(26, 158, 111, 0.04);
+  }
+  .btn-mc:hover { background: rgba(26, 158, 111, 0.09); border-color: var(--green); }
+
+  /* 주관식 — 주황 */
+  .btn-subj {
+    color: var(--orange);
+    border-color: rgba(227, 80, 45, 0.35);
+    background: rgba(227, 80, 45, 0.04);
+  }
+  .btn-subj:hover { background: rgba(227, 80, 45, 0.09); border-color: var(--orange); }
+
+  .btn-label { display: flex; align-items: center; gap: 6px; }
+  .btn-icon { font-size: 0.85rem; }
+  .btn-arrow { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; opacity: 0.7; }
 
   .no-results {
     grid-column: 1 / -1;
@@ -349,7 +319,6 @@
     padding: 3rem 2rem;
     margin-top: 4rem;
   }
-
   .footer-inner {
     max-width: 1180px;
     margin: 0 auto;
@@ -359,56 +328,35 @@
     flex-wrap: wrap;
     gap: 1.5rem;
   }
-
   .footer-text {
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     color: var(--ink-mute);
   }
-  .footer-text em {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    color: var(--accent);
-  }
+  .footer-text em { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--accent); }
 
   /* ==================== ANIMATIONS ==================== */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .hero > *, .section-header, .search-wrap {
-    animation: fadeUp 0.8s ease both;
-  }
-  .material-card {
-    animation: fadeUp 0.5s ease both;
-  }
+  .hero > *, .section-header, .search-wrap { animation: fadeUp 0.8s ease both; }
 
   /* ==================== RESPONSIVE ==================== */
   @media (max-width: 768px) {
     .header-inner { padding: 1rem 1.25rem; }
     .nav { gap: 1.25rem; font-size: 0.85rem; }
-    .hero {
-      grid-template-columns: 1fr;
-      padding: 4rem 1.25rem 3rem;
-      gap: 2rem;
-    }
-    .hero-meta {
-      border-left: none;
-      border-top: 1px solid var(--line);
-      padding-left: 0;
-      padding-top: 1.5rem;
-      text-align: left;
-    }
+    .hero { grid-template-columns: 1fr; padding: 4rem 1.25rem 3rem; gap: 2rem; }
     .tab-bar { padding: 1.5rem 1.25rem 0; }
     .materials-section { padding: 3rem 1.25rem 4rem; }
-    .section-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
     .materials-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-    .material-card { padding: 1rem 0.875rem; }
+    .material-card { padding: 1rem 0.875rem 0.875rem; }
     .footer-inner { flex-direction: column; text-align: center; }
+  }
+
+  @media (max-width: 420px) {
+    .materials-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -419,7 +367,7 @@
   <div class="header-inner">
     <a href="#" class="logo">BAROG English</a>
     <nav class="nav">
-      <a onclick="switchTab('wrong')" id="nav-wrong" class="active">오답단어</a>
+      <a id="nav-wrong" class="active">오답단어</a>
     </nav>
   </div>
 </header>
@@ -431,12 +379,10 @@
   </div>
 </section>
 
-<!-- 탭 버튼 -->
 <div class="tab-bar">
-  <button class="tab-btn active" id="tab-wrong" onclick="switchTab('wrong')">오답단어</button>
+  <button class="tab-btn active" id="tab-wrong">오답단어</button>
 </div>
 
-<!-- 오답단어 섹션 -->
 <main class="materials-section visible" id="section-wrong">
   <div class="section-header">
     <h2 class="section-title">오답단어 <em></em></h2>
@@ -462,41 +408,37 @@
 
 <script>
   /* =============================================================
-     오답단어 자료 목록
+     ★ 설정: 학생 이름 (구글 시트 탭 이름과 정확히 일치해야 함)
+     ============================================================= */
+  const STUDENT = '조문정';  // ← 각 학생 홈페이지마다 이 이름만 바꾸면 됨
+
+  /* =============================================================
+     ★ 오답단어 자료 목록
+     각 항목:
+       title       — 카드에 표시할 날짜 제목 (예: "5월 13일")
+       description — 부제 (예: "화요일")
+       start       — 시작 날짜 YYYY-MM-DD
+       end         — 종료 날짜 YYYY-MM-DD (하루면 start와 동일하게)
      ============================================================= */
   const wrongMaterials = [
-
- {
-      filename: "lesson-03.html",
-      title: "5월 10일",
-      description: "일요일",
-      tag: "."
-  },
-
-    {
-      filename: "lesson-02.html",
-      title: "5월 7일",
-      description: "목요일",
-      tag: "."
-  },
-
-      {
-      filename: "lesson-01.html",
-      title: "5월 2일",
-      description: "토요일",
-      tag: "."
-    }
-
-
-
+    { title: "5월 17일", description: "토요일", start: "2026-05-17", end: "2026-05-17" },
+    { title: "5월 16일",  description: "목요일", start: "2026-05-16", end: "2026-05-16" },
+    { title: "5월 14일",  description: "금요일", start: "2026-0514", end: "2026-05-14" }
   ];
 
-
+  /* =============================================================
+     카드 렌더링
+     ============================================================= */
   function pad(n) { return String(n).padStart(2, '0'); }
 
-  function renderMaterials(list, gridId, countId) {
-    const grid = document.getElementById(gridId);
-    const countDisplay = document.getElementById(countId);
+  function makeUrl(page, item) {
+    const base = page; // 같은 폴더에 있으므로 파일명만
+    return `${base}?student=${encodeURIComponent(STUDENT)}&start=${item.start}&end=${item.end}`;
+  }
+
+  function renderMaterials(list) {
+    const grid = document.getElementById('grid-wrong');
+    const countDisplay = document.getElementById('count-wrong');
     grid.innerHTML = '';
 
     if (list.length === 0) {
@@ -507,18 +449,32 @@
 
     countDisplay.textContent = `전체 ${list.length}개 자료`;
 
-    list.forEach((item, idx) => {
-      const card = document.createElement('a');
+    list.forEach((item, i) => {
+      const card = document.createElement('div');
       card.className = 'material-card';
-      card.href = `materials/${item.filename}`;
-      card.style.animationDelay = `${0.04 * idx}s`;
+      card.style.animationDelay = `${0.05 * i}s`;
+
+      const flashUrl = makeUrl('flashcard_live.html', item);
+      const mcUrl    = makeUrl('quiz_mc_live.html', item);
+      const subjUrl  = makeUrl('quiz_subj_live.html', item);
+
       card.innerHTML = `
-        <div class="card-number">No. ${pad(idx + 1)}</div>
+        <div class="card-number">No. ${pad(i + 1)}</div>
         <div class="card-title">${item.title}</div>
         <div class="card-description">${item.description}</div>
-        <div class="card-footer">
-          <span class="card-tag">${item.tag}</span>
-          <span class="card-arrow">→</span>
+        <div class="card-actions">
+          <a class="action-btn btn-flash" href="${flashUrl}">
+            <span class="btn-label"><span class="btn-icon">📇</span> 플래시카드</span>
+            <span class="btn-arrow">→</span>
+          </a>
+          <a class="action-btn btn-mc" href="${mcUrl}">
+            <span class="btn-label"><span class="btn-icon">🔤</span> 객관식 퀴즈</span>
+            <span class="btn-arrow">→</span>
+          </a>
+          <a class="action-btn btn-subj" href="${subjUrl}">
+            <span class="btn-label"><span class="btn-icon">✏️</span> 주관식 퀴즈</span>
+            <span class="btn-arrow">→</span>
+          </a>
         </div>
       `;
       grid.appendChild(card);
@@ -530,18 +486,15 @@
     if (!k) return list;
     return list.filter(m =>
       m.title.toLowerCase().includes(k) ||
-      m.description.toLowerCase().includes(k) ||
-      m.tag.toLowerCase().includes(k)
+      m.description.toLowerCase().includes(k)
     );
   }
 
-  // 검색 이벤트
   document.getElementById('search-wrong').addEventListener('input', (e) => {
-    renderMaterials(filterMaterials(wrongMaterials, e.target.value), 'grid-wrong', 'count-wrong');
+    renderMaterials(filterMaterials(wrongMaterials, e.target.value));
   });
 
-  // 초기 렌더
-  renderMaterials(wrongMaterials, 'grid-wrong', 'count-wrong');
+  renderMaterials(wrongMaterials);
 </script>
 
 </body>
