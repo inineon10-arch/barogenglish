@@ -9,132 +9,136 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+KR:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f1ea; --bg-alt: #ebe5d9;
-    --ink: #1f2a30; --ink-soft: #4a5560; --ink-mute: #7a8590;
-    --accent: #6b4423; --accent-soft: #a07855;
-    --line: #d6cfc0; --card: #fbf8f2;
-    --shadow: 0 1px 2px rgba(31,42,48,.04), 0 8px 24px rgba(31,42,48,.06);
-    --shadow-hover: 0 2px 4px rgba(31,42,48,.06), 0 16px 40px rgba(31,42,48,.10);
-    --blue: #2d5be3; --orange: #e3502d; --green: #1a9e6f; --purple: #7036e3;
+    --bg:#f5f1ea; --bg-alt:#ebe5d9;
+    --ink:#1f2a30; --ink-soft:#4a5560; --ink-mute:#7a8590;
+    --accent:#6b4423; --accent-soft:#a07855;
+    --line:#d6cfc0; --card:#fbf8f2;
+    --shadow:0 1px 2px rgba(31,42,48,.04),0 8px 24px rgba(31,42,48,.06);
+    --shadow-hover:0 2px 4px rgba(31,42,48,.06),0 16px 40px rgba(31,42,48,.10);
+    --purple:#7036e3;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'Noto Serif KR','Cormorant Garamond',Georgia,serif;
-    background: var(--bg); color: var(--ink); line-height: 1.7; min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Noto Serif KR','Cormorant Garamond',Georgia,serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;min-height:100vh;
+    -webkit-font-smoothing:antialiased;
     background-image:
-      radial-gradient(ellipse at top left, rgba(160,120,85,.06), transparent 50%),
-      radial-gradient(ellipse at bottom right, rgba(107,68,35,.04), transparent 50%);
+      radial-gradient(ellipse at top left,rgba(160,120,85,.06),transparent 50%),
+      radial-gradient(ellipse at bottom right,rgba(107,68,35,.04),transparent 50%);
   }
-  .site-header {
-    border-bottom: 1px solid var(--line);
-    background: rgba(245,241,234,.85); backdrop-filter: blur(12px);
-    position: sticky; top: 0; z-index: 100;
+
+  /* HEADER */
+  .site-header{border-bottom:1px solid var(--line);background:rgba(245,241,234,.85);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+  .header-inner{max-width:1180px;margin:0 auto;padding:1.25rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;letter-spacing:.02em;color:var(--ink);text-decoration:none;}
+  .nav{display:flex;gap:2rem;font-family:'Inter',sans-serif;font-size:.9rem;}
+  .nav a{color:var(--ink-soft);text-decoration:none;cursor:pointer;padding-bottom:2px;border-bottom:1px solid transparent;transition:color .2s,border-color .2s;}
+  .nav a:hover{color:var(--accent);}
+  .nav a.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .nav a.vocab-nav.active{color:var(--purple);border-bottom-color:var(--purple);}
+
+  /* HERO */
+  .hero{max-width:1180px;margin:0 auto;padding:6rem 2rem 5rem;display:grid;grid-template-columns:1fr auto;gap:3rem;align-items:end;border-bottom:1px solid var(--line);}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,6vw,4.5rem);font-weight:500;line-height:1.05;letter-spacing:-.01em;margin-bottom:1.5rem;}
+  .hero h1 em{font-style:italic;color:var(--accent);font-weight:400;}
+  .hero-subtitle{font-size:1.05rem;color:var(--ink-soft);max-width:540px;line-height:1.8;}
+
+  /* TAB BAR */
+  .tab-bar{max-width:1180px;margin:0 auto;padding:2.5rem 2rem 0;display:flex;border-bottom:1px solid var(--line);}
+  .tab-btn{font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:500;color:var(--ink-mute);background:none;border:none;border-bottom:2px solid transparent;padding:.75rem 1.75rem;margin-bottom:-1px;cursor:pointer;letter-spacing:.02em;transition:color .2s,border-color .2s;}
+  .tab-btn:hover{color:var(--ink-soft);}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-btn.vocab-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
+
+  /* SECTIONS */
+  .materials-section{max-width:1180px;margin:0 auto;padding:4rem 2rem 6rem;display:none;}
+  .materials-section.visible{display:block;}
+  .section-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line);}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:500;letter-spacing:-.005em;}
+  .section-title em{font-style:italic;color:var(--accent);}
+  .section-title.vocab-title em{color:var(--purple);}
+  .section-count{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--ink-mute);letter-spacing:.05em;}
+
+  /* SEARCH */
+  .search-wrap{margin-bottom:2.5rem;position:relative;max-width:480px;}
+  .search-input{width:100%;padding:.9rem 1.1rem .9rem 2.8rem;font-family:'Noto Serif KR',serif;font-size:.95rem;background:var(--card);border:1px solid var(--line);border-radius:2px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
+  .search-input:focus{border-color:var(--accent-soft);box-shadow:0 0 0 3px rgba(160,120,85,.1);}
+  .search-input::placeholder{color:var(--ink-mute);font-style:italic;}
+  .search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--ink-mute);pointer-events:none;}
+
+  /* ── 오답단어 카드 그리드 ── */
+  .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+  .material-card{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:1.1rem 1rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.5rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s ease both;}
+  .material-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+  .material-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent-soft);}
+  .material-card:hover::before{transform:scaleX(1);}
+  .card-number{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.75rem;color:var(--accent);letter-spacing:.05em;}
+  .card-title{font-family:'Noto Serif KR',serif;font-size:.95rem;font-weight:600;line-height:1.4;color:var(--ink);}
+  .card-description{font-size:.78rem;color:var(--ink-soft);line-height:1.6;flex-grow:1;}
+  .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:.25rem;padding-top:.6rem;border-top:1px dashed var(--line);}
+  .card-tag{font-family:'Inter',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-mute);}
+  .card-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--accent);transition:transform .3s;}
+  .material-card:hover .card-arrow{transform:translateX(4px);}
+
+  /* ── 진도단어 플래시카드 ── */
+  .vocab-meta-bar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;}
+  .vocab-stat{font-family:'Inter',sans-serif;font-size:.75rem;color:var(--ink-mute);}
+  .vocab-stat strong{color:var(--purple);font-weight:600;}
+  .vocab-flip-btn{font-family:'Inter',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1.1rem;border-radius:20px;border:1.5px solid rgba(112,54,227,.35);background:rgba(112,54,227,.04);color:var(--purple);cursor:pointer;transition:all .2s;margin-left:auto;}
+  .vocab-flip-btn:hover{background:rgba(112,54,227,.12);border-color:var(--purple);}
+
+  .vocab-grid{display:flex;flex-direction:column;gap:2.5rem;}
+  .vocab-day-group{}
+  .day-label{font-family:'Inter',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.6rem;}
+  .day-badge{background:rgba(112,54,227,.1);color:var(--purple);border-radius:20px;padding:2px 10px;font-size:.65rem;font-weight:600;}
+
+  .vocab-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.65rem;}
+
+  .vcard{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.85rem .8rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,48,.04);user-select:none;-webkit-user-select:none;}
+  .vcard::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);transform:scaleY(0);transform-origin:top;transition:transform .3s;}
+  .vcard:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(112,54,227,.12);border-color:rgba(112,54,227,.3);}
+  .vcard:hover::before{transform:scaleY(1);}
+  .vcard.open{background:rgba(112,54,227,.03);border-color:rgba(112,54,227,.22);}
+  .vcard.open::before{transform:scaleY(1);}
+
+  .vcard-pos{display:inline-block;font-family:'Inter',sans-serif;font-size:.56rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(112,54,227,.08);color:var(--purple);border-radius:10px;padding:1px 7px;margin-bottom:.3rem;}
+  .vcard-en{font-family:'Inter',sans-serif;font-size:.88rem;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+  .vcard-ko{font-size:.76rem;color:var(--ink-soft);line-height:1.5;margin-top:.3rem;display:none;}
+  .vcard-hint{font-size:.6rem;color:var(--ink-mute);margin-top:.25rem;}
+  .vcard.open .vcard-ko{display:block;}
+  .vcard.open .vcard-hint{display:none;}
+
+  /* 로딩 */
+  .loading-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--ink-mute);font-family:'Inter',sans-serif;font-size:.85rem;}
+  .spinner{width:30px;height:30px;border:2.5px solid var(--line);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .no-results{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--ink-mute);font-style:italic;}
+
+  /* FOOTER */
+  .site-footer{border-top:1px solid var(--line);background:var(--bg-alt);padding:3rem 2rem;margin-top:4rem;}
+  .footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;}
+  .footer-text{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--ink-mute);}
+  .footer-text em{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--accent);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .hero > *,.section-header,.search-wrap{animation:fadeUp .8s ease both;}
+  .material-card{animation:fadeUp .5s ease both;}
+
+  @media(max-width:768px){
+    .header-inner{padding:1rem 1.25rem;} .nav{gap:1.25rem;font-size:.85rem;}
+    .hero{grid-template-columns:1fr;padding:4rem 1.25rem 3rem;gap:2rem;}
+    .tab-bar{padding:1.5rem 1.25rem 0;} .materials-section{padding:3rem 1.25rem 4rem;}
+    .section-header{flex-direction:column;align-items:flex-start;gap:.5rem;}
+    .materials-grid{grid-template-columns:repeat(2,1fr);gap:.75rem;}
+    .material-card{padding:1rem .875rem;}
+    .vocab-cards{grid-template-columns:repeat(2,1fr);}
+    .footer-inner{flex-direction:column;text-align:center;}
   }
-  .header-inner {
-    max-width: 1180px; margin: 0 auto; padding: 1.25rem 2rem;
-    display: flex; justify-content: space-between; align-items: center;
+  @media(max-width:420px){
+    .materials-grid{grid-template-columns:1fr;}
   }
-  .logo { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; letter-spacing:.02em; color:var(--ink); text-decoration:none; }
-  .nav { display:flex; gap:2rem; font-family:'Inter',sans-serif; font-size:.9rem; }
-  .nav a { color:var(--ink-soft); text-decoration:none; cursor:pointer; padding-bottom:2px; border-bottom:1px solid transparent; transition:color .2s,border-color .2s; }
-  .nav a:hover { color:var(--accent); }
-  .nav a.active { color:var(--accent); border-bottom-color:var(--accent); }
-
-  .hero {
-    max-width:1180px; margin:0 auto; padding:6rem 2rem 5rem;
-    display:grid; grid-template-columns:1fr auto; gap:3rem; align-items:end;
-    border-bottom:1px solid var(--line);
-  }
-  .hero h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.8rem,6vw,4.5rem); font-weight:500; line-height:1.05; letter-spacing:-.01em; margin-bottom:1.5rem; }
-  .hero h1 em { font-style:italic; color:var(--accent); font-weight:400; }
-  .hero-subtitle { font-size:1.05rem; color:var(--ink-soft); max-width:540px; line-height:1.8; }
-
-  .tab-bar { max-width:1180px; margin:0 auto; padding:2.5rem 2rem 0; display:flex; gap:.5rem; border-bottom:1px solid var(--line); }
-  .tab-btn { font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:500; color:var(--ink-mute); background:none; border:none; border-bottom:2px solid transparent; padding:.75rem 1.75rem; margin-bottom:-1px; cursor:pointer; letter-spacing:.02em; transition:color .2s,border-color .2s; }
-  .tab-btn:hover { color:var(--ink-soft); }
-  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
-
-  .materials-section { max-width:1180px; margin:0 auto; padding:4rem 2rem 6rem; display:none; }
-  .materials-section.visible { display:block; }
-  .section-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3rem; padding-bottom:1.5rem; border-bottom:1px solid var(--line); }
-  .section-title { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:500; letter-spacing:-.005em; }
-  .section-title em { font-style:italic; color:var(--accent); }
-  .section-count { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--ink-mute); letter-spacing:.05em; }
-
-  .search-wrap { margin-bottom:2.5rem; position:relative; max-width:480px; }
-  .search-input { width:100%; padding:.9rem 1.1rem .9rem 2.8rem; font-family:'Noto Serif KR',serif; font-size:.95rem; background:var(--card); border:1px solid var(--line); border-radius:2px; color:var(--ink); outline:none; transition:border-color .2s,box-shadow .2s; }
-  .search-input:focus { border-color:var(--accent-soft); box-shadow:0 0 0 3px rgba(160,120,85,.1); }
-  .search-input::placeholder { color:var(--ink-mute); font-style:italic; }
-  .search-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--ink-mute); pointer-events:none; }
-
-  .materials-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; }
-
-  .material-card {
-    background:var(--card); border:1px solid var(--line); border-radius:2px;
-    padding:1.1rem 1rem 1rem; display:flex; flex-direction:column; gap:.45rem;
-    transition:transform .3s,box-shadow .3s,border-color .3s;
-    position:relative; overflow:hidden; box-shadow:var(--shadow);
-    animation:fadeUp .5s ease both;
-  }
-  .material-card::before {
-    content:''; position:absolute; top:0; left:0; width:100%; height:2px;
-    background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform .4s;
-  }
-  .material-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-hover); border-color:var(--accent-soft); }
-  .material-card:hover::before { transform:scaleX(1); }
-
-  /* 단어장 카드 - 보라 강조선 */
-  .material-card.vocab-card::before { background:var(--purple); }
-  .material-card.vocab-card:hover { border-color:rgba(112,54,227,.4); }
-
-  .card-number { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.75rem; color:var(--accent); letter-spacing:.05em; }
-  .material-card.vocab-card .card-number { color:var(--purple); }
-  .card-title { font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:600; line-height:1.4; color:var(--ink); }
-  .card-description { font-size:.78rem; color:var(--ink-soft); line-height:1.6; }
-
-  .card-actions { display:flex; flex-direction:column; gap:6px; margin-top:8px; padding-top:10px; border-top:1px dashed var(--line); }
-  .action-btn {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:8px 12px; border-radius:6px; border:1.5px solid;
-    font-family:'Inter',sans-serif; font-size:.72rem; font-weight:600;
-    letter-spacing:.06em; text-transform:uppercase; text-decoration:none;
-    cursor:pointer; transition:all .18s; background:transparent;
-  }
-  .action-btn:hover { opacity:.82; transform:translateX(2px); }
-  .action-btn:active { transform:scale(.97); }
-
-  .btn-flash { color:var(--blue); border-color:rgba(45,91,227,.35); background:rgba(45,91,227,.04); }
-  .btn-flash:hover { background:rgba(45,91,227,.09); border-color:var(--blue); }
-  .btn-quiz { color:var(--green); border-color:rgba(26,158,111,.35); background:rgba(26,158,111,.04); }
-  .btn-quiz:hover { background:rgba(26,158,111,.09); border-color:var(--green); }
-  .btn-vocab { color:var(--purple); border-color:rgba(112,54,227,.35); background:rgba(112,54,227,.04); }
-  .btn-vocab:hover { background:rgba(112,54,227,.09); border-color:var(--purple); }
-
-  .btn-label { display:flex; align-items:center; gap:6px; }
-  .btn-icon { font-size:.85rem; }
-  .btn-arrow { font-family:'Cormorant Garamond',serif; font-size:.95rem; opacity:.7; }
-
-  .no-results { grid-column:1/-1; text-align:center; padding:4rem 2rem; color:var(--ink-mute); font-style:italic; }
-
-  .site-footer { border-top:1px solid var(--line); background:var(--bg-alt); padding:3rem 2rem; margin-top:4rem; }
-  .footer-inner { max-width:1180px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; }
-  .footer-text { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--ink-mute); }
-  .footer-text em { font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--accent); }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  .hero > *, .section-header, .search-wrap { animation:fadeUp .8s ease both; }
-
-  @media(max-width:768px) {
-    .header-inner{padding:1rem 1.25rem} .nav{gap:1.25rem;font-size:.85rem}
-    .hero{grid-template-columns:1fr;padding:4rem 1.25rem 3rem;gap:2rem}
-    .tab-bar{padding:1.5rem 1.25rem 0} .materials-section{padding:3rem 1.25rem 4rem}
-    .section-header{flex-direction:column;align-items:flex-start;gap:.5rem}
-    .materials-grid{grid-template-columns:repeat(2,1fr);gap:.75rem}
-    .material-card{padding:1rem .875rem .875rem} .footer-inner{flex-direction:column;text-align:center}
-  }
-  @media(max-width:420px) { .materials-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -142,33 +146,60 @@
 <header class="site-header">
   <div class="header-inner">
     <a href="#" class="logo">BAROG English</a>
-    <nav class="nav"><a id="nav-wrong" class="active">오답학습</a></nav>
+    <nav class="nav">
+      <a onclick="switchTab('wrong')" id="nav-wrong" class="active">오답단어</a>
+      <a onclick="switchTab('vocab')" id="nav-vocab" class="vocab-nav">진도단어</a>
+    </nav>
   </div>
 </header>
 
 <section class="hero">
   <div>
     <h1>Practice<br><em>makes</em> Perfect</h1>
-    <p class="hero-subtitle">틀린 문제를 내 것으로 만드는 학습을 시작하세요.</p>
+    <p class="hero-subtitle">오늘의 오답은 내일의 실력이 됩니다.</p>
   </div>
 </section>
 
 <div class="tab-bar">
-  <button class="tab-btn active" id="tab-wrong">오답학습</button>
+  <button class="tab-btn active"   id="tab-wrong" onclick="switchTab('wrong')">오답단어</button>
+  <button class="tab-btn vocab-tab" id="tab-vocab" onclick="switchTab('vocab')">진도단어</button>
 </div>
 
+<!-- ★ 오답단어 — 수동 파일 링크 (플래시카드) -->
 <main class="materials-section visible" id="section-wrong">
   <div class="section-header">
-    <h2 class="section-title">오답학습 <em></em></h2>
+    <h2 class="section-title">오답단어 <em></em></h2>
     <div class="section-count" id="count-wrong">전체 자료</div>
   </div>
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
-    <input type="text" class="search-input" id="search-wrong" placeholder="날짜나 설명으로 검색하세요." aria-label="오답학습 검색">
+    <input type="text" class="search-input" id="search-wrong" placeholder="날짜로 검색하세요." aria-label="오답단어 검색">
   </div>
   <div class="materials-grid" id="grid-wrong"></div>
+</main>
+
+<!-- ★ 진도단어 — 구글 시트 자동 로딩 플래시카드 -->
+<main class="materials-section" id="section-vocab">
+  <div class="section-header">
+    <h2 class="section-title vocab-title">진도단어 <em></em></h2>
+    <div class="section-count" id="count-vocab">불러오는 중...</div>
+  </div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input type="text" class="search-input" id="search-vocab" placeholder="단어나 뜻으로 검색하세요.">
+  </div>
+  <div class="vocab-meta-bar" id="vocab-meta" style="display:none">
+    <span class="vocab-stat">단어 <strong id="vocab-total">0</strong>개</span>
+    <span class="vocab-stat">· Day <strong id="vocab-days">0</strong>개</span>
+    <button class="vocab-flip-btn" onclick="flipAll()">전체 뒤집기</button>
+  </div>
+  <div id="vocab-content">
+    <div class="loading-box"><div class="spinner"></div><span>단어 불러오는 중...</span></div>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -178,95 +209,185 @@
 </footer>
 
 <script>
-  // ★ 학생 이름 설정
-  const STUDENT = '조문정';
+/* ============================================================
+   ★ 오답단어 목록 — 새 시험 후 여기에 한 줄씩 추가
+   ============================================================ */
+const wrongMaterials = [
+  { filename:"lesson-04.html", title:"5월 15일", description:"금요일", tag:"." },
+  { filename:"lesson-03.html", title:"5월 13일", description:"수요일", tag:"." },
+  { filename:"lesson-02.html", title:"5월 10일", description:"일요일", tag:"." },
+  { filename:"lesson-01.html", title:"5월 6일",  description:"수요일", tag:"." },
+];
 
-  // ★ 오답 학습 목록 — 날짜/제목 추가 시 여기에 한 줄씩
-  const wrongMaterials = [
-    { title: "5월 10일", description: "화요시험", start: "2026-05-10", end: "2026-05-10" },
-    { title: "5월 16일",  description: "금요시험", start: "2026-05-16", end: "2026-05-16" },
-    { title: "5월 14일",  description: "수요시험", start: "2026-05-14", end: "2026-05-14" }
-  ];
+/* ============================================================
+   ★ 진도단어 구글 시트 — 웹에 게시 CSV URL
+   ============================================================ */
+const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv';
 
-  function pad(n) { return String(n).padStart(2, '0'); }
+/* ============================================================
+   탭 전환
+   ============================================================ */
+function switchTab(t) {
+  ['wrong','vocab'].forEach(id => {
+    document.getElementById('section-'+id).classList.toggle('visible', id===t);
+    document.getElementById('tab-'+id).classList.toggle('active', id===t);
+    const n = document.getElementById('nav-'+id);
+    if(n) n.classList.toggle('active', id===t);
+  });
+  if(t==='vocab' && !vocabLoaded) loadVocab();
+}
 
-  function makeUrl(page, item) {
-    return `${page}?student=${encodeURIComponent(STUDENT)}&start=${item.start}&end=${item.end}`;
-  }
+/* ============================================================
+   오답단어 렌더
+   ============================================================ */
+function pad(n){ return String(n).padStart(2,'0'); }
 
-  function renderMaterials(list) {
-    const grid = document.getElementById('grid-wrong');
-    const countDisplay = document.getElementById('count-wrong');
-    grid.innerHTML = '';
+function renderWrong(list) {
+  const grid = document.getElementById('grid-wrong');
+  const cnt  = document.getElementById('count-wrong');
+  grid.innerHTML = '';
+  if(!list.length){ grid.innerHTML='<div class="no-results">자료가 없습니다.</div>'; cnt.textContent='자료 없음'; return; }
+  cnt.textContent = `전체 ${list.length}개 자료`;
+  list.forEach((item,i) => {
+    const a = document.createElement('a');
+    a.className = 'material-card';
+    a.href = `materials/${item.filename}`;
+    a.style.animationDelay = `${0.04*i}s`;
+    a.innerHTML = `
+      <div class="card-number">No. ${pad(i+1)}</div>
+      <div class="card-title">${esc(item.title)}</div>
+      <div class="card-description">${esc(item.description)}</div>
+      <div class="card-footer"><span class="card-tag">${esc(item.tag)}</span><span class="card-arrow">→</span></div>`;
+    grid.appendChild(a);
+  });
+}
+document.getElementById('search-wrong').addEventListener('input', e => {
+  const k = e.target.value.trim().toLowerCase();
+  renderWrong(k ? wrongMaterials.filter(m => m.title.toLowerCase().includes(k)||m.description.toLowerCase().includes(k)) : wrongMaterials);
+});
+renderWrong(wrongMaterials);
 
-    if (list.length === 0) {
-      grid.innerHTML = '<div class="no-results">자료를 찾을 수 없습니다.</div>';
-      countDisplay.textContent = '자료 없음';
-      return;
+/* ============================================================
+   진도단어 — CSV 로딩
+   ============================================================ */
+let vocabLoaded = false;
+let allWords = [];
+let allOpen  = false;
+
+function csvSplit(line) {
+  const r=[]; let cur='', q=false;
+  for(const c of line){ if(c==='"'){q=!q;}else if(c===','&&!q){r.push(cur);cur='';}else{cur+=c;} }
+  r.push(cur); return r;
+}
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const heads = csvSplit(lines[0]);
+  return lines.slice(1).map(l => {
+    const v = csvSplit(l), o={};
+    heads.forEach((h,i) => o[h.trim()]=(v[i]||'').trim());
+    return o;
+  });
+}
+
+async function loadVocab() {
+  vocabLoaded = true;
+  try {
+    const res = await fetch(VOCAB_CSV);
+    if(!res.ok) throw new Error('시트를 불러올 수 없습니다 ('+res.status+')');
+    const rows = parseCSV(await res.text());
+    const keys = Object.keys(rows[0]||{});
+
+    /* 헤더 자동 감지 */
+    const wk = keys.find(k=>/^단어$/i.test(k.trim()));
+    const mk = keys.find(k=>/^뜻$/i.test(k.trim()));
+    if(wk && mk) {
+      /* 원래 형식: 단어, 뜻, 품사, 출처날짜 ... */
+      const pk = keys.find(k=>/^품사$/i.test(k.trim()))||'';
+      const dk = keys.find(k=>/출처|날짜|date/i.test(k.trim()))||'';
+      allWords = rows.filter(r=>r[wk]&&r[mk]).map(r=>({
+        day:(dk?r[dk]:'')||'',
+        word:r[wk], meaning:r[mk],
+        pos:pk?r[pk]:''
+      }));
+    } else {
+      /* 헤더 없음 — 3컬럼: Day, 단어, 뜻 */
+      const k0=keys[0],k1=keys[1],k2=keys[2];
+      allWords = rows.filter(r=>r[k1]&&r[k2]&&!/^Day\s/i.test((r[k1]||'').trim())).map(r=>({
+        day:(r[k0]||'').trim(), word:r[k1].trim(), meaning:r[k2].trim(), pos:''
+      }));
     }
 
-    countDisplay.textContent = `전체 ${list.length + 1}개 자료`;
+    if(!allWords.length) throw new Error('단어가 없습니다.');
+    renderVocab(allWords);
+  } catch(e) {
+    document.getElementById('vocab-content').innerHTML=`<div class="loading-box" style="color:#d94040">⚠️ ${e.message}</div>`;
+    document.getElementById('count-vocab').textContent='로딩 실패';
+  }
+}
 
-    // 오답 카드들 (flashcard + 통합퀴즈)
-    list.forEach((item, i) => {
-      const card = document.createElement('div');
-      card.className = 'material-card';
-      card.style.animationDelay = `${0.05 * i}s`;
+/* ============================================================
+   진도단어 렌더 — Day별 그룹 플래시카드
+   ============================================================ */
+function renderVocab(words) {
+  /* Day 그룹 */
+  const groups={};
+  words.forEach(w=>{ const d=w.day||'기타'; if(!groups[d])groups[d]=[]; groups[d].push(w); });
+  const days = Object.keys(groups);
 
-      const flashUrl = makeUrl('flashcard_live.html', item);
-      const quizUrl  = makeUrl('quiz_live.html', item) + '&mode=student';
+  document.getElementById('count-vocab').textContent=`전체 ${words.length}개 단어`;
+  document.getElementById('vocab-total').textContent=words.length;
+  document.getElementById('vocab-days').textContent=days.length;
+  document.getElementById('vocab-meta').style.display='flex';
 
-      card.innerHTML = `
-        <div class="card-number">No. ${pad(i + 1)}</div>
-        <div class="card-title">${item.title}</div>
-        <div class="card-description">${item.description}</div>
-        <div class="card-actions">
-          <a class="action-btn btn-flash" href="${flashUrl}">
-            <span class="btn-label"><span class="btn-icon">📗</span> 플래시카드</span>
-            <span class="btn-arrow">→</span>
-          </a>
-          <a class="action-btn btn-quiz" href="${quizUrl}">
-            <span class="btn-label"><span class="btn-icon">📝</span> 퀴즈 (객관식 + 주관식)</span>
-            <span class="btn-arrow">→</span>
-          </a>
-        </div>
-      `;
-      grid.appendChild(card);
+  const box = document.getElementById('vocab-content');
+  box.innerHTML='';
+  const grid = document.createElement('div');
+  grid.className='vocab-grid';
+
+  days.forEach(day => {
+    const grp = document.createElement('div');
+    grp.className='vocab-day-group';
+
+    const lbl = document.createElement('div');
+    lbl.className='day-label';
+    lbl.innerHTML=`<span class="day-badge">${esc(day)}</span>${groups[day].length}개 단어`;
+    grp.appendChild(lbl);
+
+    const cards = document.createElement('div');
+    cards.className='vocab-cards';
+
+    groups[day].forEach(w => {
+      const c = document.createElement('div');
+      c.className='vcard';
+      c.innerHTML=`
+        ${w.pos?`<div class="vcard-pos">${esc(w.pos)}</div>`:''}
+        <div class="vcard-en">${esc(w.word)}</div>
+        <div class="vcard-ko">${esc(w.meaning)}</div>
+        <div class="vcard-hint">탭해서 뜻 보기</div>`;
+      c.addEventListener('click', ()=>c.classList.toggle('open'));
+      cards.appendChild(c);
     });
 
-    // 단어장 퀴즈 카드 (항상 마지막에 고정)
-    const vocabCard = document.createElement('div');
-    vocabCard.className = 'material-card vocab-card';
-    vocabCard.style.animationDelay = `${0.05 * list.length}s`;
-    vocabCard.innerHTML = `
-      <div class="card-number">단어장</div>
-      <div class="card-title">단어장 플래시카드 & 퀴즈</div>
-      <div class="card-description">전체 오답 단어 50개 · 플래시카드 / 객관식 / 주관식 학습</div>
-      <div class="card-actions">
-        <a class="action-btn btn-vocab" href="quiz_live.html">
-          <span class="btn-label"><span class="btn-icon">📚</span> 단어장 퀴즈 시작</span>
-          <span class="btn-arrow">→</span>
-        </a>
-      </div>
-    `;
-    grid.appendChild(vocabCard);
-  }
-
-  function filterMaterials(list, keyword) {
-    const k = keyword.trim().toLowerCase();
-    if (!k) return list;
-    return list.filter(m =>
-      m.title.toLowerCase().includes(k) ||
-      m.description.toLowerCase().includes(k)
-    );
-  }
-
-  document.getElementById('search-wrong').addEventListener('input', (e) => {
-    renderMaterials(filterMaterials(wrongMaterials, e.target.value));
+    grp.appendChild(cards);
+    grid.appendChild(grp);
   });
 
-  renderMaterials(wrongMaterials);
-</script>
+  box.appendChild(grid);
+}
 
+function flipAll() {
+  allOpen = !allOpen;
+  document.querySelectorAll('.vcard').forEach(c=>c.classList.toggle('open', allOpen));
+  document.querySelector('.vocab-flip-btn').textContent = allOpen?'전체 닫기':'전체 뒤집기';
+}
+
+document.getElementById('search-vocab').addEventListener('input', e=>{
+  if(!allWords.length) return;
+  const k=e.target.value.trim().toLowerCase();
+  renderVocab(k?allWords.filter(w=>w.word.toLowerCase().includes(k)||w.meaning.toLowerCase().includes(k)||w.day.toLowerCase().includes(k)):allWords);
+});
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
 </body>
 </html>
