@@ -223,6 +223,8 @@ function swapCard(html,direction){
   return new Promise(resolve=>{
     const vp=document.getElementById('viewport');
     const old=cardEl;
+    // 기존 카드 transform 완전 초기화
+    if(old){old.style.transition='none';old.style.transform='translateX(0)';old.style.opacity='1';}
     const el=document.createElement('div');
     el.className='quiz-card no-transition';
     el.innerHTML=html;
@@ -235,10 +237,11 @@ function swapCard(html,direction){
       el.style.transform='translateX(0)';el.style.opacity='1';
       if(old){
         old.classList.remove('no-transition');
+        old.style.transition='transform 0.35s cubic-bezier(.4,0,.2,1),opacity 0.35s';
         old.style.transform=`translateX(${direction>0?'-100%':'100%'})`;
         old.style.opacity='0.3';
-        setTimeout(()=>{old.remove();isAnimating=false;resolve();},360);
-      } else {setTimeout(()=>{isAnimating=false;resolve();},360);}
+        setTimeout(()=>{if(old.parentNode)old.remove();isAnimating=false;resolve();},380);
+      } else {setTimeout(()=>{isAnimating=false;resolve();},380);}
     }));
   });
 }
@@ -422,9 +425,13 @@ function initSwipe(){
     const dx=ex-sX,dt=Date.now()-(window._swipeT||Date.now());
     const fast=Math.abs(dx)>SV;const far=Math.abs(dx)>SD;
     if(locked==='h'&&(fast||far)){
-      if(dx<0&&canNext()){if(c)c.style.transform='';goNext();}
-      else if(dx>0&&canPrev()){if(c)c.style.transform='';goPrev();}
-      else{if(c){c.style.transition='transform 0.3s cubic-bezier(.175,.885,.32,1.275)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},320);}}
+      if(dx<0&&canNext()){
+        if(c){c.style.transition='none';c.style.transform='translateX(0)';}
+        goNext();
+      } else if(dx>0&&canPrev()){
+        if(c){c.style.transition='none';c.style.transform='translateX(0)';}
+        goPrev();
+      } else{if(c){c.style.transition='transform 0.3s cubic-bezier(.175,.885,.32,1.275)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},320);}}
     } else {if(c)c.style.transform='';}
     locked=null;
   }
@@ -457,15 +464,32 @@ async function init(){
     if(data.error){showError(data.error);return;}
     if(!data.words||data.words.length===0){showError(`${_student}의 ${_start} 오답 데이터가 없어요.`);return;}
     data.words.forEach(w=>ALL_WORDS.push({num:w.num,word:w.word,pos:w.pos,correct:w.correct,student:w.student,tip:w.tip,example:w.example}));
-    // 헤더 업데이트
     document.querySelector('.header-left .name').textContent=`바로그영어 · ${data.student}`;
     const dp=data.startDate.split('-');
     const label=data.startDate===data.endDate?`${parseInt(dp[1])}월 ${parseInt(dp[2])}일`:`${parseInt(dp[1])}월 ${parseInt(dp[2])}일~${parseInt(data.endDate.split('-')[2])}일`;
     document.querySelector('.header-left .title').textContent=label+' 객관식 퀴즈';
     document.title=`객관식 퀴즈 – ${data.student}`;
-    renderIntro();initSwipe();
+    renderIntro();
   }catch(err){showError(`네트워크 오류: ${err.message}`);}
 }
+
+// ── 키보드 단축키 ──
+document.addEventListener('keydown', e => {
+  if((e.key==='ArrowLeft'||e.key===' ')&&!isAnimating){
+    e.preventDefault();
+    if((stage==='mc'||stage==='retry')&&answered) goNext();
+  }
+  if(e.key==='ArrowRight'&&!isAnimating){
+    if((stage==='mc'||stage==='retry')&&pos>0) goPrev();
+  }
+  if((stage==='mc'||stage==='retry')&&!answered&&!isAnimating){
+    const keyMap={'a':0,'b':1,'c':2,'d':3};
+    const i=keyMap[e.key.toLowerCase()];
+    if(i!==undefined){const btns=document.querySelectorAll('.opt-btn:not(.disabled)');if(btns[i])btns[i].click();}
+  }
+});
+
+initSwipe();
 init();
 </script>
 </body>

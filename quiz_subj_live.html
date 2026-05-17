@@ -215,6 +215,7 @@ function swapCard(html,direction){
   return new Promise(resolve=>{
     const vp=document.getElementById('viewport');
     const old=cardEl;
+    if(old){old.style.transition='none';old.style.transform='translateX(0)';old.style.opacity='1';}
     const el=document.createElement('div');
     el.className='quiz-card no-transition';
     el.innerHTML=html;
@@ -227,10 +228,11 @@ function swapCard(html,direction){
       el.style.transform='translateX(0)';el.style.opacity='1';
       if(old){
         old.classList.remove('no-transition');
+        old.style.transition='transform 0.35s cubic-bezier(.4,0,.2,1),opacity 0.35s';
         old.style.transform=`translateX(${direction>0?'-100%':'100%'})`;
         old.style.opacity='0.3';
-        setTimeout(()=>{old.remove();isAnimating=false;resolve();},360);
-      } else {setTimeout(()=>{isAnimating=false;resolve();},360);}
+        setTimeout(()=>{if(old.parentNode)old.remove();isAnimating=false;resolve();},380);
+      } else {setTimeout(()=>{isAnimating=false;resolve();},380);}
     }));
   });
 }
@@ -468,8 +470,13 @@ function initSwipe(){
     const c=cardEl;if(c)c.classList.remove('dragging');
     const dx=ex-sX;const far=Math.abs(dx)>SD;const fast=Math.abs(dx)>SV;
     if(locked==='h'&&(fast||far)){
-      if(dx<0&&canNext()){if(c)c.style.transform='';goNext();}
-      else if(dx>0&&canPrev()){if(c)c.style.transform='';goPrev();}
+      if(dx<0&&canNext()){
+        if(c){c.style.transition='none';c.style.transform='translateX(0)';}
+        goNext();
+      } else if(dx>0&&canPrev()){
+        if(c){c.style.transition='none';c.style.transform='translateX(0)';}
+        goPrev();
+      }
       else{if(c){c.style.transition='transform 0.3s cubic-bezier(.175,.885,.32,1.275)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},320);}}
     } else {if(c)c.style.transform='';}
     locked=null;
@@ -508,9 +515,25 @@ async function init(){
     const label=data.startDate===data.endDate?`${parseInt(dp[1])}월 ${parseInt(dp[2])}일`:`${parseInt(dp[1])}월 ${parseInt(dp[2])}일~${parseInt(data.endDate.split('-')[2])}일`;
     document.querySelector('.header-left .title').textContent=label+' 주관식 퀴즈';
     document.title=`주관식 퀴즈 – ${data.student}`;
-    renderIntro();initSwipe();
+    renderIntro();
   }catch(err){showError(`네트워크 오류: ${err.message}`);}
 }
+
+// ── 키보드 단축키 ──
+document.addEventListener('keydown', e => {
+  if((e.key==='ArrowLeft'||e.key===' ')&&!isAnimating){
+    e.preventDefault();
+    if((stage==='subj'||stage==='retry')&&answered) goNext();
+  }
+  if(e.key==='ArrowRight'&&!isAnimating){
+    if((stage==='subj'||stage==='retry')&&pos>0) goPrev();
+  }
+  if(e.key==='Backspace'){
+    if((stage==='subj'||stage==='retry')&&!answered) deleteLetter();
+  }
+});
+
+initSwipe();
 init();
 </script>
 </body>
