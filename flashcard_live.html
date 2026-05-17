@@ -277,6 +277,12 @@ async function init(){
     document.getElementById('tot').textContent = cards.length;
     originalCards.length = 0;
     cards.forEach(c => originalCards.push(c));
+    // viewport를 깨끗하게 비우고 인디케이터만 다시 넣기
+    document.getElementById('viewport').innerHTML = `
+      <div class="swipe-indicator ind-prev" id="ind-prev">← 이전</div>
+      <div class="swipe-indicator ind-next" id="ind-next">다음 →</div>
+      <div class="swipe-indicator ind-up" id="ind-up">↑ 뒤집기</div>
+      <div class="swipe-indicator ind-down" id="ind-down">↓ 뒤집기</div>`;
     buildDots(); initInteraction(); renderCard(0);
   } catch(err) {
     showError(`네트워크 오류: ${err.message}`);
