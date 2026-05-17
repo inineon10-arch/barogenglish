@@ -179,10 +179,35 @@ async function loadWords(){
       const res=await fetch(SHEET_CSV);
       if(!res.ok)throw new Error('시트를 불러올 수 없습니다.');
       const rows=parseCSV(await res.text());
-      allWords=rows.filter(r=>r['단어']&&r['뜻']).map((r,i)=>({
-        id:i+1,word:r['단어'],meaning:r['뜻'],pos:r['품사']||'',
-        tip:r['암기팁']||'',example:r['예문']||'',source:r['출처날짜']||''
-      }));
+      // 컬럼 자동 감지 파싱
+      const keys=Object.keys(rows[0]||{});
+      const hasWordKey=keys.some(k=>k.trim()==='단어'||k.trim()==='word');
+      if(hasWordKey){
+        const wk=keys.find(k=>k.trim()==='단어'||k.trim()==='word');
+        const mk=keys.find(k=>k.trim()==='뜻'||k.trim()==='meaning');
+        allWords=rows.filter(r=>r[wk]&&r[mk]&&r[wk].trim()&&r[mk].trim()).map((r,i)=>({
+          id:i+1,word:r[wk].trim(),meaning:r[mk].trim(),
+          pos:(r['품사']||r['pos']||'').trim(),
+          tip:(r['암기팁']||r['tip']||'').trim(),
+          example:(r['예문']||r['example']||'').trim(),
+          source:(r['출처날짜']||r['source']||'').trim()
+        }));
+      } else {
+        // 헤더 없는 형식: 컬럼 위치로 파싱 (Day, 단어, 뜻 or 단어, 뜻)
+        const k0=keys[0],k1=keys[1],k2=keys[2];
+        const has3col=keys.length>=3;
+        allWords=rows.filter(r=>{
+          const w=has3col?r[k1]:r[k0];
+          const m=has3col?r[k2]:r[k1];
+          return w&&m&&w.trim()&&m.trim()&&!/^Day\s/i.test(w.trim());
+        }).map((r,i)=>({
+          id:i+1,
+          word:(has3col?r[k1]:r[k0]).trim(),
+          meaning:(has3col?r[k2]:r[k1]).trim(),
+          pos:'',tip:'',example:'',
+          source:has3col?(r[k0]||'').trim():''
+        }));
+      }
       document.getElementById('app-name').textContent='오답 단어장 · 전체';
       document.getElementById('app-title').textContent='단어 퀴즈';
     }
