@@ -309,14 +309,22 @@ async function loadVocab() {
       /* 형식 B: 헤더 없음 — 컬럼 수로 판단
          3컬럼: Day, 단어, 뜻
          2컬럼: 단어, 뜻  */
-      const colCount = firstCols.length;
-      allWords = lines.map(l=>csvSplit(l)).filter(v=>{
-        if(colCount>=3) return v[1]&&v[2]&&!/^Day\s/i.test(v[1].trim())&&v[1].trim()!=='단어';
-        return v[0]&&v[1]&&v[0].trim()!=='단어';
-      }).map(v=>{
-        if(colCount>=3) return { day:v[0].trim(), word:v[1].trim(), meaning:v[2].trim(), pos:'' };
-        return { day:'', word:v[0].trim(), meaning:v[1].trim(), pos:'' };
-      });
+      /* 첫 컬럼이 'Day 숫자' 패턴이면 3컬럼 형식 */
+      const isDayFmt = /^Day\s*\d/i.test((firstCols[0]||'').trim());
+      allWords = lines.map(l=>{
+        const v=csvSplit(l);
+        if(isDayFmt){
+          const day=(v[0]||'').trim();
+          const word=(v[1]||'').trim();
+          /* 뜻은 3번째~끝 컬럼 합치기 (뜻 안에 쉼표 있어도 OK) */
+          const meaning=v.slice(2).join(',').trim();
+          return {day,word,meaning,pos:''};
+        } else {
+          const word=(v[0]||'').trim();
+          const meaning=v.slice(1).join(',').trim();
+          return {day:'',word,meaning,pos:''};
+        }
+      }).filter(w=>w.word&&w.meaning&&!/^Day\s*\d/i.test(w.word));
     }
 
     if(!allWords.length) throw new Error('단어가 없습니다.');
