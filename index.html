@@ -711,6 +711,13 @@ function fmtMMDD(dateStr) {
   return `${parseInt(p[1])}월 ${parseInt(p[2])}일`;
 }
 
+/* 날짜의 요일 (월/화/수...) */
+const DOW = ['일','월','화','수','목','금','토'];
+function getDow(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return DOW[d.getDay()];
+}
+
 /* localStorage 제출 기록 키 */
 const SUBMIT_KEY = `quiz_submitted_${STUDENT_NAME}`;
 
@@ -807,8 +814,8 @@ function renderQuizBanners() {
     banner.dataset.idx = idx;
 
     const label = q.overdue
-      ? `밀린 퀴즈 <span class="quiz-banner-overdue-tag">${fmtMMDD(q.dateStr)}</span>`
-      : `오늘의 퀴즈`;
+      ? `밀린 단어 <span class="quiz-banner-overdue-tag">${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})</span>`
+      : `오늘의 단어 · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
     const sub = q.count === null ? `객관식 · 전체 문제` : `객관식 · ${q.count}문제`;
     const btn = q.overdue ? '지금 풀기 →' : '시작하기 →';
 
