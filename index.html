@@ -115,7 +115,7 @@
 
   .vocab-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.65rem;}
 
-  .vcard{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.85rem .8rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,48,.04);user-select:none;-webkit-user-select:none;}
+  .vcard{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.85rem .8rem .85rem .8rem;padding-right:2.2rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,48,.04);user-select:none;-webkit-user-select:none;}
   .vcard::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);transform:scaleY(0);transform-origin:top;transition:transform .3s;}
   .vcard:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(112,54,227,.12);border-color:rgba(112,54,227,.3);}
   .vcard:hover::before{transform:scaleY(1);}
@@ -126,11 +126,11 @@
   .vcard-hint{font-size:.58rem;color:var(--ink-mute);margin-top:.22rem;}
   .vcard.open .vcard-ko{display:block;}
   .vcard.open .vcard-hint{display:none;}
-  .vcard-tts{display:none;margin-top:.3rem;}
-  .vcard.open .vcard-tts{display:flex;align-items:center;gap:.3rem;font-size:.6rem;color:var(--purple);cursor:pointer;width:fit-content;}
-  .vcard.open .vcard-tts:hover{opacity:.75;}
-  .tts-playing{color:var(--purple);animation:pulse .6s ease infinite alternate;}
-  @keyframes pulse{from{opacity:.5}to{opacity:1}}
+  .vcard-tts{position:absolute;top:.5rem;right:.5rem;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(112,54,227,.08);color:var(--purple);cursor:pointer;font-size:.7rem;transition:all .15s;z-index:2;}
+  .vcard-tts:hover{background:rgba(112,54,227,.18);transform:scale(1.08);}
+  .vcard-tts:active{transform:scale(.92);}
+  .tts-playing{background:var(--purple) !important;color:#fff !important;animation:pulse .6s ease infinite alternate;}
+  @keyframes pulse{from{opacity:.7}to{opacity:1}}
 
   /* 로딩 */
   .loading-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--ink-mute);font-family:'Inter',sans-serif;font-size:.85rem;}
@@ -154,13 +154,22 @@
     .hero{grid-template-columns:1fr;padding:4rem 1.25rem 3rem;gap:2rem;}
     .tab-bar{padding:1.5rem 1.25rem 0;} .materials-section{padding:3rem 1.25rem 4rem;}
     .section-header{flex-direction:column;align-items:flex-start;gap:.5rem;}
-    .materials-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
-    .material-card{padding:1rem .875rem;}
-    .vocab-cards{grid-template-columns:repeat(2,1fr);}
+    .materials-grid{grid-template-columns:repeat(2,1fr) !important;gap:.55rem;}
+    .vocab-day-grid{grid-template-columns:repeat(2,1fr) !important;gap:.55rem;}
+    .material-card,.day-folder{padding:.75rem .65rem;}
+    .card-title,.day-folder-title{font-size:.78rem;}
+    .card-description,.day-folder-desc{font-size:.66rem;}
+    .vocab-cards{grid-template-columns:repeat(2,1fr);gap:.5rem;}
+    .day-detail{padding:1rem .75rem;}
+    .day-detail-header{flex-direction:column;align-items:flex-start;gap:.5rem;}
     .footer-inner{flex-direction:column;text-align:center;}
   }
   @media(max-width:420px){
-    .materials-grid{grid-template-columns:1fr;}
+    /* 작은 폰에서도 2열 유지 — 패딩만 더 줄임 */
+    .materials-grid,.vocab-day-grid{gap:.45rem;}
+    .material-card,.day-folder{padding:.65rem .55rem;}
+    .vocab-cards{grid-template-columns:repeat(2,1fr);gap:.45rem;}
+    .vcard{padding:.65rem .55rem;}
   }
 </style>
 </head>
@@ -414,10 +423,10 @@ function renderVocab(words) {
     groups[day].forEach(w => {
       const c = document.createElement('div');
       c.className='vcard';
-      c.innerHTML=`<div class="vcard-en">${esc(w.word)}</div>
+      c.innerHTML=`<div class="vcard-tts" title="발음 듣기">🔊</div>
+        <div class="vcard-en">${esc(w.word)}</div>
         <div class="vcard-ko">${esc(w.meaning)}</div>
-        <div class="vcard-hint">탭해서 뜻 보기</div>
-        <div class="vcard-tts" data-word="${esc(w.word)}">🔊 <span>발음 듣기</span></div>`;
+        <div class="vcard-hint">탭해서 뜻 보기</div>`;
       c.addEventListener('click', (e) => {
         if(e.target.closest('.vcard-tts')) return; // TTS 버튼은 toggle 안 함
         c.classList.toggle('open');
@@ -490,16 +499,49 @@ document.getElementById('search-vocab').addEventListener('input', e=>{
   renderVocab(k?allWords.filter(w=>w.word.toLowerCase().includes(k)||w.meaning.toLowerCase().includes(k)||w.day.toLowerCase().includes(k)):allWords);
 });
 
-/* TTS */
+/* TTS — Google Translate TTS (사용자 클릭 후 재생) */
 let _audio = null;
 function ttsPlay(word, btn) {
-  if(_audio){ _audio.pause(); _audio=null; document.querySelectorAll('.vcard-tts').forEach(b=>b.classList.remove('tts-playing')); }
+  // 이전 재생 정지
+  if(_audio){
+    try{_audio.pause();}catch(e){}
+    _audio=null;
+    document.querySelectorAll('.vcard-tts').forEach(b=>b.classList.remove('tts-playing'));
+  }
   if(!word) return;
   const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;
-  _audio = new Audio(url);
+  _audio = new Audio();
+  _audio.crossOrigin = 'anonymous';
+  _audio.src = url;
   if(btn) btn.classList.add('tts-playing');
-  _audio.onended = _audio.onerror = () => { if(btn) btn.classList.remove('tts-playing'); _audio=null; };
-  _audio.play().catch(()=>{ if(btn) btn.classList.remove('tts-playing'); _audio=null; });
+  _audio.onended = () => { if(btn) btn.classList.remove('tts-playing'); _audio=null; };
+  _audio.onerror = () => {
+    if(btn) btn.classList.remove('tts-playing');
+    _audio=null;
+    // 폴백: 브라우저 내장 TTS (Web Speech API)
+    if('speechSynthesis' in window){
+      const u = new SpeechSynthesisUtterance(word);
+      u.lang = 'en-US';
+      u.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+  };
+  const p = _audio.play();
+  if(p && p.catch){
+    p.catch(() => {
+      // 자동 재생 실패시 폴백
+      if(btn) btn.classList.remove('tts-playing');
+      _audio=null;
+      if('speechSynthesis' in window){
+        const u = new SpeechSynthesisUtterance(word);
+        u.lang = 'en-US';
+        u.rate = 0.9;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      }
+    });
+  }
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
