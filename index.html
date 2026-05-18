@@ -158,6 +158,13 @@
   .qz-start-btn:active{transform:scale(.97);}
   .qz-start-btn.retry{background:#be185d;box-shadow:0 4px 16px rgba(190,24,93,.25);}
 
+  /* 제출 버튼 */
+  .qz-submit-btn{width:100%;padding:13px 30px;background:#1a9e6f;color:#fff;border:none;border-radius:16px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(26,158,111,.25);min-height:46px;margin-top:8px;transition:transform .15s,opacity .2s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .qz-submit-btn:active{transform:scale(.97);}
+  .qz-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .qz-submit-btn.submitted{background:#b0aab8;box-shadow:none;cursor:default;}
+  .qz-submit-btn.error{background:#d94040;}
+
   /* 결과 */
   .qz-result{flex:1;display:flex;flex-direction:column;padding:18px 20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
   .qz-score-circle{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;position:relative;flex-shrink:0;}
@@ -674,6 +681,9 @@ function ttsAutoPlay(word, btn) {
 const STUDENT_NAME = '조문정';
 const SCHEDULE_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=414941877';
 
+/* ★ Apps Script 웹앱 URL — scan-ocr 시트 Apps Script 배포 URL */
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbx5Y3daCCYcLP5WXsusQtrQmIpHrb1t7DyNqbIGRNYGDvYv74ZZ4c9tY_iATFX2krDHHA/exec';
+
 /* 스케줄 탭 형식 (헤더 행 1개 + 데이터):
    날짜,       학생,   Day,    문제수(선택)
    2026-05-18, 조문정, Day 10,
@@ -761,15 +771,17 @@ function qzBuildOpts(target, pool) {
   return qzShuffle(opts);
 }
 
+let qzStartTime = null; // 퀴즈 시작 시각
+
 function startQuiz() {
   const dayWords = allWords.filter(w => w.day === QUIZ_CONFIG.day);
   if(!dayWords.length){ alert(`${QUIZ_CONFIG.day} 단어를 먼저 불러오세요.`); return; }
-  // count null → 전체, 숫자 → 그 수만큼 (랜덤 선택)
   const count = QUIZ_CONFIG.count === null ? dayWords.length : QUIZ_CONFIG.count;
   const selected = qzShuffle([...dayWords]).slice(0, count);
   qzQueue = selected.map(w=>({...w, _opts:qzBuildOpts(w, allWords), _result:null, _picked:null}));
   qzPos=0; qzAnswered=false; qzWrong=[];
   qzStage='mc';
+  qzStartTime = Date.now(); // ← 시작 시각 기록
   document.getElementById('qz-title').textContent=`${QUIZ_CONFIG.day} · 객관식`;
   document.getElementById('qz-overlay').style.display='flex';
   qzUpdatePill();
@@ -950,8 +962,63 @@ function qzRenderResult(){
       <div class="qz-result-ttl">수고했어요! 🎉</div>
       <div class="qz-result-sub">정답률 ${pct}%</div>
       ${wrongHTML}
-      <div style="margin-top:14px"><button class="qz-start-btn" style="width:100%" onclick="startQuiz()">↻ 다시 풀기</button></div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+        <button class="qz-submit-btn" id="qz-submit-btn" onclick="submitResult(${allTotal - qzWrong.filter(w=>w._result==='wrong').length}, ${allTotal})">
+          📤 선생님께 제출하기
+        </button>
+        <button class="qz-start-btn" style="width:100%" onclick="startQuiz()">↻ 다시 풀기</button>
+      </div>
     </div>`,1);
+}
+
+/* ============================================================
+   퀴즈 결과 제출
+   ============================================================ */
+function fmtElapsed(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m > 0 ? `${m}분 ${sec}초` : `${sec}초`;
+}
+
+async function submitResult(correct, total) {
+  const btn = document.getElementById('qz-submit-btn');
+  if(!btn || btn.classList.contains('submitted')) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ 제출 중...';
+
+  const elapsed = qzStartTime ? fmtElapsed(Date.now() - qzStartTime) : '-';
+  const payload = {
+    student: STUDENT_NAME,
+    day:     QUIZ_CONFIG.day,
+    correct: correct,
+    total:   total,
+    elapsed: elapsed
+  };
+
+  try {
+    const res = await fetch(SUBMIT_URL, {
+      method: 'POST',
+      body:   JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if(json.ok) {
+      btn.classList.add('submitted');
+      btn.innerHTML = '✅ 제출 완료!';
+    } else {
+      throw new Error(json.error || '오류');
+    }
+  } catch(err) {
+    btn.classList.add('error');
+    btn.innerHTML = '⚠️ 제출 실패 — 다시 시도';
+    btn.disabled = false;
+    btn.classList.remove('error');
+    setTimeout(() => {
+      btn.classList.remove('submitted');
+      btn.innerHTML = '📤 선생님께 제출하기';
+    }, 2000);
+  }
 }
 
 /* 스와이프 */
