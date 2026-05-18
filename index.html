@@ -279,42 +279,44 @@ function csvSplit(line) {
   for(const c of line){ if(c==='"'){q=!q;}else if(c===','&&!q){r.push(cur);cur='';}else{cur+=c;} }
   r.push(cur); return r;
 }
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const heads = csvSplit(lines[0]);
-  return lines.slice(1).map(l => {
-    const v = csvSplit(l), o={};
-    heads.forEach((h,i) => o[h.trim()]=(v[i]||'').trim());
-    return o;
-  });
-}
 
 async function loadVocab() {
   vocabLoaded = true;
   try {
     const res = await fetch(VOCAB_CSV);
     if(!res.ok) throw new Error('시트를 불러올 수 없습니다 ('+res.status+')');
-    const rows = parseCSV(await res.text());
-    const keys = Object.keys(rows[0]||{});
+    const text = await res.text();
+    const lines = text.trim().split('\n').map(l=>l.replace(/\r$/,''));
 
-    /* 헤더 자동 감지 */
-    const wk = keys.find(k=>/^단어$/i.test(k.trim()));
-    const mk = keys.find(k=>/^뜻$/i.test(k.trim()));
-    if(wk && mk) {
-      /* 원래 형식: 단어, 뜻, 품사, 출처날짜 ... */
-      const pk = keys.find(k=>/^품사$/i.test(k.trim()))||'';
-      const dk = keys.find(k=>/출처|날짜|date/i.test(k.trim()))||'';
-      allWords = rows.filter(r=>r[wk]&&r[mk]).map(r=>({
-        day:(dk?r[dk]:'')||'',
-        word:r[wk], meaning:r[mk],
-        pos:pk?r[pk]:''
+    /* ── 헤더 감지: 첫 줄에 '단어'가 있으면 헤더형, 없으면 데이터형 ── */
+    const firstCols = csvSplit(lines[0]);
+    const hasHeader = firstCols.some(c=>/^단어$/i.test(c.trim()));
+
+    if(hasHeader) {
+      /* 형식 A: 헤더행 있음 — 단어, 뜻, 품사, 출처날짜 */
+      const heads = firstCols.map(c=>c.trim());
+      const wi=heads.findIndex(h=>/^단어$/i.test(h));
+      const mi=heads.findIndex(h=>/^뜻$/i.test(h));
+      const pi=heads.findIndex(h=>/^품사$/i.test(h));
+      const di=heads.findIndex(h=>/출처|날짜|date/i.test(h));
+      allWords = lines.slice(1).map(l=>csvSplit(l)).filter(v=>v[wi]&&v[mi]).map(v=>({
+        day:  di>=0?(v[di]||'').trim():'',
+        word: v[wi].trim(),
+        meaning: v[mi].trim(),
+        pos:  pi>=0?(v[pi]||'').trim():''
       }));
     } else {
-      /* 헤더 없음 — 3컬럼: Day, 단어, 뜻 */
-      const k0=keys[0],k1=keys[1],k2=keys[2];
-      allWords = rows.filter(r=>r[k1]&&r[k2]&&!/^Day\s/i.test((r[k1]||'').trim())).map(r=>({
-        day:(r[k0]||'').trim(), word:r[k1].trim(), meaning:r[k2].trim(), pos:''
-      }));
+      /* 형식 B: 헤더 없음 — 컬럼 수로 판단
+         3컬럼: Day, 단어, 뜻
+         2컬럼: 단어, 뜻  */
+      const colCount = firstCols.length;
+      allWords = lines.map(l=>csvSplit(l)).filter(v=>{
+        if(colCount>=3) return v[1]&&v[2]&&!/^Day\s/i.test(v[1].trim())&&v[1].trim()!=='단어';
+        return v[0]&&v[1]&&v[0].trim()!=='단어';
+      }).map(v=>{
+        if(colCount>=3) return { day:v[0].trim(), word:v[1].trim(), meaning:v[2].trim(), pos:'' };
+        return { day:'', word:v[0].trim(), meaning:v[1].trim(), pos:'' };
+      });
     }
 
     if(!allWords.length) throw new Error('단어가 없습니다.');
