@@ -189,6 +189,17 @@
   .card-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--accent);transition:transform .3s;}
   .material-card:hover .card-arrow{transform:translateX(4px);}
 
+  /* ── 오답단어 진입 버튼 ── */
+  .wrong-entry-btn{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1.4rem 1.6rem;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;max-width:520px;}
+  .wrong-entry-btn::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+  .wrong-entry-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent-soft);}
+  .wrong-entry-btn:hover::before{transform:scaleX(1);}
+  .wrong-entry-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .wrong-entry-label{font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;}
+  .wrong-entry-desc{font-size:.78rem;color:var(--ink-soft);line-height:1.5;}
+  .wrong-entry-arrow{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--accent);transition:transform .3s;flex-shrink:0;}
+  .wrong-entry-btn:hover .wrong-entry-arrow{transform:translateX(5px);}
+
   /* ── 진도단어 플래시카드 ── */
   /* ── 진도단어 Day 폴더 카드 ── */
   .vocab-meta-bar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;}
@@ -305,13 +316,21 @@
   <button class="tab-btn vocab-tab" id="tab-vocab" onclick="switchTab('vocab')">진도단어</button>
 </div>
 
-<!-- ★ 오답단어 — 수동 파일 링크 (플래시카드) -->
+<!-- ★ 오답단어 — wrong-words.html 실시간 연동 -->
 <main class="materials-section visible" id="section-wrong">
   <div class="section-header">
     <h2 class="section-title">오답단어 <em></em></h2>
-    <div class="section-count" id="count-wrong">전체 자료</div>
+    <div class="section-count" id="count-wrong">시트 실시간 연동</div>
   </div>
-  <div class="materials-grid" id="grid-wrong"></div>
+  <a href="wrong-words.html" class="wrong-entry-btn">
+    <div class="wrong-entry-inner">
+      <div class="wrong-entry-left">
+        <div class="wrong-entry-label">오답 단어장 열기</div>
+        <div class="wrong-entry-desc">날짜별 오답을 플래시카드로 복습해요</div>
+      </div>
+      <span class="wrong-entry-arrow">→</span>
+    </div>
+  </a>
 </main>
 
 <!-- ★ 진도단어 — 구글 시트 자동 로딩 플래시카드 -->
@@ -369,16 +388,6 @@
 
 <script>
 /* ============================================================
-   ★ 오답단어 목록 — 새 시험 후 여기에 한 줄씩 추가
-   ============================================================ */
-const wrongMaterials = [
-  { filename:"lesson-04.html", title:"5월 15일", description:"금요일", tag:"." },
-  { filename:"lesson-03.html", title:"5월 13일", description:"수요일", tag:"." },
-  { filename:"lesson-02.html", title:"5월 10일", description:"일요일", tag:"." },
-  { filename:"lesson-01.html", title:"5월 6일",  description:"수요일", tag:"." },
-];
-
-/* ============================================================
    ★ 진도단어 구글 시트 — 웹에 게시 CSV URL
    ============================================================ */
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1174135286';
@@ -395,33 +404,6 @@ function switchTab(t) {
   });
   if(t==='vocab' && !vocabLoaded) loadVocab();
 }
-
-/* ============================================================
-   오답단어 렌더
-   ============================================================ */
-function pad(n){ return String(n).padStart(2,'0'); }
-
-function renderWrong(list) {
-  const grid = document.getElementById('grid-wrong');
-  const cnt  = document.getElementById('count-wrong');
-  grid.innerHTML = '';
-  if(!list.length){ grid.innerHTML='<div class="no-results">자료가 없습니다.</div>'; cnt.textContent='자료 없음'; return; }
-  cnt.textContent = `전체 ${list.length}개 자료`;
-  list.forEach((item,i) => {
-    const a = document.createElement('a');
-    a.className = 'material-card';
-    a.href = `materials/${item.filename}`;
-    a.style.animationDelay = `${0.04*i}s`;
-    a.innerHTML = `
-      <div class="card-number">No. ${pad(i+1)}</div>
-      <div class="card-title">${esc(item.title)}</div>
-      <div class="card-description">${esc(item.description)}</div>
-      <div class="card-footer"><span class="card-tag">${esc(item.tag)}</span><span class="card-arrow">→</span></div>`;
-    grid.appendChild(a);
-  });
-}
-
-renderWrong(wrongMaterials);
 
 /* ============================================================
    진도단어 — CSV 로딩

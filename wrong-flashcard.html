@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f5f0eb">
 <meta name="referrer" content="no-referrer">
-<title>오답 단어장 – 조문정</title>
+<title>오답 단어장</title>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -105,8 +105,8 @@
 <div id="app">
   <div class="header">
     <div class="header-left">
-      <div class="name">바로그영어 · 조문정</div>
-      <div class="title">오답 단어장</div>
+      <div class="name" id="hdr-name">바로그영어</div>
+      <div class="title" id="hdr-title">오답 단어장</div>
     </div>
     <div class="header-right">
       <div class="index-display"><span id="cur">1</span><span> / <span id="tot">8</span></span></div>
@@ -125,6 +125,7 @@
     <div class="swipe-indicator ind-next" id="ind-next">다음 →</div>
     <div class="swipe-indicator ind-up" id="ind-up">↑ 뒤집기</div>
     <div class="swipe-indicator ind-down" id="ind-down">↓ 뒤집기</div>
+    <div id="status-msg" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;padding:20px;font-size:0.95rem;color:var(--text2);max-width:300px;line-height:1.6;"></div>
   </div>
   <div class="nav-hint">
     <div class="nav-item"><span class="nav-arrow">→</span> 이전 단어</div>
@@ -133,44 +134,27 @@
   </div>
 </div>
 <script>
-const cards = [
-  { num:5, word:'surprised', pos:'형용사', type:'wrong',
-    correct:'놀란', student:'놀라운',
-    tip:'surprised는 감정을 \'느낀\' 사람을, surprising은 \'놀라운\' 대상을 설명해요.',
-    example:'I was very <em>surprised</em> to see her at the party.' },
-  { num:17, word:'photograph', pos:'명사', type:'wrong',
-    correct:'사진', student:'사건',
-    tip:'photo(빛)와 graph(그림)의 합성어로, \'빛으로 그린 그림\' 즉 사진을 뜻해요.',
-    example:'She showed me an old <em>photograph</em> of her grandparents.' },
-  { num:27, word:'leisure', pos:'명사', type:'wrong',
-    correct:'여가, 한가한 시간', student:'휴가',
-    tip:'leisure는 일상 속 여가 시간을, vacation은 일을 쉬는 긴 휴가를 의미해요.',
-    example:'What do you like to do in your <em>leisure</em> time?' },
-  { num:9, word:'storm', pos:'명사', type:'wrong',
-    correct:'폭풍, 폭풍우', student:'태풍',
-    tip:'태풍(typhoon)\'은 storm의 한 종류입니다. storm은 폭설, 뇌우 등 더 넓은 악천후를 포함하는 단어입니다.',
-    example:'The small fishing boat was badly damaged in a violent <em>storm</em> at sea.' },
-  { num:12, word:'international', pos:'형용사', type:'wrong',
-    correct:'국제적인', student:'내부의',
-    tip:'접두사 \'inter-\'는 \'~사이\'를 뜻해요. \'국가들 사이\'이므로 \'국제적인\'입니다. \'내부의(internal)\'와는 반대 의미입니다.',
-    example:'She is attending an <em>international</em> conference on climate change in Paris.' },
-  { num:17, word:'marine', pos:'형용사', type:'wrong',
-    correct:'바다의, 해양의', student:'항해',
-    tip:'marine\'은 \'바다의\'라는 뜻의 형용사입니다. 바다에서 하는 활동인 \'항해(voyage)\'라는 명사와 헷갈리지 않도록 주의하세요.',
-    example:'The documentary explored the diverse and fragile <em>marine</em> ecosystem of the coral reef.' },
-  { num:20, word:'challenge', pos:'명사/동사', type:'wrong',
-    correct:'도전, 도전하다', student:'힘든',
-    tip:'challenge\'는 \'도전\'이라는 명사입니다. \'힘든(difficult)\'은 도전을 묘사하는 형용사이니 품사를 구분해서 암기하세요.',
-    example:'Learning a new language can be a real <em>challenge</em>, but it is also very rewarding.' },
-  { num:32, word:'metal', pos:'명사', type:'wrong',
-    correct:'금속', student:'금속의',
-    tip:'metal\'은 \'금속\'이라는 명사입니다. 학생이 답한 \'금속의\'는 형용사인 \'metallic\'이니 품사를 헷갈리지 않도록 주의하세요.',
-    example:'The robot\'s body was constructed from a lightweight but strong <em>metal</em> alloy.' }
-];
+/* ============================================================
+   ★ 오답단어 시트 설정 (학생별로 이 두 줄만 변경)
+   ============================================================ */
+const STUDENT_NAME = '조문정';   // 학생 이름 (헤더에 표시)
+const SHEET_GID    = '1168557374';         // scan-ocr 시트에서 이 학생 탭의 gid
+// scan-ocr 스프레드시트 published URL
+const SHEET_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyO-Sx_N0LFENgIcQp-3ATAHrYOUvLCuEr2Nls8qYKYMnOTRyo5_zJY1hbyA1ONfzcf2UK7kwe3fTP/pub?output=csv';
+/* ============================================================ */
+
+// URL 파라미터에서 날짜 가져오기 (?date=2026-05-17 또는 ?start=2026-05-13&end=2026-05-16)
+const _params = new URLSearchParams(location.search);
+const _date  = _params.get('date')  || '';
+const _start = _params.get('start') || _date;
+const _end   = _params.get('end')   || _date;
+
+const cards = [];
+
 let idx=0,startFace='word',showingBack=false,isAnimating=false;
 document.getElementById('btn-meaning').addEventListener('click',()=>{if(isAnimating)return;startFace='meaning';showingBack=false;document.getElementById('btn-meaning').classList.add('active');document.getElementById('btn-word').classList.remove('active');if(idx<cards.length)renderCard(0);});
 document.getElementById('btn-word').addEventListener('click',()=>{if(isAnimating)return;startFace='word';showingBack=false;document.getElementById('btn-word').classList.add('active');document.getElementById('btn-meaning').classList.remove('active');if(idx<cards.length)renderCard(0);});
-const originalCards=[...cards];let isShuffled=false;
+let originalCards=[];let isShuffled=false;
 function shuffleArray(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 document.getElementById('btn-random').addEventListener('click',function(){if(isAnimating)return;haptic(20);if(!isShuffled){const s=shuffleArray(cards);cards.length=0;s.forEach(c=>cards.push(c));isShuffled=true;this.classList.add('shuffled');this.textContent='🔀 랜덤ON';}else{cards.length=0;originalCards.forEach(c=>cards.push(c));isShuffled=false;this.classList.remove('shuffled');this.textContent='🔀 랜덤';}idx=0;showingBack=false;buildDots();renderCard(0);});
 let currentAudio=null;
@@ -202,7 +186,135 @@ document.addEventListener('keydown',e=>{if(isAnimating)return;if(e.key==='ArrowR
 let lte=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lte<=300)e.preventDefault();lte=n;},{passive:false});
 window.addEventListener('resize',()=>document.documentElement.style.setProperty('--app-vh',`${window.innerHeight*0.01}px`));
 document.documentElement.style.setProperty('--app-vh',`${window.innerHeight*0.01}px`);
-buildDots();initInteraction();renderCard(0);
+
+/* ============================================================
+   CSV 파싱 (쉼표·따옴표 처리)
+   ============================================================ */
+function parseCSV(text){
+  const rows=[];
+  let row=[],cur='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){
+        if(text[i+1]==='"'){cur+='"';i++;}
+        else inQ=false;
+      } else cur+=ch;
+    } else {
+      if(ch==='"') inQ=true;
+      else if(ch===','){row.push(cur);cur='';}
+      else if(ch==='\n'){row.push(cur);rows.push(row);row=[];cur='';}
+      else if(ch==='\r'){/* skip */}
+      else cur+=ch;
+    }
+  }
+  if(cur||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+
+/* ============================================================
+   날짜 정규화 (YYYY-MM-DD)
+   ============================================================ */
+function normDate(s){
+  if(!s) return '';
+  const m=String(s).trim().match(/(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
+  if(!m) return '';
+  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+}
+
+/* ============================================================
+   상태 메시지
+   ============================================================ */
+function showStatus(html){
+  const m=document.getElementById('status-msg');
+  m.innerHTML=html;
+  m.style.display='block';
+}
+function hideStatus(){document.getElementById('status-msg').style.display='none';}
+
+/* ============================================================
+   헤더 업데이트
+   ============================================================ */
+function updateHeader(name,start,end){
+  document.getElementById('hdr-name').textContent=`바로그영어 · ${name}`;
+  let label='오답 단어장';
+  if(start){
+    const sp=start.split('-');
+    if(start===end || !end){
+      label=`${parseInt(sp[1])}월 ${parseInt(sp[2])}일 오답`;
+    } else {
+      const ep=end.split('-');
+      label=`${parseInt(sp[1])}/${parseInt(sp[2])}~${parseInt(ep[1])}/${parseInt(ep[2])} 오답`;
+    }
+  }
+  document.getElementById('hdr-title').textContent=label;
+  document.title=`오답 단어장 – ${name}`;
+}
+
+/* ============================================================
+   데이터 로드
+   ============================================================ */
+async function loadData(){
+  updateHeader(STUDENT_NAME,_start,_end);
+  if(!_start){
+    showStatus('날짜 정보가 없어요.<br><span style="font-size:0.8rem;color:var(--muted)">예: wrong-flashcard.html?date=2026-05-17</span>');
+    return;
+  }
+  showStatus('<div style="font-size:0.85rem">데이터를 불러오는 중...</div>');
+  try {
+    const url=`${SHEET_CSV_BASE}&gid=${SHEET_GID}&t=${Date.now()}`;
+    const res=await fetch(url);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text=await res.text();
+    const rows=parseCSV(text);
+
+    // 헤더 찾기 (첫 행이 "날짜"로 시작하는지)
+    let startRow=0;
+    if(rows.length && String(rows[0][0]||'').trim()==='날짜') startRow=1;
+
+    // 날짜 범위 필터링
+    for(let i=startRow;i<rows.length;i++){
+      const r=rows[i];
+      if(!r||r.length<5) continue;
+      const dateStr=normDate(r[0]);
+      if(!dateStr) continue;
+      if(dateStr<_start || dateStr>_end) continue;
+
+      const num=String(r[1]||'').trim();
+      const word=String(r[2]||'').trim();
+      const student=String(r[3]||'').trim();
+      const correct=String(r[4]||'').trim();
+      const pos=String(r[5]||'').trim();
+      const tip=String(r[6]||'').trim();
+      const example=String(r[7]||'').trim();
+
+      if(!word) continue;
+      const isBlank = student==='빈칸' || student==='' || student==='(무응답)';
+      cards.push({
+        num:num||'-',
+        word:word,
+        pos:pos||'-',
+        type:isBlank?'blank':'wrong',
+        correct:correct||'-',
+        student:isBlank?'(무응답)':student,
+        tip:tip||'-',
+        example:example||''
+      });
+    }
+
+    if(cards.length===0){
+      showStatus(`${STUDENT_NAME}의 ${_start} 오답 데이터가 없어요.<br><span style="font-size:0.8rem;color:var(--muted)">아직 채점이 안 됐거나, 만점을 받았을 수도 있어요 🎉</span>`);
+      return;
+    }
+    originalCards=[...cards];
+    hideStatus();
+    buildDots();initInteraction();renderCard(0);
+  } catch(err){
+    showStatus(`데이터를 불러오지 못했어요.<br><span style="font-size:0.8rem;color:var(--muted)">${err.message}</span>`);
+  }
+}
+
+loadData();
 </script>
 </body>
 </html>
