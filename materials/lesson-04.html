@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f5f0eb">
 <meta name="referrer" content="no-referrer">
-<title>오답 단어장 – 김균하</title>
+<title>오답 단어장 – 박하경</title>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -32,15 +32,15 @@
   .pdot.done{background:var(--accent);}
   .pdot.current{background:var(--accent);opacity:0.4;}
   .pdot.done.all{background:var(--green);}
-  .card-viewport{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0;touch-action:pan-y;user-select:none;-webkit-user-select:none;}
-  .flash-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:calc(100% - 10px);max-height:620px;will-change:transform,opacity;cursor:pointer;touch-action:pan-y;transition:transform 0.32s cubic-bezier(.4,0,.2,1),opacity 0.32s;}
+  .card-viewport{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .flash-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:calc(100% - 10px);max-height:620px;will-change:transform,opacity;cursor:pointer;touch-action:none;transition:transform 0.32s cubic-bezier(.4,0,.2,1),opacity 0.32s;}
   .flash-card.no-transition{transition:none!important;}
   .flash-card.dragging{transition:none!important;}
-  .card-face{width:100%;height:100%;background:var(--card);border-radius:22px;border:1.5px solid var(--border);box-shadow:0 8px 40px rgba(45,91,227,0.08),0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;overflow:hidden;}
+  .card-face{width:100%;height:100%;background:var(--card);border-radius:22px;border:1.5px solid var(--border);box-shadow:0 8px 40px rgba(45,91,227,0.08),0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;overflow:hidden;position:relative;}
   .card-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--wrong-col) 0%,#ff9980 100%);}
   .card-content{flex:1;padding:16px 18px 12px;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
   .face-meaning,.face-word{display:flex;flex-direction:column;height:100%;min-height:0;}
-  .scroll-area{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:thin;}
+  .scroll-area{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:none;overscroll-behavior:contain;scrollbar-width:thin;}
   .scroll-area::-webkit-scrollbar{width:3px;}
   .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
   .badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;flex-shrink:0;}
@@ -81,7 +81,7 @@
   .mode-chip{display:inline-flex;align-items:center;gap:2px;background:var(--border);border-radius:22px;padding:3px;}
   .mode-btn{font-family:'Space Grotesk',sans-serif;font-size:0.6rem;font-weight:600;padding:8px 12px;border-radius:18px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;min-height:36px;min-width:60px;touch-action:manipulation;}
   .mode-btn.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.1);}
-  .end-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:calc(100% - 10px);max-height:620px;touch-action:pan-y;transition:transform 0.32s cubic-bezier(.4,0,.2,1),opacity 0.32s;}
+  .end-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:calc(100% - 10px);max-height:620px;touch-action:none;transition:transform 0.32s cubic-bezier(.4,0,.2,1),opacity 0.32s;}
   .end-card.no-transition{transition:none!important;}
   .end-face{width:100%;height:100%;background:var(--card);border-radius:22px;border:1.5px solid var(--border);box-shadow:0 8px 40px rgba(45,91,227,0.08);display:flex;flex-direction:column;overflow:hidden;}
   .end-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--accent) 0%,#6a8eff 50%,var(--green) 100%);}
@@ -93,7 +93,7 @@
   .end-subtitle{font-size:0.85rem;color:var(--text2);line-height:1.6;}
   .restart-btn{background:var(--accent);color:#fff;border:none;border-radius:16px;padding:14px 32px;font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(45,91,227,0.25);min-height:48px;display:inline-flex;align-items:center;gap:8px;touch-action:pan-y;}
   .end-hint{font-size:0.65rem;color:var(--muted);}
-  .tts-btn{background:none;border:1.5px solid var(--border);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:1.1rem;transition:all 0.18s;touch-action:manipulation;flex-shrink:0;margin-top:6px;}
+  .tts-btn{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.9);border:1.5px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:1.05rem;transition:all 0.18s;touch-action:manipulation;flex-shrink:0;z-index:10;backdrop-filter:blur(4px);}
   .tts-btn:active{transform:scale(0.88);background:var(--tip-bg);border-color:var(--accent);color:var(--accent);}
   .tts-btn.playing{border-color:var(--accent);color:var(--accent);background:var(--tip-bg);animation:pulse-tts 0.8s ease-in-out infinite alternate;}
   @keyframes pulse-tts{from{box-shadow:0 0 0 0 rgba(45,91,227,0.15)}to{box-shadow:0 0 0 6px rgba(45,91,227,0)}}
@@ -105,11 +105,11 @@
 <div id="app">
   <div class="header">
     <div class="header-left">
-      <div class="name">바로그영어 · 김균하</div>
+      <div class="name">바로그영어 · 박하경</div>
       <div class="title">오답 단어장</div>
     </div>
     <div class="header-right">
-      <div class="index-display"><span id="cur">1</span><span> / <span id="tot">18</span></span></div>
+      <div class="index-display"><span id="cur">1</span><span> / <span id="tot">20</span></span></div>
       <div style="display:flex;align-items:center;gap:8px;">
         <button class="random-btn" id="btn-random" type="button">🔀 랜덤</button>
         <div class="mode-chip">
@@ -134,78 +134,86 @@
 </div>
 <script>
 const cards = [
-  { num:11, word:'predict', pos:'동사', type:'blank',
-    correct:'예측하다, 예언하다', student:'(무응답)',
-    tip:'pre-\'는 \'미리\', \'dict\'는 \'말하다\'를 의미하므로 \'미리 말하다\'로 기억하면 쉬워요.',
-    example:'It is difficult to <em>predict</em> what will happen next.' },
-  { num:14, word:'discourage', pos:'동사', type:'blank',
-    correct:'낙담시키다, 단념시키다', student:'(무응답)',
-    tip:'용기(courage)를 없애는(dis-) 것이라고 생각하면 \'낙담시키다\'를 쉽게 외울 수 있어요.',
-    example:'His parents tried to <em>discourage</em> him from being an artist.' },
-  { num:21, word:'progress', pos:'명사·동사', type:'wrong',
-    correct:'진전, 진행; 진전을 보이다', student:'과정',
-    tip:'과정\'은 process, 앞으로 나아가는 \'진전\'이나 \'진보\'는 progress로 구분해서 외워두세요.',
-    example:'We are making good <em>progress</em> with the project.' },
-  { num:28, word:'research', pos:'명사·동사', type:'wrong',
-    correct:'연구, 조사; 연구하다, 조사하다', student:'검색하다',
-    tip:'인터넷에서 간단히 찾는 것은 search, 학문적으로 깊이 파고드는 것은 research입니다.',
-    example:'She is conducting <em>research</em> on climate change.' },
-  { num:29, word:'preference', pos:'명사', type:'wrong',
-    correct:'선호, 애호', student:'실용적인',
-    tip:'동사 prefer(선호하다)의 명사형으로, \'더 좋아하는 것\'을 의미합니다. \'실용적인\'은 practical입니다.',
-    example:'Do you have a color <em>preference</em> for your new car?' },
-  { num:42, word:'active', pos:'형용사', type:'wrong',
-    correct:'활동적인, 적극적인', student:'활동하다',
-    tip:'품사 오류입니다. \'active\'는 형용사이고, 동사 \'활동하다\'는 be active로 표현할 수 있어요.',
-    example:'It\'s important to stay physically <em>active</em>.' },
-  { num:43, word:'participation', pos:'명사', type:'wrong',
-    correct:'참가, 참여', student:'실용',
-    tip:'동사 participate(참가하다)의 명사형입니다. \'실용\'은 practical use를 의미합니다.',
-    example:'Class <em>participation</em> is part of your grade.' },
-  { num:47, word:'various', pos:'형용사', type:'wrong',
-    correct:'다양한', student:'다양성',
-    tip:'품사 오류입니다. \'various\'는 형용사이고, 명사 \'다양성\'은 variety 또는 diversity입니다.',
-    example:'The store offers <em>various</em> types of cheese.' },
-  { num:2, word:'resource', pos:'명사', type:'wrong',
-    correct:'자원, 원천', student:'공급원',
-    tip:'source\'가 \'공급원\'에 더 가깝고, \'resource\'는 \'자원\'을 의미해요.',
-    example:'The country has abundant natural <em>resources</em>.' },
-  { num:8, word:'raise', pos:'동사', type:'wrong',
-    correct:'~을 올리다, 기르다', student:'오르다',
-    tip:'raise\'는 목적어가 필요한 타동사(~을 올리다), \'rise\'가 자동사(오르다)예요.',
-    example:'Please <em>raise</em> your hand if you have a question.' },
-  { num:12, word:'contract', pos:'동사', type:'wrong',
-    correct:'계약하다, 수축하다', student:'접촉하다',
-    tip:'contact(접촉하다)\'와 철자가 비슷하니 주의해서 암기하세요.',
-    example:'The company won a <em>contract</em> to build the new bridge.' },
-  { num:13, word:'be known as', pos:'구동사', type:'wrong',
-    correct:'~로서 알려져 있다', student:'때문에',
-    tip:'be known for\'가 \'~때문에 유명하다\'는 뜻이니 구분해서 외워두세요.',
-    example:'He <em>is known as</em> a talented musician.' },
-  { num:21, word:'experience', pos:'명사·동사', type:'wrong',
-    correct:'경험, 경험하다', student:'경험을 얻은',
-    tip:'경험을 얻은\'은 형용사 \'experienced\'의 뜻이므로 품사에 주의하세요.',
-    example:'She has a lot of <em>experience</em> in marketing.' },
-  { num:22, word:'reliable', pos:'형용사', type:'wrong',
-    correct:'믿을 수 있는, 신뢰할 수 있는', student:'안도하는',
-    tip:'relieved(안도하는)\'와 혼동하지 않도록 \'rely(의지하다)\'를 떠올리세요.',
-    example:'We need a <em>reliable</em> car for our road trip.' },
-  { num:27, word:'vague', pos:'형용사', type:'wrong',
-    correct:'모호한, 애매한', student:'모호하다',
-    tip:'모호하다\'는 동사이므로, 형용사인 \'vague\'는 \'모호한\'으로 써야 맞습니다.',
-    example:'His instructions were too <em>vague</em> to follow.' },
-  { num:37, word:'intense', pos:'형용사', type:'wrong',
-    correct:'강렬한, 극심한', student:'의도',
-    tip:'intent(의도)\'는 명사이고, \'intense\'는 \'강렬한\'이라는 뜻의 형용사입니다.',
-    example:'The work requires <em>intense</em> concentration.' },
-  { num:41, word:'ethnic', pos:'형용사', type:'wrong',
-    correct:'민족의, 인종의', student:'윤리적인',
-    tip:'ethical(윤리적인)\'과 철자가 비슷하니 주의해서 암기하세요.',
-    example:'The city has a diverse mix of <em>ethnic</em> groups.' },
-  { num:42, word:'hostility', pos:'명사', type:'wrong',
-    correct:'적의, 적대감', student:'환대',
-    tip:'hospitality(환대)\'와 반대되는 뜻이니 헷갈리지 않도록 주의하세요.',
-    example:'There was open <em>hostility</em> between the two leaders.' }
+  { num:8, word:'certificate', pos:'명사', type:'wrong',
+    correct:'증명서, 자격증', student:'확인하게하다',
+    tip:'동사 \'certify(증명하다)\'와 헷갈렸네요. \'certificate\'는 증명해주는 \'문서\'를 뜻하는 명사입니다.',
+    example:'To get the job, you need to show your teaching <em>certificate</em>.' },
+  { num:15, word:'simultaneous', pos:'형용사', type:'wrong',
+    correct:'동시의', student:'자극제',
+    tip:'자극제\'를 뜻하는 \'stimulant\'와 발음이 비슷해서 헷갈릴 수 있어요. \'simultaneous\'는 \'동시의\'라는 뜻입니다.',
+    example:'The two explosions were <em>simultaneous</em>, making it hard to tell which came first.' },
+  { num:20, word:'verdict', pos:'명사', type:'wrong',
+    correct:'평결, 판결', student:'수직의',
+    tip:'수직의\'를 뜻하는 \'vertical\'과 헷갈리지 않도록 주의하세요. \'verdict\'는 법정에서의 \'평결\'을 의미합니다.',
+    example:'The jury reached a guilty <em>verdict</em> after deliberating for five hours.' },
+  { num:23, word:'assimilate', pos:'동사', type:'wrong',
+    correct:'동화되다, 흡수하다', student:'비슷한',
+    tip:'비슷한(similar)\'과 어원이 같아요. \'비슷하게 만들다\', 즉 \'동화시키다\'라는 뜻으로 기억하세요.',
+    example:'It can be difficult for immigrants to <em>assimilate</em> into a new culture.' },
+  { num:28, word:'breakthrough', pos:'명사', type:'wrong',
+    correct:'돌파구, 비약적 발전', student:'돌파하다',
+    tip:'break through(돌파하다)\'는 동사구, \'breakthrough\'는 \'돌파구\'라는 명사입니다. 품사를 헷갈리지 마세요.',
+    example:'Scientists have made a major <em>breakthrough</em> in the treatment of the disease.' },
+  { num:29, word:'intersection', pos:'명사', type:'wrong',
+    correct:'교차로, 교차', student:'분야',
+    tip:'부분, 분야\'를 뜻하는 \'section\'과 헷갈리지 마세요. \'inter-\'는 \'사이\'를 뜻해 \'교차로\'를 의미합니다.',
+    example:'A serious car accident occurred at the busy <em>intersection</em> this morning.' },
+  { num:47, word:'alienate', pos:'동사', type:'wrong',
+    correct:'소외시키다, 멀어지게 하다', student:'멀리있는',
+    tip:'alien(외계인, 이방인)\'처럼 \'멀리 떨어뜨리다\', 즉 \'소외시키다\'라는 뜻의 동사입니다.',
+    example:'His arrogant comments have <em>alienated</em> many of his colleagues.' },
+  { num:48, word:'seemingly', pos:'부사', type:'wrong',
+    correct:'겉보기에는, 외견상으로', student:'비슷하게',
+    tip:'비슷하게(similarly)\'와 혼동하기 쉬워요. \'seem(~처럼 보이다)\'에서 온 부사로 \'겉보기에는\' 이란 뜻입니다.',
+    example:'The new plan is <em>seemingly</em> simple, but its implementation will be complex.' },
+  { num:49, word:'affirm', pos:'동사', type:'wrong',
+    correct:'단언하다, 확언하다', student:'허락하다',
+    tip:'허락하다(approve)\'와는 달라요. \'firm(확고한)\'하게 \'맞다\'고 \'단언하다\'라고 기억하세요.',
+    example:'The witness was asked to <em>affirm</em> that the statement he made to the police was true.' },
+  { num:2, word:'converse', pos:'동사/형용사', type:'wrong',
+    correct:'대화하다, 정반대의', student:'뒤집다',
+    tip:'reverse\'(뒤집다)와 발음이 비슷하지만, \'함께(con) 대화하다\'는 뜻으로 기억하세요.',
+    example:'She enjoyed the chance to <em>converse</em> with someone who shared her interests.' },
+  { num:4, word:'midst', pos:'명사', type:'wrong',
+    correct:'중앙, 한가운데', student:'중간의',
+    tip:'middle\'(중간의)은 형용사, \'midst\'는 \'...의 한가운데\'라는 뜻의 명사입니다. 품사를 구분하세요.',
+    example:'The country is in the <em>midst</em> of an economic crisis.' },
+  { num:12, word:'summit', pos:'명사', type:'wrong',
+    correct:'정상, 산꼭대기', student:'제출하다',
+    tip:'submit\'(제출하다)과 발음이 비슷하니 주의하세요. 산의 \'정상\'을 뜻하는 단어입니다.',
+    example:'They finally reached the <em>summit</em> of the mountain after a five-hour climb.' },
+  { num:22, word:'difficulty', pos:'명사', type:'wrong',
+    correct:'어려움, 곤란', student:'어려운',
+    tip:'difficult\'(어려운)는 형용사, \'difficulty\'는 \'어려움\'이라는 명사입니다. 품사를 구분해서 외우세요.',
+    example:'He had great <em>difficulty</em> in starting the car on the cold morning.' },
+  { num:29, word:'feat', pos:'명사', type:'wrong',
+    correct:'위업, 솜씨', student:'특징',
+    tip:'feature\'(특징)와 혼동하기 쉬워요. \'위업\'이나 \'대단한 솜씨\'라는 뜻으로 기억하세요.',
+    example:'Building the pyramids was an incredible <em>feat</em> of engineering.' },
+  { num:39, word:'torment', pos:'명사/동사', type:'wrong',
+    correct:'고통, 괴롭히다', student:'토너먼트',
+    tip:'발음이 비슷한 \'tournament\'(토너먼트)와 헷갈리지 마세요. \'고통\'이라는 전혀 다른 뜻입니다.',
+    example:'He was in a state of mental <em>torment</em> after losing his job.' },
+  { num:41, word:'mistrust', pos:'명사/동사', type:'wrong',
+    correct:'불신, 의심하다', student:'믿지 못하는',
+    tip:'mis-\'(잘못된)와 \'trust\'(믿음)가 합쳐진 단어로, \'불신\' 또는 \'의심하다\'라는 뜻입니다.',
+    example:'There is a growing <em>mistrust</em> of the government\'s official statements.' },
+  { num:44, word:'tactic', pos:'명사', type:'blank',
+    correct:'전략, 전술', student:'(무응답)',
+    tip:'전략\'이라는 뜻으로, 비슷한 단어 \'strategy\'와 함께 기억하면 좋습니다.',
+    example:'The general decided to change his <em>tactic</em> to surprise the enemy.' },
+  { num:45, word:'defect', pos:'명사', type:'wrong',
+    correct:'결함, 결점', student:'패배시키다',
+    tip:'defeat\'(패배시키다)와 발음이 비슷하니 주의하세요. 제품의 \'결함\'을 뜻하는 명사입니다.',
+    example:'The company had to recall thousands of cars due to a serious design <em>defect</em>.' },
+  { num:47, word:'implement', pos:'명사/동사', type:'wrong',
+    correct:'도구, 시행하다', student:'수단',
+    tip:'도구\'라는 뜻도 있지만, 계획 등을 \'시행하다\'라는 동사로 더 자주 쓰입니다.',
+    example:'The government will <em>implement</em> a new policy to improve public health.' },
+  { num:49, word:'pension', pos:'명사', type:'wrong',
+    correct:'연금', student:'휴양지',
+    tip:'우리가 아는 숙소 \'펜션\'과 철자는 같지만, 영어에서는 \'연금\'이라는 뜻으로 쓰입니다.',
+    example:'After retiring, he will receive a monthly <em>pension</em> from his former employer.' }
 ];
 let idx=0,startFace='word',showingBack=false,isAnimating=false;
 document.getElementById('btn-meaning').addEventListener('click',()=>{if(isAnimating)return;startFace='meaning';showingBack=false;document.getElementById('btn-meaning').classList.add('active');document.getElementById('btn-word').classList.remove('active');if(idx<cards.length)renderCard(0);});
@@ -214,7 +222,7 @@ const originalCards=[...cards];let isShuffled=false;
 function shuffleArray(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 document.getElementById('btn-random').addEventListener('click',function(){if(isAnimating)return;haptic(20);if(!isShuffled){const s=shuffleArray(cards);cards.length=0;s.forEach(c=>cards.push(c));isShuffled=true;this.classList.add('shuffled');this.textContent='🔀 랜덤ON';}else{cards.length=0;originalCards.forEach(c=>cards.push(c));isShuffled=false;this.classList.remove('shuffled');this.textContent='🔀 랜덤';}idx=0;showingBack=false;buildDots();renderCard(0);});
 let currentAudio=null;
-function speakWord(btn,word){if(currentAudio){currentAudio.pause();currentAudio=null;document.querySelectorAll('.tts-btn.playing').forEach(b=>b.classList.remove('playing'));if(btn.dataset.playing==='true'){btn.dataset.playing='';return;}}btn.classList.add('playing');btn.dataset.playing='true';const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;const audio=new Audio(url);currentAudio=audio;audio.onended=()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;};audio.onerror=()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;const u=new SpeechSynthesisUtterance(word);u.lang='en-US';u.rate=0.85;window.speechSynthesis&&window.speechSynthesis.speak(u);};audio.play().catch(()=>audio.onerror());}
+function speakWord(btn,word){if(currentAudio){currentAudio.pause();currentAudio=null;document.querySelectorAll('.tts-btn.playing').forEach(b=>b.classList.remove('playing'));if(btn.dataset.playing==='true'){btn.dataset.playing='';return;}}btn.classList.add('playing');btn.dataset.playing='true';const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;const audio=new Audio(url);currentAudio=audio;audio.onended=()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;};audio.onerror=()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;};audio.play().catch(()=>{btn.classList.remove('playing');btn.dataset.playing='';currentAudio=null;});}
 function buildDots(){const wrap=document.getElementById('prog-dots');wrap.innerHTML='';cards.forEach((_,i)=>{const d=document.createElement('div');d.className='pdot';d.id=`dot-${i}`;wrap.appendChild(d);});updateDots();}
 function updateDots(){const isEnd=idx>=cards.length;cards.forEach((_,i)=>{const d=document.getElementById(`dot-${i}`);if(!d)return;d.className='pdot'+(isEnd?' done all':i<idx?' done':i===idx?' current':'');});document.getElementById('cur').textContent=isEnd?'✓':(idx+1);document.getElementById('tot').textContent=cards.length;}
 function buildCardHTML(card){
@@ -222,19 +230,22 @@ function buildCardHTML(card){
   const badgeType=isBlank?`<span class="badge b-blank">미응답</span>`:`<span class="badge b-wrong">오답</span>`;
   const studentHTML=`<div class="student-row"><span class="student-label">내 답</span>${isBlank?`<span class="blank-label">— 미응답</span>`:`<span class="student-ans">${card.student}</span>`}</div>`;
   const badges=`<div class="badges"><span class="badge b-num">No.${card.num}</span>${badgeType}<span class="badge b-pos">${card.pos}</span></div>`;
+  const ttsWord=card.word.replace(/'/g,"&#39;");
+  const ttsBtn=`<button class="tts-btn" onclick="event.stopPropagation();speakWord(this,'${ttsWord}');" type="button">🔊</button>`;
   const MFACE=`<div class="face-meaning">${badges}<div class="meaning-center"><div class="meaning-label">뜻</div><div class="meaning-text">${card.correct}</div></div><div class="tap-hint">탭해서 영단어 보기</div></div>`;
   const MBACK=`<div class="face-meaning">${badges}<div class="scroll-area"><div class="word-center" style="min-height:90px"><div class="word-label">영단어</div><div class="word-text">${card.word}</div><div class="word-pos">${card.pos}</div></div>${studentHTML}<div class="tip-box"><div class="tip-title">💡 암기 팁</div>${card.tip}</div><div class="example-box">${card.example}</div></div><div class="tap-hint">탭해서 뜻 보기</div></div>`;
-  const WFACE=`<div class="face-word">${badges}<div class="word-center"><div class="word-label">영단어</div><div class="word-text">${card.word}</div><div class="word-pos">${card.pos}</div><button class="tts-btn" onclick="event.stopPropagation();speakWord(this,'${card.word.replace(/'/g,"&#39;")}');" type="button">🔊</button></div><div class="tap-hint">탭해서 뜻 보기</div></div>`;
+  const WFACE=`<div class="face-word">${badges}<div class="word-center"><div class="word-label">영단어</div><div class="word-text">${card.word}</div><div class="word-pos">${card.pos}</div></div><div class="tap-hint">탭해서 뜻 보기</div></div>`;
   const WBACK=`<div class="face-word">${badges}<div class="scroll-area"><div class="word-center" style="min-height:80px"><div class="word-label">영단어</div><div class="word-text" style="font-size:1.6rem">${card.word}</div></div><div class="meaning-label" style="text-align:center;margin-bottom:6px">뜻</div><div class="meaning-text" style="text-align:center;font-size:1.35rem;margin-bottom:10px">${card.correct}</div>${studentHTML}<div class="tip-box"><div class="tip-title">💡 암기 팁</div>${card.tip}</div><div class="example-box">${card.example}</div></div><div class="tap-hint">탭해서 영단어 보기</div></div>`;
-  return{frontHTML:startFace==='meaning'?MFACE:WFACE,backHTML:startFace==='meaning'?MBACK:WBACK};
+  return{frontHTML:startFace==='meaning'?MFACE:WFACE,backHTML:startFace==='meaning'?MBACK:WBACK,ttsBtn};
 }
 function buildEndHTML(){return`<div class="end-face"><div class="end-line"></div><div class="end-content"><div class="end-emoji">🎉</div><div><div class="end-label">All Done</div><div class="end-title">학습을 모두 마쳤어요!</div></div><div class="end-subtitle">오답 단어 ${cards.length}개를 모두 복습했어요.<br>한 번 더 반복하면 더욱 확실해져요 ✨</div><button class="restart-btn" id="restart-btn" type="button"><span>↻</span><span>다시 시작하기</span></button><div class="end-hint">→ 스와이프하면 마지막 카드로 돌아가요</div></div></div>`;}
 let cardEl=null;
-function renderCard(direction){const vp=document.getElementById('viewport');const old=vp.querySelector('.flash-card,.end-card');const isEnd=idx>=cards.length;const el=document.createElement('div');if(isEnd){el.className='end-card no-transition';el.innerHTML=buildEndHTML();}else{const{frontHTML,backHTML}=buildCardHTML(cards[idx]);el.className='flash-card no-transition';el.innerHTML=`<div class="card-face"><div class="card-line"></div><div class="card-content">${showingBack?backHTML:frontHTML}</div></div>`;}if(direction!==0){el.style.transform=`translateX(${direction>0?'100%':'-100%'})`;isAnimating=true;}vp.appendChild(el);cardEl=el;if(isEnd){const btn=el.querySelector('#restart-btn');if(btn)btn.addEventListener('click',restart);}requestAnimationFrame(()=>requestAnimationFrame(()=>{el.classList.remove('no-transition');el.style.transform='translateX(0)';}));if(old){old.classList.remove('no-transition');old.style.transform=`translateX(${direction>0?'-100%':'100%'})`;old.style.opacity='0.3';setTimeout(()=>{if(old.parentNode)old.remove();isAnimating=false;},350);}else isAnimating=false;updateDots();}
+function autoPlayTTS(card){if(!card||idx>=cards.length)return;const word=cards[idx].word;const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;if(currentAudio){currentAudio.pause();currentAudio=null;document.querySelectorAll('.tts-btn.playing').forEach(b=>{b.classList.remove('playing');b.dataset.playing='';});}const audio=new Audio(url);currentAudio=audio;const btn=card.querySelector('.tts-btn');if(btn){btn.classList.add('playing');btn.dataset.playing='true';}audio.onended=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}currentAudio=null;};audio.onerror=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}currentAudio=null;};audio.play().catch(()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}currentAudio=null;});}
+function renderCard(direction){const vp=document.getElementById('viewport');const old=vp.querySelector('.flash-card,.end-card');const isEnd=idx>=cards.length;const el=document.createElement('div');if(isEnd){el.className='end-card no-transition';el.innerHTML=buildEndHTML();}else{const{frontHTML,backHTML,ttsBtn}=buildCardHTML(cards[idx]);el.className='flash-card no-transition';el.innerHTML=`<div class="card-face"><div class="card-line"></div>${ttsBtn}<div class="card-content">${showingBack?backHTML:frontHTML}</div></div>`;}if(direction!==0){el.style.transform=`translateX(${direction>0?'100%':'-100%'})`;isAnimating=true;}vp.appendChild(el);cardEl=el;if(isEnd){const btn=el.querySelector('#restart-btn');if(btn)btn.addEventListener('click',restart);}requestAnimationFrame(()=>requestAnimationFrame(()=>{el.classList.remove('no-transition');el.style.transform='translateX(0)';if(!isEnd&&direction!==0&&startFace==='word')setTimeout(()=>autoPlayTTS(el),120);}));if(old){old.classList.remove('no-transition');old.style.transform=`translateX(${direction>0?'-100%':'100%'})`;old.style.opacity='0.3';setTimeout(()=>{if(old.parentNode)old.remove();isAnimating=false;},350);}else{isAnimating=false;if(!isEnd&&startFace==='word')setTimeout(()=>autoPlayTTS(el),120);}updateDots();}
 function restart(){if(isAnimating)return;idx=0;showingBack=false;haptic(15);renderCard(-1);}
 function flipCard(el){if(!el||isAnimating||idx>=cards.length||!el.querySelector('.card-face'))return;showingBack=!showingBack;const{frontHTML,backHTML}=buildCardHTML(cards[idx]);const content=el.querySelector('.card-content');const face=el.querySelector('.card-face');face.style.transition='transform 0.15s ease';face.style.transform='scale(0.97)';setTimeout(()=>{content.innerHTML=showingBack?backHTML:frontHTML;face.style.transform='scale(1)';},80);setTimeout(()=>{face.style.transition='';},230);}
 function haptic(ms=8){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(_){}}
-function initInteraction(){const vp=document.getElementById('viewport');let sX=0,sY=0,sT=0,tracking=false,hasMoved=false,locked=null,pid=null;const DL=8,TT=8,SD=60,SV=30,ST=350,VD=45,VV=25;function getCard(){return vp.querySelector('.flash-card,.end-card');}function startT(x,y,t){if(isAnimating)return false;if(t&&t.closest&&t.closest('.tts-btn'))return false;tracking=true;hasMoved=false;locked=null;sX=x;sY=y;sT=Date.now();const c=getCard();if(c)c.classList.add('dragging');return true;}function moveT(x,y,ev){if(!tracking)return;const dx=x-sX,dy=y-sY;if(locked===null){if(Math.abs(dx)>DL||Math.abs(dy)>DL)locked=Math.abs(dx)>Math.abs(dy)*1.1?'h':Math.abs(dy)>Math.abs(dx)*1.1?'v':'h';}if(locked==='h'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();hasMoved=true;const c=getCard();if(c)c.style.transform=`translateX(${dx*((dx>0&&idx===0)||(dx<0&&idx>=cards.length)?0.25:0.55)}px)`;const t=Math.min(Math.abs(dx)/70,1);if(dx>5){document.getElementById('ind-prev').style.opacity=String(t*0.9);document.getElementById('ind-next').style.opacity='0';}else if(dx<-5){document.getElementById('ind-next').style.opacity=String(t*0.9);document.getElementById('ind-prev').style.opacity='0';}else{document.getElementById('ind-prev').style.opacity='0';document.getElementById('ind-next').style.opacity='0';}}else if(locked==='v'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();hasMoved=true;const c=getCard();if(c)c.style.transform=`translateY(${dy*0.25}px)`;const t=Math.min(Math.abs(dy)/50,1);if(dy<-5){document.getElementById('ind-up').style.opacity=String(t*0.9);document.getElementById('ind-down').style.opacity='0';}else if(dy>5){document.getElementById('ind-down').style.opacity=String(t*0.9);document.getElementById('ind-up').style.opacity='0';}else{document.getElementById('ind-up').style.opacity='0';document.getElementById('ind-down').style.opacity='0';}}}function endT(ex,ey){if(!tracking&&locked!=='h'&&locked!=='v'){locked=null;return;}tracking=false;['ind-prev','ind-next','ind-up','ind-down'].forEach(id=>document.getElementById(id).style.opacity='0');const c=getCard();if(c)c.classList.remove('dragging');const dx=ex-sX,dy=ey-sY,dt=Date.now()-sT;if(locked==='v'&&hasMoved){if(c)c.style.transform='';if((dt<ST&&Math.abs(dy)>VV)||Math.abs(dy)>VD){if(idx<cards.length){haptic(8);flipCard(c);}}else if(c){c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';c.style.transform='translateY(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}locked=null;return;}const wh=locked==='h'&&hasMoved,fast=wh&&dt<ST&&Math.abs(dx)>SV,far=wh&&Math.abs(dx)>SD;if(wh&&(fast||far)){if(c)c.style.transform='';if(dx>0&&idx>0){idx--;showingBack=false;haptic(10);renderCard(-1);}else if(dx<0&&idx<cards.length){idx++;showingBack=false;haptic(10);renderCard(1);}else if(c){c.style.transition='transform 0.3s cubic-bezier(.175,.885,.32,1.275)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},350);}}else{if(c&&wh){c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}else if(c)c.style.transform='';if(locked===null&&Math.abs(dx)<TT&&Math.abs(dy)<TT)flipCard(c);}locked=null;}function cancelT(){tracking=false;hasMoved=false;locked=null;const c=getCard();if(c){c.classList.remove('dragging');c.style.transition='transform 0.25s';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}['ind-prev','ind-next','ind-up','ind-down'].forEach(id=>document.getElementById(id).style.opacity='0');}if(window.PointerEvent){vp.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;if(pid!==null)return;if(!startT(e.clientX,e.clientY,e.target))return;pid=e.pointerId;});vp.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;moveT(e.clientX,e.clientY,e);});vp.addEventListener('pointerup',e=>{if(e.pointerId!==pid)return;pid=null;endT(e.clientX,e.clientY);});vp.addEventListener('pointercancel',e=>{if(e.pointerId!==pid)return;pid=null;cancelT();});}else{vp.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;startT(e.touches[0].clientX,e.touches[0].clientY,e.target);},{passive:true});vp.addEventListener('touchmove',e=>{if(!tracking||e.touches.length!==1)return;moveT(e.touches[0].clientX,e.touches[0].clientY,e);},{passive:false});vp.addEventListener('touchend',e=>{if(!e.changedTouches||!e.changedTouches.length)return;endT(e.changedTouches[0].clientX,e.changedTouches[0].clientY);},{passive:true});vp.addEventListener('touchcancel',cancelT,{passive:true});let md=false;vp.addEventListener('mousedown',e=>{if(!startT(e.clientX,e.clientY,e.target))return;md=true;});window.addEventListener('mousemove',e=>{if(!md)return;moveT(e.clientX,e.clientY,e);});window.addEventListener('mouseup',e=>{if(!md)return;md=false;endT(e.clientX,e.clientY);});}}
+function initInteraction(){const vp=document.getElementById('viewport');let sX=0,sY=0,sT=0,tracking=false,hasMoved=false,locked=null,pid=null,scrollCtx=null;const DL=6,TT=8,SD=60,SV=30,ST=400,VD=30,VV=15;function getCard(){return vp.querySelector('.flash-card,.end-card');}function startT(x,y,t){if(isAnimating)return false;if(t&&t.closest&&t.closest('.tts-btn'))return false;tracking=true;hasMoved=false;locked=null;scrollCtx=null;sX=x;sY=y;sT=Date.now();const sa=t&&t.closest&&t.closest('.scroll-area');if(sa&&sa.scrollHeight>sa.clientHeight){scrollCtx={el:sa,lastY:y,max:sa.scrollHeight-sa.clientHeight};}const c=getCard();if(c)c.classList.add('dragging');return true;}function moveT(x,y,ev){if(!tracking)return;const dx=x-sX,dy=y-sY;if(locked===null){if(Math.abs(dx)>DL||Math.abs(dy)>DL){const wantV=Math.abs(dy)>=Math.abs(dx);if(wantV&&scrollCtx){const atTop=scrollCtx.el.scrollTop<=0,atBot=scrollCtx.el.scrollTop>=scrollCtx.max;if((dy>0&&!atTop)||(dy<0&&!atBot)){locked='scroll';}else{locked='v';}}else{locked=wantV?'v':'h';}}}if(locked==='scroll'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();scrollCtx.el.scrollTop-=(y-scrollCtx.lastY);scrollCtx.lastY=y;const atTop=scrollCtx.el.scrollTop<=0,atBot=scrollCtx.el.scrollTop>=scrollCtx.max;const cumDy=y-sY;if(((cumDy>0&&atTop)||(cumDy<0&&atBot))&&Math.abs(cumDy)>VD){locked='v';sY=y-VV*(cumDy>0?1:-1);return;}return;}if(locked==='h'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();hasMoved=true;const c=getCard();if(c)c.style.transform=`translateX(${dx*((dx>0&&idx===0)||(dx<0&&idx>=cards.length)?0.25:0.55)}px)`;const t=Math.min(Math.abs(dx)/70,1);if(dx>5){document.getElementById('ind-prev').style.opacity=String(t*0.9);document.getElementById('ind-next').style.opacity='0';}else if(dx<-5){document.getElementById('ind-next').style.opacity=String(t*0.9);document.getElementById('ind-prev').style.opacity='0';}else{document.getElementById('ind-prev').style.opacity='0';document.getElementById('ind-next').style.opacity='0';}}else if(locked==='v'){if(ev&&ev.cancelable&&ev.type==='touchmove')ev.preventDefault();hasMoved=true;const c=getCard();if(c)c.style.transform=`translateY(${dy*0.25}px)`;const t=Math.min(Math.abs(dy)/50,1);if(dy<-5){document.getElementById('ind-up').style.opacity=String(t*0.9);document.getElementById('ind-down').style.opacity='0';}else if(dy>5){document.getElementById('ind-down').style.opacity=String(t*0.9);document.getElementById('ind-up').style.opacity='0';}else{document.getElementById('ind-up').style.opacity='0';document.getElementById('ind-down').style.opacity='0';}}}function endT(ex,ey){if(!tracking&&locked!=='h'&&locked!=='v'){locked=null;return;}tracking=false;['ind-prev','ind-next','ind-up','ind-down'].forEach(id=>document.getElementById(id).style.opacity='0');const c=getCard();if(c)c.classList.remove('dragging');const dx=ex-sX,dy=ey-sY,dt=Date.now()-sT;if(locked==='v'&&hasMoved){if(c)c.style.transform='';if((dt<ST&&Math.abs(dy)>VV)||Math.abs(dy)>VD){if(idx<cards.length){haptic(8);flipCard(c);}}else if(c){c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';c.style.transform='translateY(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}locked=null;return;}const wh=locked==='h'&&hasMoved,fast=wh&&dt<ST&&Math.abs(dx)>SV,far=wh&&Math.abs(dx)>SD;if(wh&&(fast||far)){if(c)c.style.transform='';if(dx>0&&idx>0){idx--;showingBack=false;haptic(10);renderCard(-1);}else if(dx<0&&idx<cards.length){idx++;showingBack=false;haptic(10);renderCard(1);}else if(c){c.style.transition='transform 0.3s cubic-bezier(.175,.885,.32,1.275)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},350);}}else{if(c&&wh){c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}else if(c)c.style.transform='';if(locked===null&&Math.abs(dx)<TT&&Math.abs(dy)<TT)flipCard(c);}locked=null;}function cancelT(){tracking=false;hasMoved=false;locked=null;const c=getCard();if(c){c.classList.remove('dragging');c.style.transition='transform 0.25s';c.style.transform='translateX(0)';setTimeout(()=>{if(c)c.style.transition='';},280);}['ind-prev','ind-next','ind-up','ind-down'].forEach(id=>document.getElementById(id).style.opacity='0');}if(window.PointerEvent){vp.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;if(pid!==null)return;if(!startT(e.clientX,e.clientY,e.target))return;pid=e.pointerId;});vp.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;moveT(e.clientX,e.clientY,e);});vp.addEventListener('pointerup',e=>{if(e.pointerId!==pid)return;pid=null;endT(e.clientX,e.clientY);});vp.addEventListener('pointercancel',e=>{if(e.pointerId!==pid)return;pid=null;cancelT();});}else{vp.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;startT(e.touches[0].clientX,e.touches[0].clientY,e.target);},{passive:true});vp.addEventListener('touchmove',e=>{if(!tracking||e.touches.length!==1)return;moveT(e.touches[0].clientX,e.touches[0].clientY,e);},{passive:false});vp.addEventListener('touchend',e=>{if(!e.changedTouches||!e.changedTouches.length)return;endT(e.changedTouches[0].clientX,e.changedTouches[0].clientY);},{passive:true});vp.addEventListener('touchcancel',cancelT,{passive:true});let md=false;vp.addEventListener('mousedown',e=>{if(!startT(e.clientX,e.clientY,e.target))return;md=true;});window.addEventListener('mousemove',e=>{if(!md)return;moveT(e.clientX,e.clientY,e);});window.addEventListener('mouseup',e=>{if(!md)return;md=false;endT(e.clientX,e.clientY);});}}
 document.addEventListener('keydown',e=>{if(isAnimating)return;if(e.key==='ArrowRight'&&idx>0){idx--;showingBack=false;renderCard(-1);}else if(e.key==='ArrowLeft'&&idx<cards.length){idx++;showingBack=false;renderCard(1);}else if(e.key===' '||e.key==='Enter'){e.preventDefault();if(idx>=cards.length)restart();else if(cardEl)flipCard(cardEl);}});
 let lte=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lte<=300)e.preventDefault();lte=n;},{passive:false});
 window.addEventListener('resize',()=>document.documentElement.style.setProperty('--app-vh',`${window.innerHeight*0.01}px`));
