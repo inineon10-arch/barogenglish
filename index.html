@@ -68,7 +68,7 @@
   .search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--ink-mute);pointer-events:none;}
 
   /* ── 오답단어 카드 그리드 ── */
-  .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.75rem;}
+  .materials-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
   .material-card{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.85rem .8rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s ease both;}
   .material-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
   .material-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent-soft);}
@@ -88,7 +88,7 @@
   .vocab-stat strong{color:var(--purple);font-weight:600;}
 
   /* Day 폴더 그리드 — 오답단어처럼 */
-  .vocab-day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.75rem;}
+  .vocab-day-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
 
   .day-folder{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.85rem .8rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;user-select:none;animation:fadeUp .5s ease both;}
   .day-folder::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--purple);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
@@ -126,6 +126,11 @@
   .vcard-hint{font-size:.58rem;color:var(--ink-mute);margin-top:.22rem;}
   .vcard.open .vcard-ko{display:block;}
   .vcard.open .vcard-hint{display:none;}
+  .vcard-tts{display:none;margin-top:.3rem;}
+  .vcard.open .vcard-tts{display:flex;align-items:center;gap:.3rem;font-size:.6rem;color:var(--purple);cursor:pointer;width:fit-content;}
+  .vcard.open .vcard-tts:hover{opacity:.75;}
+  .tts-playing{color:var(--purple);animation:pulse .6s ease infinite alternate;}
+  @keyframes pulse{from{opacity:.5}to{opacity:1}}
 
   /* 로딩 */
   .loading-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--ink-mute);font-family:'Inter',sans-serif;font-size:.85rem;}
@@ -149,7 +154,7 @@
     .hero{grid-template-columns:1fr;padding:4rem 1.25rem 3rem;gap:2rem;}
     .tab-bar{padding:1.5rem 1.25rem 0;} .materials-section{padding:3rem 1.25rem 4rem;}
     .section-header{flex-direction:column;align-items:flex-start;gap:.5rem;}
-    .materials-grid{grid-template-columns:repeat(2,1fr);gap:.75rem;}
+    .materials-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
     .material-card{padding:1rem .875rem;}
     .vocab-cards{grid-template-columns:repeat(2,1fr);}
     .footer-inner{flex-direction:column;text-align:center;}
@@ -411,8 +416,15 @@ function renderVocab(words) {
       c.className='vcard';
       c.innerHTML=`<div class="vcard-en">${esc(w.word)}</div>
         <div class="vcard-ko">${esc(w.meaning)}</div>
-        <div class="vcard-hint">탭해서 뜻 보기</div>`;
-      c.addEventListener('click', ()=>c.classList.toggle('open'));
+        <div class="vcard-hint">탭해서 뜻 보기</div>
+        <div class="vcard-tts" data-word="${esc(w.word)}">🔊 <span>발음 듣기</span></div>`;
+      c.addEventListener('click', (e) => {
+        if(e.target.closest('.vcard-tts')) return; // TTS 버튼은 toggle 안 함
+        c.classList.toggle('open');
+        if(c.classList.contains('open')) ttsPlay(w.word, c.querySelector('.vcard-tts'));
+      });
+      const ttsBtn = c.querySelector('.vcard-tts');
+      ttsBtn.addEventListener('click', (e) => { e.stopPropagation(); ttsPlay(w.word, ttsBtn); });
       cardsWrap.appendChild(c);
     });
 
@@ -477,6 +489,18 @@ document.getElementById('search-vocab').addEventListener('input', e=>{
   const k=e.target.value.trim().toLowerCase();
   renderVocab(k?allWords.filter(w=>w.word.toLowerCase().includes(k)||w.meaning.toLowerCase().includes(k)||w.day.toLowerCase().includes(k)):allWords);
 });
+
+/* TTS */
+let _audio = null;
+function ttsPlay(word, btn) {
+  if(_audio){ _audio.pause(); _audio=null; document.querySelectorAll('.vcard-tts').forEach(b=>b.classList.remove('tts-playing')); }
+  if(!word) return;
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;
+  _audio = new Audio(url);
+  if(btn) btn.classList.add('tts-playing');
+  _audio.onended = _audio.onerror = () => { if(btn) btn.classList.remove('tts-playing'); _audio=null; };
+  _audio.play().catch(()=>{ if(btn) btn.classList.remove('tts-playing'); _audio=null; });
+}
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 </script>
