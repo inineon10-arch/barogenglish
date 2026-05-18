@@ -60,12 +60,47 @@
   .section-title.vocab-title em{color:var(--purple);}
   .section-count{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--ink-mute);letter-spacing:.05em;}
 
-  /* SEARCH */
-  .search-wrap{margin-bottom:2.5rem;position:relative;max-width:480px;}
-  .search-input{width:100%;padding:.9rem 1.1rem .9rem 2.8rem;font-family:'Noto Serif KR',serif;font-size:.95rem;background:var(--card);border:1px solid var(--line);border-radius:2px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
-  .search-input:focus{border-color:var(--accent-soft);box-shadow:0 0 0 3px rgba(160,120,85,.1);}
-  .search-input::placeholder{color:var(--ink-mute);font-style:italic;}
-  .search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--ink-mute);pointer-events:none;}
+  /* 오늘의 퀴즈 배너 */
+  .quiz-banner{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--card);border:1.5px solid rgba(112,54,227,.25);border-radius:10px;padding:1.1rem 1.4rem;margin-bottom:2rem;box-shadow:0 2px 12px rgba(112,54,227,.08);position:relative;overflow:hidden;}
+  .quiz-banner::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--purple);}
+  .quiz-banner-label{font-family:'Inter',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:.3rem;}
+  .quiz-banner-day{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--ink);line-height:1.1;}
+  .quiz-banner-sub{font-size:.75rem;color:var(--ink-mute);margin-top:.2rem;}
+  .quiz-banner-btn{font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.65rem 1.3rem;background:var(--purple);color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .2s,transform .15s;flex-shrink:0;}
+  .quiz-banner-btn:hover{opacity:.88;} .quiz-banner-btn:active{transform:scale(.96);}
+
+  /* 퀴즈 오버레이 & 모달 */
+  .quiz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto;}
+  .quiz-modal{background:var(--bg);border-radius:14px;width:100%;max-width:540px;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative;margin:auto;}
+  .quiz-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:.9rem;border-bottom:1px solid var(--line);}
+  .quiz-modal-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--ink);}
+  .quiz-modal-prog{font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:var(--purple);background:rgba(112,54,227,.08);padding:.3rem .8rem;border-radius:20px;}
+  .quiz-modal-close{margin-top:1.2rem;width:100%;padding:.75rem;background:none;border:1.5px solid var(--line);border-radius:8px;font-family:'Inter',sans-serif;font-size:.8rem;color:var(--ink-mute);cursor:pointer;transition:border-color .2s;}
+  .quiz-modal-close:hover{border-color:var(--ink-mute);}
+
+  /* 퀴즈 문제 */
+  .qm-question{font-size:1.1rem;font-weight:600;font-family:'Inter',sans-serif;color:var(--ink);margin-bottom:1.1rem;line-height:1.4;}
+  .qm-word{font-size:1.5rem;font-weight:700;font-family:'Inter',sans-serif;color:var(--ink);display:block;margin-bottom:.3rem;}
+  .qm-options{display:flex;flex-direction:column;gap:.6rem;}
+  .qm-opt{padding:.8rem 1rem;border:1.5px solid var(--line);border-radius:8px;background:var(--card);font-size:.9rem;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.75rem;}
+  .qm-opt:hover{border-color:rgba(112,54,227,.4);background:rgba(112,54,227,.03);}
+  .qm-opt.correct{border-color:#1a9e6f;background:#f0faf6;color:#1a6b50;pointer-events:none;}
+  .qm-opt.wrong{border-color:#d94040;background:#fff0f0;color:#a82c2c;pointer-events:none;}
+  .qm-opt.disabled{pointer-events:none;opacity:.6;}
+  .qm-mark{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-family:'Inter',sans-serif;font-weight:700;flex-shrink:0;}
+  .qm-opt.correct .qm-mark{background:#1a9e6f;border-color:#1a9e6f;color:#fff;}
+  .qm-opt.wrong .qm-mark{background:#d94040;border-color:#d94040;color:#fff;}
+  .qm-feedback{margin-top:.9rem;padding:.75rem 1rem;border-radius:8px;font-size:.82rem;line-height:1.5;display:none;}
+  .qm-feedback.show{display:block;}
+  .qm-feedback.ok{background:#f0faf6;border:1px solid #b8e8d4;color:#1a6b50;}
+  .qm-feedback.fail{background:#fff0f0;border:1px solid #ffcccc;color:#a82c2c;}
+  .qm-next{margin-top:.9rem;width:100%;padding:.85rem;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;display:none;}
+  .qm-next.show{display:block;}
+  .qm-result{text-align:center;padding:1.5rem 0;}
+  .qm-result-emoji{font-size:3rem;margin-bottom:.5rem;}
+  .qm-result-score{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;color:var(--purple);}
+  .qm-result-label{font-size:.85rem;color:var(--ink-mute);margin-top:.4rem;}
+  .qm-restart{margin-top:1.2rem;padding:.75rem 2rem;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;}
 
   /* ── 오답단어 카드 그리드 ── */
   .materials-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
@@ -203,12 +238,6 @@
     <h2 class="section-title">오답단어 <em></em></h2>
     <div class="section-count" id="count-wrong">전체 자료</div>
   </div>
-  <div class="search-wrap">
-    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-    <input type="text" class="search-input" id="search-wrong" placeholder="날짜로 검색하세요." aria-label="오답단어 검색">
-  </div>
   <div class="materials-grid" id="grid-wrong"></div>
 </main>
 
@@ -218,12 +247,28 @@
     <h2 class="section-title vocab-title">진도단어 <em></em></h2>
     <div class="section-count" id="count-vocab">불러오는 중...</div>
   </div>
-  <div class="search-wrap">
-    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-    <input type="text" class="search-input" id="search-vocab" placeholder="단어나 뜻으로 검색하세요.">
+  <!-- ★ 오늘의 퀴즈 배너 -->
+  <div class="quiz-banner" id="quiz-banner" style="display:none">
+    <div class="quiz-banner-left">
+      <div class="quiz-banner-label">오늘의 퀴즈</div>
+      <div class="quiz-banner-day" id="quiz-banner-day">Day 01</div>
+      <div class="quiz-banner-sub" id="quiz-banner-sub">객관식 · 20문제</div>
+    </div>
+    <button class="quiz-banner-btn" id="quiz-start-btn" onclick="startQuiz()">시작하기 →</button>
   </div>
+
+  <!-- 퀴즈 모달 -->
+  <div class="quiz-overlay" id="quiz-overlay" style="display:none">
+    <div class="quiz-modal" id="quiz-modal">
+      <div class="quiz-modal-header">
+        <div class="quiz-modal-title" id="qm-title">Day 01 · 객관식 퀴즈</div>
+        <div class="quiz-modal-prog" id="qm-prog">1 / 20</div>
+      </div>
+      <div class="quiz-modal-body" id="qm-body"></div>
+      <button class="quiz-modal-close" onclick="closeQuiz()">✕ 닫기</button>
+    </div>
+  </div>
+
   <div class="vocab-meta-bar" id="vocab-meta" style="display:none">
     <span class="vocab-stat">단어 <strong id="vocab-total">0</strong>개</span>
     <span class="vocab-stat">· Day <strong id="vocab-days">0</strong>개</span>
@@ -292,10 +337,7 @@ function renderWrong(list) {
     grid.appendChild(a);
   });
 }
-document.getElementById('search-wrong').addEventListener('input', e => {
-  const k = e.target.value.trim().toLowerCase();
-  renderWrong(k ? wrongMaterials.filter(m => m.title.toLowerCase().includes(k)||m.description.toLowerCase().includes(k)) : wrongMaterials);
-});
+
 renderWrong(wrongMaterials);
 
 /* ============================================================
@@ -360,6 +402,7 @@ async function loadVocab() {
 
     if(!allWords.length) throw new Error('단어가 없습니다.');
     renderVocab(allWords);
+    initQuizBanner();
   } catch(e) {
     document.getElementById('vocab-content').innerHTML=`<div class="loading-box" style="color:#d94040">⚠️ ${e.message}</div>`;
     document.getElementById('count-vocab').textContent='로딩 실패';
@@ -493,55 +536,122 @@ function flipDay(i) {
   if(btn) btn.textContent = anyOpen?'전체 뒤집기':'전체 닫기';
 }
 
-document.getElementById('search-vocab').addEventListener('input', e=>{
-  if(!allWords.length) return;
-  const k=e.target.value.trim().toLowerCase();
-  renderVocab(k?allWords.filter(w=>w.word.toLowerCase().includes(k)||w.meaning.toLowerCase().includes(k)||w.day.toLowerCase().includes(k)):allWords);
-});
 
-/* TTS — Google Translate TTS (사용자 클릭 후 재생) */
+
+/* TTS — Google Translate TTS only */
 let _audio = null;
 function ttsPlay(word, btn) {
-  // 이전 재생 정지
-  if(_audio){
-    try{_audio.pause();}catch(e){}
-    _audio=null;
-    document.querySelectorAll('.vcard-tts').forEach(b=>b.classList.remove('tts-playing'));
-  }
+  if(_audio){ try{_audio.pause();}catch(e){} _audio=null; document.querySelectorAll('.vcard-tts').forEach(b=>b.classList.remove('tts-playing')); }
   if(!word) return;
   const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;
-  _audio = new Audio();
-  _audio.crossOrigin = 'anonymous';
-  _audio.src = url;
+  _audio = new Audio(url);
   if(btn) btn.classList.add('tts-playing');
   _audio.onended = () => { if(btn) btn.classList.remove('tts-playing'); _audio=null; };
-  _audio.onerror = () => {
-    if(btn) btn.classList.remove('tts-playing');
-    _audio=null;
-    // 폴백: 브라우저 내장 TTS (Web Speech API)
-    if('speechSynthesis' in window){
-      const u = new SpeechSynthesisUtterance(word);
-      u.lang = 'en-US';
-      u.rate = 0.9;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }
-  };
-  const p = _audio.play();
-  if(p && p.catch){
-    p.catch(() => {
-      // 자동 재생 실패시 폴백
-      if(btn) btn.classList.remove('tts-playing');
-      _audio=null;
-      if('speechSynthesis' in window){
-        const u = new SpeechSynthesisUtterance(word);
-        u.lang = 'en-US';
-        u.rate = 0.9;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(u);
-      }
-    });
-  }
+  _audio.onerror = () => { if(btn) btn.classList.remove('tts-playing'); _audio=null; };
+  _audio.play().catch(()=>{ if(btn) btn.classList.remove('tts-playing'); _audio=null; });
+}
+
+/* ============================================================
+   ★ 오늘의 퀴즈 설정
+   퀴즈 Day를 바꾸려면 아래 QUIZ_CONFIG 만 수정하세요.
+   day: 표시할 Day 이름 (구글 시트의 첫 번째 컬럼 값과 정확히 일치)
+   count: 출제 문제 수
+   ============================================================ */
+const QUIZ_CONFIG = {
+  day: 'Day 01',   // ← 선생님이 매일 여기만 수정
+  count: 20
+};
+
+let quizWords=[], quizIdx=0, quizScore=0, quizAnswered=false;
+
+function initQuizBanner() {
+  const banner = document.getElementById('quiz-banner');
+  const dayEl  = document.getElementById('quiz-banner-day');
+  const subEl  = document.getElementById('quiz-banner-sub');
+  dayEl.textContent  = QUIZ_CONFIG.day;
+  subEl.textContent  = `객관식 · ${QUIZ_CONFIG.count}문제`;
+  banner.style.display = 'flex';
+}
+
+function startQuiz() {
+  const dayWords = allWords.filter(w=>w.day===QUIZ_CONFIG.day);
+  if(!dayWords.length){ alert(`${QUIZ_CONFIG.day} 단어를 먼저 불러오세요.`); return; }
+  // 랜덤 셔플 후 count개 선택
+  quizWords = shuffle([...dayWords]).slice(0, QUIZ_CONFIG.count);
+  quizIdx=0; quizScore=0;
+  document.getElementById('qm-title').textContent = `${QUIZ_CONFIG.day} · 객관식 퀴즈`;
+  document.getElementById('quiz-overlay').style.display='flex';
+  renderQuizQ();
+}
+
+function closeQuiz() {
+  document.getElementById('quiz-overlay').style.display='none';
+  if(_audio){ try{_audio.pause();}catch(e){} _audio=null; }
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a; }
+
+function renderQuizQ() {
+  const total = quizWords.length;
+  document.getElementById('qm-prog').textContent = `${quizIdx+1} / ${total}`;
+  if(quizIdx>=total){ renderQuizResult(); return; }
+
+  const w = quizWords[quizIdx];
+  quizAnswered = false;
+
+  // 오답 보기 3개 (전체 단어 풀에서 랜덤)
+  const pool = allWords.filter(x=>x.meaning!==w.meaning);
+  const wrongs = shuffle(pool).slice(0,3).map(x=>x.meaning);
+  const opts = shuffle([w.meaning, ...wrongs]);
+
+  const body = document.getElementById('qm-body');
+  body.innerHTML = `
+    <div class="qm-question"><span class="qm-word">${esc(w.word)}</span>위 단어의 뜻은?</div>
+    <div class="qm-options">
+      ${opts.map((o,i)=>`
+        <button class="qm-opt" onclick="pickOpt(this,'${esc(o)}','${esc(w.meaning)}')">
+          <span class="qm-mark">${['A','B','C','D'][i]}</span>
+          <span>${esc(o)}</span>
+        </button>`).join('')}
+    </div>
+    <div class="qm-feedback" id="qm-fb"></div>
+    <button class="qm-next" id="qm-next" onclick="nextQ()">
+      ${quizIdx+1<total?'다음 →':'결과 보기'}
+    </button>`;
+}
+
+function pickOpt(btn, chosen, correct) {
+  if(quizAnswered) return;
+  quizAnswered=true;
+  const isOk = chosen===correct;
+  if(isOk) quizScore++;
+  // 보기 색상
+  document.querySelectorAll('.qm-opt').forEach(b=>{
+    b.classList.add('disabled');
+    if(b.querySelector('span:last-child').textContent===correct) b.classList.add('correct');
+  });
+  if(!isOk) btn.classList.add('wrong');
+  // 피드백
+  const fb=document.getElementById('qm-fb');
+  fb.className='qm-feedback show '+(isOk?'ok':'fail');
+  fb.textContent = isOk?`✅ 정답!`:`❌ 정답: ${correct}`;
+  document.getElementById('qm-next').classList.add('show');
+}
+
+function nextQ(){ quizIdx++; renderQuizQ(); }
+
+function renderQuizResult(){
+  const pct=Math.round(quizScore/quizWords.length*100);
+  const em=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'💪':'📖';
+  document.getElementById('qm-body').innerHTML=`
+    <div class="qm-result">
+      <div class="qm-result-emoji">${em}</div>
+      <div class="qm-result-score">${quizScore} / ${quizWords.length}</div>
+      <div class="qm-result-label">${pct}% 정답</div>
+      <button class="qm-restart" onclick="startQuiz()">↺ 다시 풀기</button>
+    </div>`;
+  document.getElementById('qm-next').style.display='none';
+  document.getElementById('qm-prog').textContent='완료';
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
