@@ -760,6 +760,7 @@ function initQuizBanner() {
 
 /* ── 퀴즈 엔진 (quiz_mc.html 방식) ── */
 let qzStage='intro', qzQueue=[], qzPos=0, qzAnswered=false, qzWrong=[], qzCardEl=null, qzAnim=false;
+let qzOriginalTotal = 0; // 재시도 후에도 원래 전체 문제 수 유지
 
 function qzShuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
 function qzHaptic(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch(_){}}
@@ -781,6 +782,7 @@ function startQuiz() {
   qzQueue = selected.map(w=>({...w, _opts:qzBuildOpts(w, allWords), _result:null, _picked:null}));
   qzPos=0; qzAnswered=false; qzWrong=[];
   qzStage='mc';
+  qzOriginalTotal = selected.length; // ← 원래 문제 수 저장
   qzStartTime = Date.now(); // ← 시작 시각 기록
   document.getElementById('qz-title').textContent=`${QUIZ_CONFIG.day} · 객관식`;
   document.getElementById('qz-overlay').style.display='flex';
@@ -939,15 +941,16 @@ function qzRenderResult(){
   qzStage='result';qzUpdatePill();
   document.getElementById('qz-dots').innerHTML='';
   document.getElementById('qz-cur').textContent='✓';
-  const total=qzQueue.length+qzWrong.filter(w=>w._result==='wrong').length;
-  const correct=qzQueue.length-qzWrong.filter(w=>w._result==='wrong').length;
-  const allTotal=qzQueue.length;
-  const pct=Math.round((allTotal-qzWrong.filter(w=>w._result==='wrong').length)/allTotal*100);
+  // allTotal: 원래 전체 문제 수 (retry로 qzQueue가 바뀌어도 유지)
+  const allTotal  = qzOriginalTotal;
+  const stillWrong = qzWrong.filter(w=>w._result==='wrong').length;
+  const correct   = allTotal - stillWrong;
+  const pct       = Math.round(correct / allTotal * 100);
   const col=pct>=80?'#1a9e6f':pct>=60?'#e3502d':'#d94040';
   const deg=Math.round((pct/100)*360);
-  const wrongHTML=qzWrong.filter(w=>w._result==='wrong').length===0
+  const wrongHTML=stillWrong===0
     ?`<div class="qz-perfect">🏆 모든 문제를 맞혔어요!</div>`
-    :`<div><div class="qz-wrong-ttl">📌 다시 봐야 할 단어 (${qzWrong.filter(w=>w._result==='wrong').length}개)</div>
+    :`<div><div class="qz-wrong-ttl">📌 다시 봐야 할 단어 (${stillWrong}개)</div>
       ${qzWrong.filter(w=>w._result==='wrong').map(w=>`
         <div class="qz-wrong-item">
           <div class="qz-wrong-r1"><span class="qz-wrong-word">${esc(w.word)}</span><span class="qz-wrong-meaning">${esc(w.meaning)}</span></div>
@@ -957,13 +960,13 @@ function qzRenderResult(){
     <div class="qz-card-line result"></div>
     <div class="qz-result">
       <div class="qz-score-circle" style="background:conic-gradient(${col} 0deg ${deg}deg,#e2dcd8 ${deg}deg 360deg)">
-        <div class="qz-score-inner"><div class="qz-score-num">${pct}<span style="font-size:1.1rem">%</span></div><div class="qz-score-tot">${allTotal-qzWrong.filter(w=>w._result==='wrong').length}/${allTotal}</div></div>
+        <div class="qz-score-inner"><div class="qz-score-num">${pct}<span style="font-size:1.1rem">%</span></div><div class="qz-score-tot">${correct}/${allTotal}</div></div>
       </div>
       <div class="qz-result-ttl">수고했어요! 🎉</div>
       <div class="qz-result-sub">정답률 ${pct}%</div>
       ${wrongHTML}
       <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-        <button class="qz-submit-btn" id="qz-submit-btn" onclick="submitResult(${allTotal - qzWrong.filter(w=>w._result==='wrong').length}, ${allTotal})">
+        <button class="qz-submit-btn" id="qz-submit-btn" onclick="submitResult(${correct}, ${allTotal})">
           📤 선생님께 제출하기
         </button>
         <button class="qz-start-btn" style="width:100%" onclick="startQuiz()">↻ 다시 풀기</button>
