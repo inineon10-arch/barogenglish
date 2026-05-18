@@ -68,32 +68,52 @@
   .search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--ink-mute);pointer-events:none;}
 
   /* ── 오답단어 카드 그리드 ── */
-  .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
-  .material-card{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:1.1rem 1rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.5rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s ease both;}
+  .materials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.75rem;}
+  .material-card{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.85rem .8rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);animation:fadeUp .5s ease both;}
   .material-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
   .material-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent-soft);}
   .material-card:hover::before{transform:scaleX(1);}
   .card-number{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.75rem;color:var(--accent);letter-spacing:.05em;}
-  .card-title{font-family:'Noto Serif KR',serif;font-size:.95rem;font-weight:600;line-height:1.4;color:var(--ink);}
-  .card-description{font-size:.78rem;color:var(--ink-soft);line-height:1.6;flex-grow:1;}
+  .card-title{font-family:'Noto Serif KR',serif;font-size:.85rem;font-weight:600;line-height:1.4;color:var(--ink);}
+  .card-description{font-size:.72rem;color:var(--ink-soft);line-height:1.5;flex-grow:1;}
   .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:.25rem;padding-top:.6rem;border-top:1px dashed var(--line);}
   .card-tag{font-family:'Inter',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-mute);}
   .card-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--accent);transition:transform .3s;}
   .material-card:hover .card-arrow{transform:translateX(4px);}
 
   /* ── 진도단어 플래시카드 ── */
+  /* ── 진도단어 Day 폴더 카드 ── */
   .vocab-meta-bar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;}
   .vocab-stat{font-family:'Inter',sans-serif;font-size:.75rem;color:var(--ink-mute);}
   .vocab-stat strong{color:var(--purple);font-weight:600;}
-  .vocab-flip-btn{font-family:'Inter',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1.1rem;border-radius:20px;border:1.5px solid rgba(112,54,227,.35);background:rgba(112,54,227,.04);color:var(--purple);cursor:pointer;transition:all .2s;margin-left:auto;}
-  .vocab-flip-btn:hover{background:rgba(112,54,227,.12);border-color:var(--purple);}
 
-  .vocab-grid{display:flex;flex-direction:column;gap:2.5rem;}
-  .vocab-day-group{}
-  .day-label{font-family:'Inter',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.6rem;}
-  .day-badge{background:rgba(112,54,227,.1);color:var(--purple);border-radius:20px;padding:2px 10px;font-size:.65rem;font-weight:600;}
+  /* Day 폴더 그리드 — 오답단어처럼 */
+  .vocab-day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.75rem;}
 
-  .vocab-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.65rem;}
+  .day-folder{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.85rem .8rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;user-select:none;animation:fadeUp .5s ease both;}
+  .day-folder::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--purple);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+  .day-folder:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:rgba(112,54,227,.35);}
+  .day-folder:hover::before{transform:scaleX(1);}
+  .day-folder-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.75rem;color:var(--purple);letter-spacing:.05em;}
+  .day-folder-title{font-family:'Noto Serif KR',serif;font-size:.85rem;font-weight:600;line-height:1.4;color:var(--ink);}
+  .day-folder-desc{font-size:.72rem;color:var(--ink-soft);line-height:1.5;flex-grow:1;}
+  .day-folder-footer{display:flex;justify-content:space-between;align-items:center;margin-top:.25rem;padding-top:.6rem;border-top:1px dashed var(--line);}
+  .day-folder-tag{font-family:'Inter',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-mute);}
+  .day-folder-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--purple);transition:transform .3s;}
+  .day-folder:hover .day-folder-arrow{transform:translateX(4px);}
+
+  /* Day 상세 패널 (열렸을 때) */
+  .day-detail{display:none;margin-top:1.5rem;padding:1.5rem;background:rgba(112,54,227,.02);border:1px solid rgba(112,54,227,.15);border-radius:6px;animation:fadeUp .3s ease both;}
+  .day-detail.open{display:block;}
+  .day-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(112,54,227,.15);}
+  .day-detail-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:500;color:var(--ink);}
+  .day-detail-actions{display:flex;gap:.6rem;align-items:center;}
+  .day-flip-btn{font-family:'Inter',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.4rem .9rem;border-radius:20px;border:1.5px solid rgba(112,54,227,.35);background:rgba(112,54,227,.04);color:var(--purple);cursor:pointer;transition:all .2s;}
+  .day-flip-btn:hover{background:rgba(112,54,227,.12);border-color:var(--purple);}
+  .day-close-btn{font-family:'Inter',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.4rem .9rem;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-mute);cursor:pointer;transition:all .2s;}
+  .day-close-btn:hover{border-color:var(--ink-mute);color:var(--ink);}
+
+  .vocab-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.65rem;}
 
   .vcard{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.85rem .8rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,48,.04);user-select:none;-webkit-user-select:none;}
   .vcard::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);transform:scaleY(0);transform-origin:top;transition:transform .3s;}
@@ -101,11 +121,9 @@
   .vcard:hover::before{transform:scaleY(1);}
   .vcard.open{background:rgba(112,54,227,.03);border-color:rgba(112,54,227,.22);}
   .vcard.open::before{transform:scaleY(1);}
-
-  .vcard-pos{display:inline-block;font-family:'Inter',sans-serif;font-size:.56rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(112,54,227,.08);color:var(--purple);border-radius:10px;padding:1px 7px;margin-bottom:.3rem;}
-  .vcard-en{font-family:'Inter',sans-serif;font-size:.88rem;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
-  .vcard-ko{font-size:.76rem;color:var(--ink-soft);line-height:1.5;margin-top:.3rem;display:none;}
-  .vcard-hint{font-size:.6rem;color:var(--ink-mute);margin-top:.25rem;}
+  .vcard-en{font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+  .vcard-ko{font-size:.74rem;color:var(--ink-soft);line-height:1.5;margin-top:.28rem;display:none;}
+  .vcard-hint{font-size:.58rem;color:var(--ink-mute);margin-top:.22rem;}
   .vcard.open .vcard-ko{display:block;}
   .vcard.open .vcard-hint{display:none;}
 
@@ -195,7 +213,6 @@
   <div class="vocab-meta-bar" id="vocab-meta" style="display:none">
     <span class="vocab-stat">단어 <strong id="vocab-total">0</strong>개</span>
     <span class="vocab-stat">· Day <strong id="vocab-days">0</strong>개</span>
-    <button class="vocab-flip-btn" onclick="flipAll()">전체 뒤집기</button>
   </div>
   <div id="vocab-content">
     <div class="loading-box"><div class="spinner"></div><span>단어 불러오는 중...</span></div>
@@ -336,10 +353,11 @@ async function loadVocab() {
 }
 
 /* ============================================================
-   진도단어 렌더 — Day별 그룹 플래시카드
+   진도단어 렌더 — Day별 폴더 카드 (오답단어와 동일한 UX)
    ============================================================ */
+let openDayKey = null; // 현재 열린 Day
+
 function renderVocab(words) {
-  /* Day 그룹 */
   const groups={};
   words.forEach(w=>{ const d=w.day||'기타'; if(!groups[d])groups[d]=[]; groups[d].push(w); });
   const days = Object.keys(groups);
@@ -351,44 +369,107 @@ function renderVocab(words) {
 
   const box = document.getElementById('vocab-content');
   box.innerHTML='';
+
+  /* Day 폴더 그리드 */
   const grid = document.createElement('div');
-  grid.className='vocab-grid';
+  grid.className='vocab-day-grid';
 
-  days.forEach(day => {
-    const grp = document.createElement('div');
-    grp.className='vocab-day-group';
+  days.forEach((day, i) => {
+    const wordCount = groups[day].length;
 
-    const lbl = document.createElement('div');
-    lbl.className='day-label';
-    lbl.innerHTML=`<span class="day-badge">${esc(day)}</span>${groups[day].length}개 단어`;
-    grp.appendChild(lbl);
+    /* 폴더 카드 */
+    const folder = document.createElement('div');
+    folder.className='day-folder';
+    folder.style.animationDelay=`${0.04*i}s`;
+    folder.innerHTML=`
+      <div class="day-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
+      <div class="day-folder-title">${esc(day)}</div>
+      <div class="day-folder-desc">${wordCount}개 단어</div>
+      <div class="day-folder-footer">
+        <span class="day-folder-tag">단어장</span>
+        <span class="day-folder-arrow" id="arrow-${i}">→</span>
+      </div>`;
 
-    const cards = document.createElement('div');
-    cards.className='vocab-cards';
+    /* 상세 패널 (폴더 아래 펼쳐짐) */
+    const detail = document.createElement('div');
+    detail.className='day-detail';
+    detail.id=`detail-${i}`;
+    detail.innerHTML=`
+      <div class="day-detail-header">
+        <div class="day-detail-title">${esc(day)} <span style="font-size:.85rem;font-weight:400;color:var(--ink-mute)">${wordCount}개</span></div>
+        <div class="day-detail-actions">
+          <button class="day-flip-btn" onclick="flipDay(${i})">전체 뒤집기</button>
+          <button class="day-close-btn" onclick="closeDay(${i})">닫기 ✕</button>
+        </div>
+      </div>
+      <div class="vocab-cards" id="cards-${i}"></div>`;
 
+    /* 단어 카드 생성 */
+    const cardsWrap = detail.querySelector(`#cards-${i}`);
     groups[day].forEach(w => {
       const c = document.createElement('div');
       c.className='vcard';
-      c.innerHTML=`
-        ${w.pos?`<div class="vcard-pos">${esc(w.pos)}</div>`:''}
-        <div class="vcard-en">${esc(w.word)}</div>
+      c.innerHTML=`<div class="vcard-en">${esc(w.word)}</div>
         <div class="vcard-ko">${esc(w.meaning)}</div>
         <div class="vcard-hint">탭해서 뜻 보기</div>`;
       c.addEventListener('click', ()=>c.classList.toggle('open'));
-      cards.appendChild(c);
+      cardsWrap.appendChild(c);
     });
 
-    grp.appendChild(cards);
-    grid.appendChild(grp);
+    folder.addEventListener('click', ()=>toggleDay(i, folder, detail));
+
+    /* 폴더 + 상세를 감싸는 wrapper */
+    const wrap = document.createElement('div');
+    wrap.style.cssText='grid-column:1/-1;'; // 상세패널은 전체 너비
+    wrap.appendChild(detail);
+
+    grid.appendChild(folder);
+    folder._detailWrap = wrap;
+    folder._detail = detail;
+    folder._idx = i;
   });
 
   box.appendChild(grid);
 }
 
-function flipAll() {
-  allOpen = !allOpen;
-  document.querySelectorAll('.vcard').forEach(c=>c.classList.toggle('open', allOpen));
-  document.querySelector('.vocab-flip-btn').textContent = allOpen?'전체 닫기':'전체 뒤집기';
+function toggleDay(i, folder, detail) {
+  const isOpen = detail.classList.contains('open');
+  /* 다른 Day 닫기 */
+  document.querySelectorAll('.day-detail.open').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.day-folder').forEach(f=>{
+    f.style.borderColor=''; f.style.background='';
+  });
+  if(!isOpen) {
+    detail.classList.add('open');
+    /* 상세 패널을 폴더 바로 다음 행에 삽입 */
+    const grid = folder.parentElement;
+    const wrap = folder._detailWrap;
+    /* 같은 행의 마지막 폴더 찾기 — 단순하게 폴더 다음에 삽입 */
+    folder.insertAdjacentElement('afterend', wrap);
+    folder.style.borderColor='rgba(112,54,227,.4)';
+    folder.style.background='rgba(112,54,227,.03)';
+    detail.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function closeDay(i) {
+  const detail = document.getElementById(`detail-${i}`);
+  if(detail) {
+    detail.classList.remove('open');
+    /* 닫힌 wrapper 제거 */
+    if(detail.parentElement && detail.parentElement.style.gridColumn) {
+      detail.parentElement.remove();
+    }
+  }
+  document.querySelectorAll('.day-folder').forEach(f=>{ f.style.borderColor=''; f.style.background=''; });
+}
+
+function flipDay(i) {
+  const cards = document.querySelectorAll(`#cards-${i} .vcard`);
+  const anyOpen = Array.from(cards).some(c=>c.classList.contains('open'));
+  cards.forEach(c=>c.classList.toggle('open', !anyOpen));
+  const btn = document.querySelector(`#detail-${i} .day-flip-btn`);
+  if(btn) btn.textContent = anyOpen?'전체 뒤집기':'전체 닫기';
 }
 
 document.getElementById('search-vocab').addEventListener('input', e=>{
