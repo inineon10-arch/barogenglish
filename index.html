@@ -60,7 +60,7 @@
   .section-title.vocab-title em{color:var(--purple);}
   .section-count{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--ink-mute);letter-spacing:.05em;}
 
-  /* 오늘의 퀴즈 배너 */
+  /* ── 오늘의 퀴즈 배너 ── */
   .quiz-banner{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--card);border:1.5px solid rgba(112,54,227,.25);border-radius:10px;padding:1.1rem 1.4rem;margin-bottom:2rem;box-shadow:0 2px 12px rgba(112,54,227,.08);position:relative;overflow:hidden;}
   .quiz-banner::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--purple);}
   .quiz-banner-label{font-family:'Inter',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:.3rem;}
@@ -68,39 +68,109 @@
   .quiz-banner-sub{font-size:.75rem;color:var(--ink-mute);margin-top:.2rem;}
   .quiz-banner-btn{font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.65rem 1.3rem;background:var(--purple);color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .2s,transform .15s;flex-shrink:0;}
   .quiz-banner-btn:hover{opacity:.88;} .quiz-banner-btn:active{transform:scale(.96);}
+  .quiz-banner-loading{font-family:'Inter',sans-serif;font-size:.72rem;color:var(--ink-mute);font-style:italic;}
 
-  /* 퀴즈 오버레이 & 모달 */
-  .quiz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto;}
-  .quiz-modal{background:var(--bg);border-radius:14px;width:100%;max-width:540px;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative;margin:auto;}
-  .quiz-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:.9rem;border-bottom:1px solid var(--line);}
-  .quiz-modal-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--ink);}
-  .quiz-modal-prog{font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:var(--purple);background:rgba(112,54,227,.08);padding:.3rem .8rem;border-radius:20px;}
-  .quiz-modal-close{margin-top:1.2rem;width:100%;padding:.75rem;background:none;border:1.5px solid var(--line);border-radius:8px;font-family:'Inter',sans-serif;font-size:.8rem;color:var(--ink-mute);cursor:pointer;transition:border-color .2s;}
-  .quiz-modal-close:hover{border-color:var(--ink-mute);}
+  /* ── 퀴즈 풀스크린 오버레이 ── */
+  .qz-overlay{position:fixed;inset:0;z-index:500;background:#f5f0eb;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+  .qz-header{flex-shrink:0;padding:12px 16px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+  .qz-header-left .qz-name{font-family:'Inter',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#7036e3;}
+  .qz-header-left .qz-title{font-family:'Inter',sans-serif;font-size:1.15rem;font-weight:700;color:#1a1a2e;margin-top:2px;letter-spacing:-.5px;}
+  .qz-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+  .qz-idx{font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;color:#1a1a2e;}
+  .qz-idx span{color:#b0aab8;font-weight:400;}
+  .qz-pill{font-family:'Inter',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:#eef3ff;color:#7036e3;border:1px solid #d0c8ff;}
+  .qz-pill.retry{background:#fce7f3;color:#be185d;border-color:#fbcfe8;}
+  .qz-pill.done{background:#ecfdf5;color:#1a9e6f;border-color:#a7f3d0;}
+  .qz-prog{flex-shrink:0;padding:0 16px 10px;}
+  .qz-dots{display:flex;justify-content:space-between;gap:3px;}
+  .qdot{flex:1;height:4px;border-radius:3px;background:#e2dcd8;transition:all .3s;}
+  .qdot.correct{background:#1a9e6f;} .qdot.wrong{background:#d94040;} .qdot.current{background:#7036e3;opacity:.5;}
+  .qz-viewport{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0 12px;min-height:0;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .qz-close-bar{flex-shrink:0;padding:8px 16px 10px;}
+  .qz-close-btn{width:100%;padding:.65rem;background:none;border:1.5px solid #e2dcd8;border-radius:10px;font-family:'Inter',sans-serif;font-size:.78rem;color:#7a8590;cursor:pointer;transition:border-color .2s;}
+  .qz-close-btn:hover{border-color:#7a8590;}
 
-  /* 퀴즈 문제 */
-  .qm-question{font-size:1.1rem;font-weight:600;font-family:'Inter',sans-serif;color:var(--ink);margin-bottom:1.1rem;line-height:1.4;}
-  .qm-word{font-size:1.5rem;font-weight:700;font-family:'Inter',sans-serif;color:var(--ink);display:block;margin-bottom:.3rem;}
-  .qm-options{display:flex;flex-direction:column;gap:.6rem;}
-  .qm-opt{padding:.8rem 1rem;border:1.5px solid var(--line);border-radius:8px;background:var(--card);font-size:.9rem;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.75rem;}
-  .qm-opt:hover{border-color:rgba(112,54,227,.4);background:rgba(112,54,227,.03);}
-  .qm-opt.correct{border-color:#1a9e6f;background:#f0faf6;color:#1a6b50;pointer-events:none;}
-  .qm-opt.wrong{border-color:#d94040;background:#fff0f0;color:#a82c2c;pointer-events:none;}
-  .qm-opt.disabled{pointer-events:none;opacity:.6;}
-  .qm-mark{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-family:'Inter',sans-serif;font-weight:700;flex-shrink:0;}
-  .qm-opt.correct .qm-mark{background:#1a9e6f;border-color:#1a9e6f;color:#fff;}
-  .qm-opt.wrong .qm-mark{background:#d94040;border-color:#d94040;color:#fff;}
-  .qm-feedback{margin-top:.9rem;padding:.75rem 1rem;border-radius:8px;font-size:.82rem;line-height:1.5;display:none;}
-  .qm-feedback.show{display:block;}
-  .qm-feedback.ok{background:#f0faf6;border:1px solid #b8e8d4;color:#1a6b50;}
-  .qm-feedback.fail{background:#fff0f0;border:1px solid #ffcccc;color:#a82c2c;}
-  .qm-next{margin-top:.9rem;width:100%;padding:.85rem;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;display:none;}
-  .qm-next.show{display:block;}
-  .qm-result{text-align:center;padding:1.5rem 0;}
-  .qm-result-emoji{font-size:3rem;margin-bottom:.5rem;}
-  .qm-result-score{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;color:var(--purple);}
-  .qm-result-label{font-size:.85rem;color:var(--ink-mute);margin-top:.4rem;}
-  .qm-restart{margin-top:1.2rem;padding:.75rem 2rem;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;}
+  /* 스와이프 인디케이터 */
+  .qz-ind{position:absolute;font-family:'Inter',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:10px;opacity:0;pointer-events:none;z-index:20;transition:opacity .1s;}
+  .qz-ind-next{top:50%;right:16px;transform:translateY(-50%);color:#6b6b80;background:rgba(0,0,0,.05);border:1.5px solid #e2dcd8;}
+  .qz-ind-prev{top:50%;left:16px;transform:translateY(-50%);color:#7036e3;background:rgba(112,54,227,.08);border:1.5px solid rgba(112,54,227,.2);}
+
+  /* 카드 */
+  .qz-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:100%;max-height:640px;background:#fff;border-radius:22px;border:1.5px solid #e2dcd8;box-shadow:0 8px 40px rgba(112,54,227,.08),0 2px 8px rgba(0,0,0,.05);display:flex;flex-direction:column;overflow:hidden;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;will-change:transform,opacity;touch-action:none;}
+  .qz-card.no-tr{transition:none!important;} .qz-card.dragging{transition:none!important;}
+  .qz-card-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,#7036e3 0%,#a78bfa 100%);}
+  .qz-card-line.retry{background:linear-gradient(90deg,#be185d 0%,#f472b6 100%);}
+  .qz-card-line.result{background:linear-gradient(90deg,#1a9e6f 0%,#6ee7b7 100%);}
+
+  /* 문제 내용 */
+  .qz-content{flex:1;display:flex;flex-direction:column;padding:14px 18px 10px;min-height:0;overflow:hidden;}
+  .qz-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;flex-shrink:0;}
+  .qz-badge{font-family:'Inter',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+  .qz-badge-num{background:#e2dcd8;color:#6b6b80;}
+  .qz-badge-pos{background:#f0f0ff;color:#7036e3;border:1px solid #d0c8ff;}
+  .qz-prompt{text-align:center;padding:6px 0 12px;flex-shrink:0;}
+  .qz-prompt-lbl{font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:#b0aab8;margin-bottom:5px;}
+  .qz-prompt-word{font-family:'Inter',sans-serif;font-size:1.9rem;font-weight:700;color:#1a1a2e;letter-spacing:-1px;line-height:1.15;word-break:break-word;}
+  .qz-tts{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:transparent;border:1.5px solid #e2dcd8;color:#6b6b80;cursor:pointer;margin-top:6px;font-size:.9rem;transition:all .18s;touch-action:manipulation;}
+  .qz-tts:active{transform:scale(.9);background:#eef3ff;border-color:#7036e3;color:#7036e3;}
+  .qz-tts.playing{border-color:#7036e3;color:#7036e3;background:#eef3ff;animation:qz-pulse .8s ease-in-out infinite alternate;}
+  @keyframes qz-pulse{from{box-shadow:0 0 0 0 rgba(112,54,227,.15)}to{box-shadow:0 0 0 6px rgba(112,54,227,0)}}
+  .qz-options{display:flex;flex-direction:column;gap:7px;flex:1;min-height:0;overflow-y:auto;padding:2px;touch-action:none;}
+  .qz-opt{width:100%;text-align:left;background:#fff;border:1.5px solid #e2dcd8;border-radius:12px;padding:12px 14px;font-family:'Gowun Dodum',sans-serif;font-size:.95rem;color:#1a1a2e;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px;line-height:1.4;touch-action:manipulation;}
+  .qz-opt:active{transform:scale(.98);}
+  .qz-opt:hover:not(.disabled){border-color:#7036e3;background:#fafaff;}
+  .qz-opt-key{font-family:'Inter',sans-serif;font-size:.7rem;font-weight:700;width:24px;height:24px;border-radius:50%;background:#e2dcd8;color:#6b6b80;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+  .qz-opt:hover:not(.disabled) .qz-opt-key{background:#7036e3;color:#fff;}
+  .qz-opt.correct{background:#ecfdf5;border-color:#1a9e6f;color:#065f46;pointer-events:none;}
+  .qz-opt.correct .qz-opt-key{background:#1a9e6f;color:#fff;}
+  .qz-opt.wrong{background:#fff0f0;border-color:#d94040;color:#991b1b;pointer-events:none;}
+  .qz-opt.wrong .qz-opt-key{background:#d94040;color:#fff;}
+  .qz-opt.show-answer{background:#ecfdf5;border-color:#1a9e6f;color:#065f46;pointer-events:none;}
+  .qz-opt.show-answer .qz-opt-key{background:#1a9e6f;color:#fff;}
+  .qz-opt.disabled{pointer-events:none;}
+  .qz-fb{padding:9px 12px;border-radius:11px;margin-top:8px;flex-shrink:0;font-size:.8rem;line-height:1.5;display:none;}
+  .qz-fb.show{display:block;animation:qz-fadein .25s ease;}
+  @keyframes qz-fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .qz-fb.correct{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;}
+  .qz-fb.wrong{background:#fff0f0;border:1px solid #fecaca;color:#991b1b;}
+  .qz-fb-title{font-family:'Inter',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+  .qz-fb-ans{font-weight:600;font-size:.9rem;margin-bottom:2px;}
+  .qz-swipe-hint{flex-shrink:0;padding:6px 0 8px;text-align:center;font-family:'Inter',sans-serif;font-size:.6rem;color:#b0aab8;letter-spacing:1px;display:none;}
+  .qz-swipe-hint.show{display:block;animation:qz-fadein .3s ease;}
+
+  /* 스테이지 카드 */
+  .qz-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;gap:12px;}
+  .qz-stage-emoji{font-size:2.8rem;line-height:1;animation:qz-pop .5s cubic-bezier(.175,.885,.32,1.275);}
+  @keyframes qz-pop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  .qz-stage-lbl{font-family:'Inter',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7036e3;}
+  .qz-stage-lbl.retry{color:#be185d;}
+  .qz-stage-ttl{font-size:1.35rem;font-weight:400;color:#1a1a2e;line-height:1.4;}
+  .qz-stage-sub{font-size:.83rem;color:#6b6b80;line-height:1.65;padding:0 8px;}
+  .qz-stage-stats{display:flex;gap:10px;margin-top:2px;}
+  .qz-stat{padding:9px 16px;border:1.5px solid #e2dcd8;border-radius:12px;text-align:center;}
+  .qz-stat-num{font-family:'Inter',sans-serif;font-size:1.35rem;font-weight:700;}
+  .qz-stat-num.c{color:#1a9e6f;} .qz-stat-num.w{color:#d94040;}
+  .qz-stat-lbl{font-family:'Inter',sans-serif;font-size:.53rem;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#b0aab8;margin-top:3px;}
+  .qz-start-btn{background:#7036e3;color:#fff;border:none;border-radius:16px;padding:13px 30px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(112,54,227,.25);min-height:46px;margin-top:4px;transition:transform .15s;touch-action:manipulation;}
+  .qz-start-btn:active{transform:scale(.97);}
+  .qz-start-btn.retry{background:#be185d;box-shadow:0 4px 16px rgba(190,24,93,.25);}
+
+  /* 결과 */
+  .qz-result{flex:1;display:flex;flex-direction:column;padding:18px 20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
+  .qz-score-circle{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;position:relative;flex-shrink:0;}
+  .qz-score-circle::before{content:'';position:absolute;inset:9px;background:#fff;border-radius:50%;}
+  .qz-score-inner{position:relative;text-align:center;}
+  .qz-score-num{font-family:'Inter',sans-serif;font-size:2.1rem;font-weight:700;color:#1a1a2e;line-height:1;}
+  .qz-score-tot{font-family:'Inter',sans-serif;font-size:.66rem;color:#b0aab8;letter-spacing:1px;margin-top:2px;}
+  .qz-result-ttl{text-align:center;font-size:1.2rem;font-weight:400;color:#1a1a2e;margin-bottom:4px;}
+  .qz-result-sub{text-align:center;font-size:.76rem;color:#6b6b80;margin-bottom:12px;line-height:1.5;}
+  .qz-wrong-ttl{font-family:'Inter',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#d94040;margin-bottom:6px;}
+  .qz-perfect{text-align:center;padding:13px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;color:#065f46;font-size:.88rem;font-weight:600;}
+  .qz-wrong-item{background:#fff0f0;border:1px solid #ffcccc;border-radius:10px;padding:8px 11px;margin-bottom:5px;}
+  .qz-wrong-r1{display:flex;align-items:baseline;gap:6px;}
+  .qz-wrong-word{font-family:'Inter',sans-serif;font-weight:700;font-size:.9rem;color:#d94040;}
+  .qz-wrong-meaning{font-size:.74rem;color:#6b6b80;}
+  .qz-wrong-detail{font-size:.68rem;color:#991b1b;margin-top:3px;font-style:italic;}
 
   /* ── 오답단어 카드 그리드 ── */
   .materials-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
@@ -257,15 +327,25 @@
     <button class="quiz-banner-btn" id="quiz-start-btn" onclick="startQuiz()">시작하기 →</button>
   </div>
 
-  <!-- 퀴즈 모달 -->
-  <div class="quiz-overlay" id="quiz-overlay" style="display:none">
-    <div class="quiz-modal" id="quiz-modal">
-      <div class="quiz-modal-header">
-        <div class="quiz-modal-title" id="qm-title">Day 01 · 객관식 퀴즈</div>
-        <div class="quiz-modal-prog" id="qm-prog">1 / 20</div>
+  <!-- 퀴즈 풀스크린 -->
+  <div class="qz-overlay" id="qz-overlay" style="display:none">
+    <div class="qz-header">
+      <div class="qz-header-left">
+        <div class="qz-name">바로그영어 · 진도단어</div>
+        <div class="qz-title" id="qz-title">객관식 퀴즈</div>
       </div>
-      <div class="quiz-modal-body" id="qm-body"></div>
-      <button class="quiz-modal-close" onclick="closeQuiz()">✕ 닫기</button>
+      <div class="qz-header-right">
+        <span class="qz-pill" id="qz-pill">객관식</span>
+        <div class="qz-idx"><span id="qz-cur">0</span><span> / <span id="qz-tot">0</span></span></div>
+      </div>
+    </div>
+    <div class="qz-prog"><div class="qz-dots" id="qz-dots"></div></div>
+    <div class="qz-viewport" id="qz-viewport">
+      <div class="qz-ind qz-ind-prev" id="qz-ind-prev">← 이전</div>
+      <div class="qz-ind qz-ind-next" id="qz-ind-next">다음 →</div>
+    </div>
+    <div class="qz-close-bar">
+      <button class="qz-close-btn" onclick="closeQuiz()">✕ 퀴즈 닫기</button>
     </div>
   </div>
 
@@ -402,7 +482,7 @@ async function loadVocab() {
 
     if(!allWords.length) throw new Error('단어가 없습니다.');
     renderVocab(allWords);
-    initQuizBanner();
+    loadQuizConfig();
   } catch(e) {
     document.getElementById('vocab-content').innerHTML=`<div class="loading-box" style="color:#d94040">⚠️ ${e.message}</div>`;
     document.getElementById('count-vocab').textContent='로딩 실패';
@@ -552,106 +632,278 @@ function ttsPlay(word, btn) {
 }
 
 /* ============================================================
-   ★ 오늘의 퀴즈 설정
-   퀴즈 Day를 바꾸려면 아래 QUIZ_CONFIG 만 수정하세요.
-   day: 표시할 Day 이름 (구글 시트의 첫 번째 컬럼 값과 정확히 일치)
-   count: 출제 문제 수
+   ★ 오늘의 퀴즈
+   — QUIZ_CONFIG는 구글 시트 quiz_config 탭에서 자동 로딩
+   — 시트가 없으면 아래 fallback 사용
    ============================================================ */
-const QUIZ_CONFIG = {
-  day: 'Day 01',   // ← 선생님이 매일 여기만 수정
-  count: 20
-};
+const QUIZ_CONFIG_FALLBACK = { day:'Day 01', count:20 };
+let QUIZ_CONFIG = { ...QUIZ_CONFIG_FALLBACK };
 
-let quizWords=[], quizIdx=0, quizScore=0, quizAnswered=false;
+/* quiz_config 시트 URL (같은 스프레드시트, gid는 아래 initQuizConfig에서 설정) */
+/* ★ quiz_config 시트 게시 URL — 아래 단계 완료 후 채워주세요 */
+const QUIZ_CONFIG_CSV = '';  // ← 선생님이 quiz_config 시트를 웹에 게시한 뒤 URL을 여기에
+
+async function loadQuizConfig() {
+  try {
+    const res = await fetch(QUIZ_CONFIG_CSV);
+    if(!res.ok) return;
+    const lines = (await res.text()).trim().split('
+');
+    // 형식: day,count (헤더 없음) — 예: Day 05,20
+    const cols = lines[0].split(',');
+    if(cols[0]) QUIZ_CONFIG.day   = cols[0].trim();
+    if(cols[1]) QUIZ_CONFIG.count = parseInt(cols[1].trim())||20;
+  } catch(e) { /* fallback 사용 */ }
+  initQuizBanner();
+}
 
 function initQuizBanner() {
-  const banner = document.getElementById('quiz-banner');
-  const dayEl  = document.getElementById('quiz-banner-day');
-  const subEl  = document.getElementById('quiz-banner-sub');
-  dayEl.textContent  = QUIZ_CONFIG.day;
-  subEl.textContent  = `객관식 · ${QUIZ_CONFIG.count}문제`;
-  banner.style.display = 'flex';
+  document.getElementById('quiz-banner-day').textContent  = QUIZ_CONFIG.day;
+  document.getElementById('quiz-banner-sub').textContent  = `객관식 · ${QUIZ_CONFIG.count}문제`;
+  document.getElementById('quiz-banner').style.display = 'flex';
+}
+
+/* ── 퀴즈 엔진 (quiz_mc.html 방식) ── */
+let qzStage='intro', qzQueue=[], qzPos=0, qzAnswered=false, qzWrong=[], qzCardEl=null, qzAnim=false;
+
+function qzShuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function qzHaptic(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch(_){}}
+
+function qzBuildOpts(target, pool) {
+  const opts=[target.meaning];
+  const others=qzShuffle(pool.filter(w=>w.meaning!==target.meaning));
+  for(const w of others){ if(opts.length>=4)break; if(!opts.includes(w.meaning))opts.push(w.meaning); }
+  return qzShuffle(opts);
 }
 
 function startQuiz() {
   const dayWords = allWords.filter(w=>w.day===QUIZ_CONFIG.day);
   if(!dayWords.length){ alert(`${QUIZ_CONFIG.day} 단어를 먼저 불러오세요.`); return; }
-  // 랜덤 셔플 후 count개 선택
-  quizWords = shuffle([...dayWords]).slice(0, QUIZ_CONFIG.count);
-  quizIdx=0; quizScore=0;
-  document.getElementById('qm-title').textContent = `${QUIZ_CONFIG.day} · 객관식 퀴즈`;
-  document.getElementById('quiz-overlay').style.display='flex';
-  renderQuizQ();
+  const selected = qzShuffle([...dayWords]).slice(0, QUIZ_CONFIG.count);
+  qzQueue = selected.map(w=>({...w, _opts:qzBuildOpts(w, allWords), _result:null, _picked:null}));
+  qzPos=0; qzAnswered=false; qzWrong=[];
+  qzStage='mc';
+  document.getElementById('qz-title').textContent=`${QUIZ_CONFIG.day} · 객관식`;
+  document.getElementById('qz-overlay').style.display='flex';
+  qzUpdatePill();
+  qzBuildDots();
+  qzRenderQ(1);
+  qzInitSwipe();
 }
 
 function closeQuiz() {
-  document.getElementById('quiz-overlay').style.display='none';
+  document.getElementById('qz-overlay').style.display='none';
   if(_audio){ try{_audio.pause();}catch(e){} _audio=null; }
 }
 
-function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a; }
-
-function renderQuizQ() {
-  const total = quizWords.length;
-  document.getElementById('qm-prog').textContent = `${quizIdx+1} / ${total}`;
-  if(quizIdx>=total){ renderQuizResult(); return; }
-
-  const w = quizWords[quizIdx];
-  quizAnswered = false;
-
-  // 오답 보기 3개 (전체 단어 풀에서 랜덤)
-  const pool = allWords.filter(x=>x.meaning!==w.meaning);
-  const wrongs = shuffle(pool).slice(0,3).map(x=>x.meaning);
-  const opts = shuffle([w.meaning, ...wrongs]);
-
-  const body = document.getElementById('qm-body');
-  body.innerHTML = `
-    <div class="qm-question"><span class="qm-word">${esc(w.word)}</span>위 단어의 뜻은?</div>
-    <div class="qm-options">
-      ${opts.map((o,i)=>`
-        <button class="qm-opt" onclick="pickOpt(this,'${esc(o)}','${esc(w.meaning)}')">
-          <span class="qm-mark">${['A','B','C','D'][i]}</span>
-          <span>${esc(o)}</span>
-        </button>`).join('')}
-    </div>
-    <div class="qm-feedback" id="qm-fb"></div>
-    <button class="qm-next" id="qm-next" onclick="nextQ()">
-      ${quizIdx+1<total?'다음 →':'결과 보기'}
-    </button>`;
+function qzUpdatePill(){
+  const p=document.getElementById('qz-pill');
+  if(qzStage==='mc'){p.textContent='객관식';p.className='qz-pill';}
+  else if(qzStage==='retry'){p.textContent='재시도';p.className='qz-pill retry';}
+  else{p.textContent='완료';p.className='qz-pill done';}
 }
 
-function pickOpt(btn, chosen, correct) {
-  if(quizAnswered) return;
-  quizAnswered=true;
-  const isOk = chosen===correct;
-  if(isOk) quizScore++;
-  // 보기 색상
-  document.querySelectorAll('.qm-opt').forEach(b=>{
-    b.classList.add('disabled');
-    if(b.querySelector('span:last-child').textContent===correct) b.classList.add('correct');
+function qzBuildDots(){
+  const w=document.getElementById('qz-dots');w.innerHTML='';
+  qzQueue.forEach((_,i)=>{const d=document.createElement('div');d.className='qdot';d.id=`qdot-${i}`;w.appendChild(d);});
+}
+function qzUpdateDots(){
+  qzQueue.forEach((q,i)=>{
+    const d=document.getElementById(`qdot-${i}`);if(!d)return;
+    d.className='qdot'+(q._result==='correct'?' correct':q._result==='wrong'?' wrong':i===qzPos?' current':'');
   });
-  if(!isOk) btn.classList.add('wrong');
-  // 피드백
-  const fb=document.getElementById('qm-fb');
-  fb.className='qm-feedback show '+(isOk?'ok':'fail');
-  fb.textContent = isOk?`✅ 정답!`:`❌ 정답: ${correct}`;
-  document.getElementById('qm-next').classList.add('show');
+  document.getElementById('qz-cur').textContent=Math.min(qzPos+1,qzQueue.length);
+  document.getElementById('qz-tot').textContent=qzQueue.length;
 }
 
-function nextQ(){ quizIdx++; renderQuizQ(); }
+function qzSwapCard(html,dir){
+  return new Promise(res=>{
+    const vp=document.getElementById('qz-viewport');
+    const old=qzCardEl;
+    const el=document.createElement('div');
+    el.className='qz-card no-tr';
+    el.innerHTML=html;
+    if(dir!==0)el.style.transform=`translateX(${dir>0?'100%':'-100%'})`;
+    else el.style.opacity='0';
+    vp.appendChild(el);qzCardEl=el;qzAnim=true;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      el.classList.remove('no-tr');
+      el.style.transform='translateX(0)';el.style.opacity='1';
+      if(old){old.classList.remove('no-tr');old.style.transform=`translateX(${dir>0?'-100%':'100%'})`;old.style.opacity='0.3';
+        setTimeout(()=>{old.remove();qzAnim=false;res();},360);}
+      else{setTimeout(()=>{qzAnim=false;res();},360);}
+    }));
+  });
+}
+async function qzRenderStage(html,dir=0){await qzSwapCard(html,dir);}
 
-function renderQuizResult(){
-  const pct=Math.round(quizScore/quizWords.length*100);
-  const em=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'💪':'📖';
-  document.getElementById('qm-body').innerHTML=`
-    <div class="qm-result">
-      <div class="qm-result-emoji">${em}</div>
-      <div class="qm-result-score">${quizScore} / ${quizWords.length}</div>
-      <div class="qm-result-label">${pct}% 정답</div>
-      <button class="qm-restart" onclick="startQuiz()">↺ 다시 풀기</button>
-    </div>`;
-  document.getElementById('qm-next').style.display='none';
-  document.getElementById('qm-prog').textContent='완료';
+async function qzRenderQ(dir=1){
+  qzAnswered=qzQueue[qzPos]._result!==null;
+  const q=qzQueue[qzPos];
+  const optsHTML=q._opts.map((opt,i)=>{
+    const key=String.fromCharCode(65+i);
+    const cls=q._result
+      ?(opt===q.meaning?(q._result==='correct'?'qz-opt correct disabled':'qz-opt show-answer disabled')
+        :opt===q._picked?'qz-opt wrong disabled':'qz-opt disabled')
+      :'qz-opt';
+    const onclick=q._result?'':`onclick="qzAnswer(this,'${opt.replace(/\/g,'\\').replace(/'/g,"\'")}')"`;
+    return `<button class="${cls}" type="button" ${onclick}><span class="qz-opt-key">${key}</span><span>${esc(opt)}</span></button>`;
+  }).join('');
+  const fb=q._result
+    ?(q._result==='correct'
+      ?`<div class="qz-fb correct show"><div class="qz-fb-title">✓ 정답!</div><div class="qz-fb-ans">${esc(q.word)} — ${esc(q.meaning)}</div></div>`
+      :`<div class="qz-fb wrong show"><div class="qz-fb-title">✗ 오답</div><div class="qz-fb-ans">정답: ${esc(q.meaning)}</div></div>`)
+    :'';
+  const hint=q._result?`<div class="qz-swipe-hint show">${qzPos<qzQueue.length-1?'← 스와이프해서 다음 문제':'← 스와이프해서 결과 보기'}</div>`:'';
+  await qzRenderStage(`
+    <div class="qz-card-line${qzStage==='retry'?' retry':''}"></div>
+    <div class="qz-content">
+      <div class="qz-badges"><span class="qz-badge qz-badge-num">${esc(q.day)}</span></div>
+      <div class="qz-prompt">
+        <div class="qz-prompt-lbl">English</div>
+        <div class="qz-prompt-word">${esc(q.word)}</div>
+        <button class="qz-tts" type="button" onclick="ttsPlay('${q.word.replace(/'/g,"\'")}',this)">🔊</button>
+      </div>
+      <div class="qz-options">${optsHTML}</div>
+      ${fb}
+    </div>${hint}`,dir);
+  qzUpdateDots();
+}
+
+function qzAnswer(btn,chosen){
+  const q=qzQueue[qzPos];if(q._result)return;
+  const isOk=chosen===q.meaning;
+  q._picked=chosen;q._result=isOk?'correct':'wrong';
+  qzHaptic(isOk?8:15);
+  if(!isOk)qzWrong.push(q);
+  qzAnswered=true;
+  document.querySelectorAll('.qz-opt').forEach(b=>{
+    b.classList.add('disabled');b.onclick=null;
+    const txt=b.querySelector('span:last-child').textContent;
+    if(txt===q.meaning){b.classList.add(isOk?'correct':'show-answer');}
+    else if(b===btn&&!isOk){b.classList.add('wrong');}
+  });
+  const fb=isOk
+    ?`<div class="qz-fb correct show"><div class="qz-fb-title">✓ 정답!</div><div class="qz-fb-ans">${esc(q.word)} — ${esc(q.meaning)}</div></div>`
+    :`<div class="qz-fb wrong show"><div class="qz-fb-title">✗ 오답</div><div class="qz-fb-ans">정답: ${esc(q.meaning)}</div></div>`;
+  qzCardEl.querySelector('.qz-content').insertAdjacentHTML('beforeend',fb);
+  const hint=document.createElement('div');
+  hint.className='qz-swipe-hint show';
+  hint.textContent=qzPos<qzQueue.length-1?'← 스와이프해서 다음 문제':'← 스와이프해서 결과 보기';
+  qzCardEl.appendChild(hint);
+  qzUpdateDots();
+}
+
+function qzGoNext(){
+  qzPos++;
+  if(qzPos<qzQueue.length){qzRenderQ(1);return;}
+  if(qzStage==='mc'&&qzWrong.length>0){qzRetryIntro();}
+  else if(qzStage==='retry'){
+    const still=qzQueue.filter(q=>q._result==='wrong');
+    if(still.length>0){qzQueue=still.map(w=>({...w,_opts:qzBuildOpts(w,allWords),_result:null,_picked:null}));qzPos=0;qzBuildDots();qzRenderQ(1);}
+    else{qzRenderResult();}
+  } else {qzRenderResult();}
+}
+function qzGoPrev(){if(qzPos>0){qzPos--;qzRenderQ(-1);}}
+
+function qzRetryIntro(){
+  qzStage='retry';qzUpdatePill();
+  qzRenderStage(`
+    <div class="qz-card-line retry"></div>
+    <div class="qz-stage">
+      <div class="qz-stage-emoji">🔄</div>
+      <div class="qz-stage-lbl retry">재시도</div>
+      <div class="qz-stage-ttl">1차 완료!</div>
+      <div class="qz-stage-stats">
+        <div class="qz-stat"><div class="qz-stat-num c">${qzQueue.length-qzWrong.length}</div><div class="qz-stat-lbl">맞음</div></div>
+        <div class="qz-stat"><div class="qz-stat-num w">${qzWrong.length}</div><div class="qz-stat-lbl">틀림</div></div>
+      </div>
+      <div class="qz-stage-sub">틀린 ${qzWrong.length}문제를 다시 풀어볼게요.<br>다 맞히면 결과 화면으로 넘어가요.</div>
+      <button class="qz-start-btn retry" onclick="qzStartRetry()">다시 풀기 →</button>
+    </div>`,1);
+}
+function qzStartRetry(){
+  qzQueue=qzWrong.map(w=>({...w,_opts:qzBuildOpts(w,allWords),_result:null,_picked:null}));
+  qzPos=0;qzBuildDots();qzRenderQ(1);
+}
+
+function qzRenderResult(){
+  qzStage='result';qzUpdatePill();
+  document.getElementById('qz-dots').innerHTML='';
+  document.getElementById('qz-cur').textContent='✓';
+  const total=qzQueue.length+qzWrong.filter(w=>w._result==='wrong').length;
+  const correct=qzQueue.length-qzWrong.filter(w=>w._result==='wrong').length;
+  const allTotal=qzQueue.length;
+  const pct=Math.round((allTotal-qzWrong.filter(w=>w._result==='wrong').length)/allTotal*100);
+  const col=pct>=80?'#1a9e6f':pct>=60?'#e3502d':'#d94040';
+  const deg=Math.round((pct/100)*360);
+  const wrongHTML=qzWrong.filter(w=>w._result==='wrong').length===0
+    ?`<div class="qz-perfect">🏆 모든 문제를 맞혔어요!</div>`
+    :`<div><div class="qz-wrong-ttl">📌 다시 봐야 할 단어 (${qzWrong.filter(w=>w._result==='wrong').length}개)</div>
+      ${qzWrong.filter(w=>w._result==='wrong').map(w=>`
+        <div class="qz-wrong-item">
+          <div class="qz-wrong-r1"><span class="qz-wrong-word">${esc(w.word)}</span><span class="qz-wrong-meaning">${esc(w.meaning)}</span></div>
+          <div class="qz-wrong-detail">'${esc(w._picked)}' 선택</div>
+        </div>`).join('')}</div>`;
+  qzRenderStage(`
+    <div class="qz-card-line result"></div>
+    <div class="qz-result">
+      <div class="qz-score-circle" style="background:conic-gradient(${col} 0deg ${deg}deg,#e2dcd8 ${deg}deg 360deg)">
+        <div class="qz-score-inner"><div class="qz-score-num">${pct}<span style="font-size:1.1rem">%</span></div><div class="qz-score-tot">${allTotal-qzWrong.filter(w=>w._result==='wrong').length}/${allTotal}</div></div>
+      </div>
+      <div class="qz-result-ttl">수고했어요! 🎉</div>
+      <div class="qz-result-sub">정답률 ${pct}%</div>
+      ${wrongHTML}
+      <div style="margin-top:14px"><button class="qz-start-btn" style="width:100%" onclick="startQuiz()">↻ 다시 풀기</button></div>
+    </div>`,1);
+}
+
+/* 스와이프 */
+let _qzSwipeInit=false;
+function qzInitSwipe(){
+  if(_qzSwipeInit)return; _qzSwipeInit=true;
+  const vp=document.getElementById('qz-viewport');
+  let sX=0,sY=0,tracking=false,locked=null,pid=null;
+  function canNext(){return !qzAnim&&(qzStage==='mc'||qzStage==='retry')&&qzAnswered;}
+  function canPrev(){return !qzAnim&&(qzStage==='mc'||qzStage==='retry')&&qzPos>0;}
+  function start(x,y){tracking=true;locked=null;sX=x;sY=y;if(qzCardEl)qzCardEl.classList.add('dragging');}
+  function move(x,y,ev){
+    if(!tracking)return;
+    const dx=x-sX,dy=y-sY;
+    if(locked===null&&(Math.abs(dx)>8||Math.abs(dy)>8))locked=Math.abs(dx)>Math.abs(dy)?'h':'v';
+    if(locked==='h'){
+      if(ev&&ev.cancelable)ev.preventDefault();
+      if(!qzCardEl)return;
+      const block=(dx<0&&!canNext())||(dx>0&&!canPrev());
+      qzCardEl.style.transform=`translateX(${dx*(block?.15:.55)}px)`;
+      const t=Math.min(Math.abs(dx)/70,1);
+      document.getElementById('qz-ind-prev').style.opacity=dx>8&&canPrev()?String(t*.9):'0';
+      document.getElementById('qz-ind-next').style.opacity=dx<-8&&canNext()?String(t*.9):'0';
+    }
+  }
+  function end(ex){
+    if(!tracking){tracking=false;return;}tracking=false;
+    document.getElementById('qz-ind-prev').style.opacity='0';
+    document.getElementById('qz-ind-next').style.opacity='0';
+    if(qzCardEl)qzCardEl.classList.remove('dragging');
+    const dx=ex-sX;
+    if(locked==='h'&&Math.abs(dx)>40){
+      if(dx<0&&canNext()){if(qzCardEl)qzCardEl.style.transform='';qzGoNext();}
+      else if(dx>0&&canPrev()){if(qzCardEl)qzCardEl.style.transform='';qzGoPrev();}
+      else{if(qzCardEl){qzCardEl.style.transition='transform .3s cubic-bezier(.175,.885,.32,1.275)';qzCardEl.style.transform='translateX(0)';setTimeout(()=>{if(qzCardEl)qzCardEl.style.transition='';},320);}}
+    } else {if(qzCardEl)qzCardEl.style.transform='';}
+    locked=null;
+  }
+  if(window.PointerEvent){
+    vp.addEventListener('pointerdown',e=>{if(pid!==null)return;pid=e.pointerId;start(e.clientX,e.clientY);},{capture:true});
+    vp.addEventListener('pointermove',e=>{if(e.pointerId!==pid)return;move(e.clientX,e.clientY,e);},{capture:true});
+    vp.addEventListener('pointerup',e=>{if(e.pointerId!==pid)return;pid=null;end(e.clientX);},{capture:true});
+    vp.addEventListener('pointercancel',e=>{if(e.pointerId!==pid)return;pid=null;if(qzCardEl)qzCardEl.style.transform='';locked=null;tracking=false;},{capture:true});
+  } else {
+    vp.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;start(e.touches[0].clientX,e.touches[0].clientY);},{passive:true,capture:true});
+    vp.addEventListener('touchmove',e=>{if(!tracking||e.touches.length!==1)return;move(e.touches[0].clientX,e.touches[0].clientY,e);},{passive:false,capture:true});
+    vp.addEventListener('touchend',e=>{if(!e.changedTouches.length)return;end(e.changedTouches[0].clientX);},{passive:true,capture:true});
+  }
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
