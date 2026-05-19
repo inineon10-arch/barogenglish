@@ -871,20 +871,34 @@ function startQuiz() {
   qzQueue = selected.map(w=>({...w, _opts:qzBuildOpts(w, allWords), _result:null, _picked:null}));
   qzPos=0; qzAnswered=false; qzWrong=[];
   qzStage='mc';
-  qzOriginalTotal = selected.length; // ← 원래 문제 수 저장
-  qzStartTime = Date.now(); // ← 시작 시각 기록
+  qzOriginalTotal = selected.length;
+  qzStartTime = Date.now();
   document.getElementById('qz-title').textContent=`${QUIZ_CONFIG.day} · 객관식`;
   document.getElementById('qz-overlay').style.display='flex';
+  // 뒤로가기 감지용 history 상태 추가
+  history.pushState({ quiz: true }, '', location.href);
   qzUpdatePill();
   qzBuildDots();
   qzRenderQ(1);
   qzInitSwipe();
 }
 
-function closeQuiz() {
+function closeQuiz(fromPopState) {
   document.getElementById('qz-overlay').style.display='none';
   if(_audio){ try{_audio.pause();}catch(e){} _audio=null; }
+  // 사용자가 X 버튼으로 닫은 경우 → 추가했던 history 상태 제거
+  if(!fromPopState && history.state && history.state.quiz) {
+    history.back();
+  }
 }
+
+// 뒤로가기 감지 → 퀴즈 오버레이가 열려있으면 닫기만 하고 페이지는 유지
+window.addEventListener('popstate', function(e){
+  const overlay = document.getElementById('qz-overlay');
+  if(overlay && overlay.style.display === 'flex') {
+    closeQuiz(true);
+  }
+});
 
 function qzUpdatePill(){
   const p=document.getElementById('qz-pill');
