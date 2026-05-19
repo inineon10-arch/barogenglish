@@ -761,8 +761,8 @@ async function loadQuizConfig() {
   const container = document.getElementById('quiz-banner-container');
   container.innerHTML = '';
 
-  // 1. 스케줄 시트에서 3일치(오늘+어제+그제) 학생 데이터 읽기
-  const targetDates = [todayStr(), daysAgo(1), daysAgo(2)]; // 최근순
+  // 1. 스케줄 시트에서 7일치(오늘~6일 전) 학생 데이터 읽기
+  const targetDates = [todayStr(), daysAgo(1), daysAgo(2), daysAgo(3), daysAgo(4), daysAgo(5), daysAgo(6)]; // 최근순
   let scheduleRows = [];
 
   try {
