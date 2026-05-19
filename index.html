@@ -688,11 +688,19 @@ function todayStr() {
   return `${y}-${m}-${dd}`;
 }
 
-/* 날짜 문자열을 YYYY-MM-DD 로 정규화 */
+/* 날짜 문자열을 YYYY-MM-DD 로 정규화
+   지원 형식:
+   - 2026-05-18, 2026/05/18, 2026.05.18
+   - 2026년 5월 18일 (월요일)  ← 시트에서 보기 좋은 형식 */
 function normScheduleDate(s) {
-  const m = String(s).trim().match(/(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
-  if(!m) return '';
-  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  const str = String(s).trim();
+  // 한국식: "2026년 5월 18일"
+  let m = str.match(/(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  // 표준 구분자
+  m = str.match(/(\d{4})[-./]\s*(\d{1,2})[-./]\s*(\d{1,2})/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  return '';
 }
 
 /* N일 전 날짜 (YYYY-MM-DD) */
@@ -762,7 +770,9 @@ async function loadQuizConfig() {
     if(res.ok) {
       const text = await res.text();
       const lines = text.trim().split('\n').map(l => l.replace(/\r$/, ''));
-      const startRow = /\d{4}[-./]\d{1,2}[-./]\d{1,2}/.test(lines[0]) ? 0 : 1;
+      // 헤더 감지: 첫 줄이 날짜 형식이 아니면 헤더로 간주해서 건너뜀
+      const isDateLine = /\d{4}\s*[년\-./]/.test(lines[0]);
+      const startRow = isDateLine ? 0 : 1;
 
       for(let i = startRow; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim());
