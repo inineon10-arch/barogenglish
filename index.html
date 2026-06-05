@@ -276,7 +276,6 @@
 
   /* ── 모의고사 Day 폴더 카드 ── */
   .mock-stat strong{color:var(--green-mock);font-weight:600;}
-
   .mock-day-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
 
   .mock-folder{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.85rem .8rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;user-select:none;animation:fadeUp .5s ease both;}
@@ -291,7 +290,6 @@
   .mock-folder-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--green-mock);transition:transform .3s;}
   .mock-folder:hover .mock-folder-arrow{transform:translateX(4px);}
 
-  /* 모의고사 Day 상세 패널 */
   .mock-detail{display:none;margin-top:1.5rem;padding:1.5rem;background:rgba(26,122,94,.02);border:1px solid rgba(26,122,94,.15);border-radius:6px;animation:fadeUp .3s ease both;}
   .mock-detail.open{display:block;}
   .mock-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(26,122,94,.15);}
@@ -302,7 +300,6 @@
   .mock-close-btn{font-family:'Inter',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.4rem .9rem;border-radius:20px;border:1.5px solid var(--line);background:transparent;color:var(--ink-mute);cursor:pointer;transition:all .2s;}
   .mock-close-btn:hover{border-color:var(--ink-mute);color:var(--ink);}
 
-  /* 모의고사 단어 플래시카드 */
   .mock-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.65rem;}
   .mcard{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:.85rem .8rem .85rem .8rem;padding-right:2.2rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,48,.04);user-select:none;-webkit-user-select:none;}
   .mcard::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green-mock);transform:scaleY(0);transform-origin:top;transition:transform .3s;}
@@ -319,7 +316,6 @@
   .mcard-tts:hover{background:rgba(26,122,94,.18);transform:scale(1.08);}
   .mcard-tts:active{transform:scale(.92);}
 
-  /* 모의고사 퀴즈 배너 (초록) */
   .quiz-banner.mock-banner{border-color:rgba(26,122,94,.25);background:var(--card);box-shadow:0 2px 12px rgba(26,122,94,.08);}
   .quiz-banner.mock-banner::before{background:var(--green-mock);}
   .quiz-banner.mock-banner .quiz-banner-label{color:var(--green-mock);}
@@ -329,7 +325,6 @@
   .quiz-banner.mock-banner.overdue .quiz-banner-label{color:#d94040;}
   .quiz-banner.mock-banner.overdue .quiz-banner-btn{background:#d94040;}
 
-  /* 모의고사 퀴즈 오버레이 — 카드 top-line 초록 */
   .qz-card-line.mock{background:linear-gradient(90deg,var(--green-mock) 0%,var(--green-mock-soft) 100%);}
   .qz-pill.mock-pill{background:#e6f7f3;color:var(--green-mock);border:1px solid #b3dfd4;}
   .qz-start-btn.mock-start{background:var(--green-mock);box-shadow:0 4px 16px rgba(26,122,94,.25);}
@@ -350,7 +345,10 @@
     .mock-folder{padding:.65rem .55rem;}
     .mock-cards{grid-template-columns:repeat(2,1fr);gap:.45rem;}
     .mcard{padding:.65rem .55rem;}
-  }{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--ink-mute);font-family:'Inter',sans-serif;font-size:.85rem;}
+  }
+
+  /* 로딩 */
+  .loading-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--ink-mute);font-family:'Inter',sans-serif;font-size:.85rem;}
   .spinner{width:30px;height:30px;border:2.5px solid var(--line);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -473,13 +471,12 @@
   </div>
 </main>
 
-<!-- ★ 모의고사 — 구글 시트 자동 로딩 플래시카드 -->
+<!-- ★ 모의고사 — MOCK_CSV 시트에서 자동 로딩 -->
 <main class="materials-section" id="section-mock">
   <div class="section-header">
     <h2 class="section-title mock-title">모의고사 <em></em></h2>
     <div class="section-count" id="count-mock">불러오는 중...</div>
   </div>
-  <!-- 모의고사 퀴즈 배너 컨테이너 -->
   <div id="mock-banner-container"></div>
 
   <!-- 모의고사 퀴즈 풀스크린 -->
@@ -521,9 +518,16 @@
 
 <script>
 /* ============================================================
-   ★ 진도단어 구글 시트 — 웹에 게시 CSV URL
-   ============================================================ */
-const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=792901992';
+   ★ 학생별 설정 — 이 4줄만 수정하면 됩니다
+   ============================================================
+   STUDENT_NAME : 학생 이름 (스케줄 탭의 B열과 정확히 일치)
+   VOCAB_CSV    : 진도단어 시트 CSV URL (해당 학생의 학년·반에 맞는 gid)
+   MOCK_CSV     : 모의고사 시트 CSV URL (해당 학생의 학년·학교에 맞는 gid)
+   ─ 학년·학교별로 구글 시트 탭을 따로 만들고, 그 탭의 gid만 바꿔주세요
+   ─ 모의고사가 없는 학생이면 MOCK_CSV = '' 로 두면 탭이 자동 안내 메시지 표시 */
+const STUDENT_NAME = '인상현';
+const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1590011270';
+const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1055070695';
 
 /* ============================================================
    탭 전환
@@ -786,13 +790,8 @@ function ttsAutoPlay(word, btn) {
    ★ 오늘의 퀴즈 — 스케줄 시트에서 날짜+학생명 → Day 자동 로딩
    ============================================================ */
 
-/* ★ 학생별로 이 줄들만 수정
-   STUDENT_NAME : 학생 이름 (스케줄 탭의 B열과 정확히 일치해야 함)
-   SCHEDULE_CSV : 스케줄 탭 CSV URL (모든 학생 공통 gid)
-   MOCK_CSV     : 모의고사/특강 단어 시트 CSV URL (없으면 빈 문자열 '') */
-const STUDENT_NAME = '조문주';
+/* ★ 스케줄 시트 — 모든 학생 공통 gid (수정 불필요) */
 const SCHEDULE_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=414941877';
-const MOCK_CSV     = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?gid=1027447664&single=true&output=csv'
 
 /* ★ Apps Script 웹앱 URL — scan-ocr 시트 Apps Script 배포 URL */
 const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbx5Y3daCCYcLP5WXsusQtrQmIpHrb1t7DyNqbIGRNYGDvYv74ZZ4c9tY_iATFX2krDHHA/exec';
@@ -1420,15 +1419,24 @@ function qzInitSwipe(){
 }
 
 /* ============================================================
-   ★ 모의고사 탭 — 독립 엔진
+   ★ 모의고사 탭 — 독립 엔진 (MOCK_CSV 시트만으로 동작)
    ============================================================ */
 let mockTabLoaded = false;
-let mockTabWords  = []; // 모의고사 탭 단어 풀 (mockWords 로딩 후 복사)
+let mockTabWords  = [];
 
-/* 모의고사 탭 진입 시 단어 로드 및 렌더 */
 async function loadMockTab() {
   mockTabLoaded = true;
-  await loadMockWords(); // 이미 로딩됐으면 즉시 반환
+  if(!MOCK_CSV) {
+    document.getElementById('mock-content').innerHTML =
+      `<div class="loading-box" style="color:var(--ink-mute);text-align:center">
+        <span style="font-size:2rem">📋</span>
+        <span>모의고사 시트가 아직 등록되지 않았어요.<br>
+        <span style="font-size:.78rem">상단의 MOCK_CSV에 구글 시트 URL을 입력해 주세요.</span></span>
+      </div>`;
+    document.getElementById('count-mock').textContent = '미등록';
+    return;
+  }
+  await loadMockWords();
   if(!mockWords.length) {
     document.getElementById('mock-content').innerHTML =
       `<div class="loading-box" style="color:#d94040">⚠️ 모의고사 단어를 불러오지 못했어요.<br><span style="font-size:.8rem;color:var(--ink-mute)">MOCK_CSV URL을 확인해 주세요.</span></div>`;
@@ -1439,9 +1447,6 @@ async function loadMockTab() {
   renderMockVocab(mockTabWords);
   loadMockQuizBanners();
 }
-
-/* ── 모의고사 Day별 폴더 카드 렌더 ── */
-let openMockKey = null;
 
 function renderMockVocab(words) {
   const groups = {};
@@ -1455,13 +1460,11 @@ function renderMockVocab(words) {
 
   const box = document.getElementById('mock-content');
   box.innerHTML = '';
-
   const grid = document.createElement('div');
   grid.className = 'mock-day-grid';
 
   days.forEach((day, i) => {
     const wordCount = groups[day].length;
-
     const folder = document.createElement('div');
     folder.className = 'mock-folder';
     folder.style.animationDelay = `${0.04*i}s`;
@@ -1471,7 +1474,7 @@ function renderMockVocab(words) {
       <div class="mock-folder-desc">${wordCount}개 단어</div>
       <div class="mock-folder-footer">
         <span class="mock-folder-tag">모의고사</span>
-        <span class="mock-folder-arrow" id="mock-arrow-${i}">→</span>
+        <span class="mock-folder-arrow">→</span>
       </div>`;
 
     const detail = document.createElement('div');
@@ -1506,15 +1509,12 @@ function renderMockVocab(words) {
     });
 
     folder.addEventListener('click', () => toggleMockDay(i, folder, detail));
-
     const wrap = document.createElement('div');
     wrap.style.cssText = 'grid-column:1/-1;';
     wrap.appendChild(detail);
-
     grid.appendChild(folder);
     folder._detailWrap = wrap;
     folder._detail = detail;
-    folder._idx = i;
   });
 
   box.appendChild(grid);
@@ -1532,7 +1532,6 @@ function toggleMockDay(i, folder, detail) {
     detail.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
 }
-
 function closeMockDay(i) {
   const detail = document.getElementById(`mock-detail-${i}`);
   if(detail) {
@@ -1541,7 +1540,6 @@ function closeMockDay(i) {
   }
   document.querySelectorAll('.mock-folder').forEach(f => { f.style.borderColor=''; f.style.background=''; });
 }
-
 function flipMockDay(i) {
   const cards = document.querySelectorAll(`#mock-cards-${i} .mcard`);
   const anyOpen = Array.from(cards).some(c => c.classList.contains('open'));
@@ -1558,10 +1556,8 @@ let mockQzConfig    = { day: null, count: null };
 async function loadMockQuizBanners() {
   const container = document.getElementById('mock-banner-container');
   container.innerHTML = '';
-
   const targetDates = [todayStr(), daysAgo(1), daysAgo(2), daysAgo(3), daysAgo(4), daysAgo(5), daysAgo(6)];
   let scheduleRows = [];
-
   try {
     const res = await fetch(SCHEDULE_CSV + '&t=' + Date.now());
     if(res.ok) {
@@ -1576,14 +1572,13 @@ async function loadMockQuizBanners() {
         if(!targetDates.includes(dateStr)) continue;
         if((cols[1] || '') !== STUDENT_NAME) continue;
         const dayVal = (cols[2] || '');
-        if(!dayVal || !isMockDay(dayVal)) continue; // 모의고사 Day만
+        if(!dayVal || !isMockDay(dayVal)) continue;
         const cntRaw = parseInt(cols[3] || '');
         const cntVal = isNaN(cntRaw) ? null : cntRaw;
         scheduleRows.push({ dateStr, day: dayVal, count: cntVal });
       }
     }
   } catch(e) {}
-
   if(!scheduleRows.length) return;
 
   const localMap   = getLocalSubmitted();
@@ -1600,7 +1595,6 @@ async function loadMockQuizBanners() {
       if(b.dateStr === today && a.dateStr !== today) return  1;
       return b.dateStr.localeCompare(a.dateStr);
     });
-
   renderMockQuizBanners();
 }
 
@@ -1610,7 +1604,6 @@ function renderMockQuizBanners() {
   mockQuizList.forEach((q, idx) => {
     const banner = document.createElement('div');
     banner.className = 'quiz-banner mock-banner' + (q.overdue ? ' overdue' : '');
-
     const left = document.createElement('div');
     left.className = 'quiz-banner-left';
 
@@ -1690,7 +1683,6 @@ function closeMockQuiz(fromPopState) {
   if(_audio) { try{_audio.pause();}catch(e){} _audio=null; }
   if(!fromPopState && history.state && history.state.mockQuiz) history.back();
 }
-
 window.addEventListener('popstate', function(e) {
   const ov = document.getElementById('mock-qz-overlay');
   if(ov && ov.style.display === 'flex') closeMockQuiz(true);
@@ -1698,11 +1690,10 @@ window.addEventListener('popstate', function(e) {
 
 function mqUpdatePill() {
   const p = document.getElementById('mock-qz-pill');
-  if(mqStage==='mc')    { p.textContent='객관식'; p.className='qz-pill mock-pill'; }
+  if(mqStage==='mc')         { p.textContent='객관식'; p.className='qz-pill mock-pill'; }
   else if(mqStage==='retry') { p.textContent='재시도'; p.className='qz-pill retry'; }
-  else                  { p.textContent='완료';   p.className='qz-pill done'; }
+  else                       { p.textContent='완료';   p.className='qz-pill done'; }
 }
-
 function mqBuildDots() {
   const w = document.getElementById('mock-qz-dots'); w.innerHTML='';
   mqQueue.forEach((_,i) => { const d=document.createElement('div'); d.className='qdot'; d.id=`mqdot-${i}`; w.appendChild(d); });
@@ -1742,7 +1733,6 @@ async function mqRenderStage(html, dir=0) { await mqSwapCard(html, dir); }
 async function mqRenderQ(dir=1) {
   mqAnswered = mqQueue[mqPos]._result !== null;
   const q = mqQueue[mqPos];
-
   const optsHTML = q._opts.map((opt,i) => {
     const key = String.fromCharCode(65+i);
     const cls = q._result
@@ -1888,7 +1878,6 @@ function mqRenderResult() {
     </div>`,1);
 }
 
-/* 모의고사 결과 제출 */
 async function submitMockResult(correct, total) {
   const btn = document.getElementById('mock-qz-submit-btn');
   if(!btn || btn.classList.contains('submitted')) return;
@@ -1917,7 +1906,6 @@ async function submitMockResult(correct, total) {
   }
 }
 
-/* 모의고사 스와이프 */
 function mqInitSwipe() {
   if(_mqSwipeInit) return; _mqSwipeInit=true;
   const vp=document.getElementById('mock-qz-viewport');
