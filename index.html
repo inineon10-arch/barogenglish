@@ -352,11 +352,20 @@
   .folder-group:last-child{margin-bottom:0;}
   .folder-group-header{
     display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;
-    padding:.6rem .85rem;margin-bottom:1rem;
+    padding:.7rem .85rem;margin-bottom:1rem;
     border-left:3px solid var(--fg-color);
     background:linear-gradient(to right, rgba(var(--fg-rgb),.06) 0%, rgba(var(--fg-rgb),0) 80%);
     border-radius:0 4px 4px 0;
+    cursor:pointer;user-select:none;-webkit-user-select:none;
+    transition:background .2s;
   }
+  .folder-group-header:hover{background:linear-gradient(to right, rgba(var(--fg-rgb),.1) 0%, rgba(var(--fg-rgb),0) 80%);}
+  .folder-group-toggle{
+    font-family:'Inter',sans-serif;font-size:.7rem;color:var(--fg-color);
+    transition:transform .25s ease;display:inline-flex;align-items:center;
+    width:14px;height:14px;justify-content:center;flex-shrink:0;
+  }
+  .folder-group.collapsed .folder-group-toggle{transform:rotate(-90deg);}
   .folder-group-icon{font-size:1.05rem;line-height:1;}
   .folder-group-name{
     font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:700;
@@ -367,10 +376,51 @@
     font-size:.7rem;color:var(--ink-mute);letter-spacing:.02em;
   }
   .folder-group-meta strong{color:var(--fg-color);font-weight:700;}
+
+  /* 폴더 본문 — 접힌 상태에서 숨김 */
+  .folder-group-body{
+    overflow:hidden;
+    transition:max-height .35s ease, opacity .25s ease, margin .25s ease;
+  }
+  .folder-group.collapsed .folder-group-body{
+    max-height:0 !important;opacity:0;margin-top:-1rem;pointer-events:none;
+  }
+
+  /* ── 상단 폴더 바로가기 칩 ── */
+  .folder-jump-bar{
+    display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;
+    margin:.3rem 0 1.5rem;padding:.55rem .75rem;
+    background:var(--card);border:1px solid var(--line);border-radius:24px;
+    box-shadow:0 1px 3px rgba(31,42,48,.03);
+  }
+  .folder-jump-label{
+    font-family:'Inter',sans-serif;font-size:.6rem;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);
+    margin-right:.25rem;
+  }
+  .folder-jump-chip{
+    display:inline-flex;align-items:center;gap:.35rem;
+    padding:.32rem .75rem;border-radius:18px;
+    background:rgba(var(--fg-rgb),.08);color:var(--fg-color);
+    border:1px solid rgba(var(--fg-rgb),.2);
+    font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;
+    cursor:pointer;transition:all .15s;user-select:none;-webkit-user-select:none;
+  }
+  .folder-jump-chip:hover{background:rgba(var(--fg-rgb),.14);border-color:rgba(var(--fg-rgb),.35);transform:translateY(-1px);}
+  .folder-jump-chip:active{transform:translateY(0);}
+  .folder-jump-chip.disabled{opacity:.45;cursor:default;}
+  .folder-jump-chip-icon{font-size:.85rem;line-height:1;}
+  .folder-jump-chip-count{
+    font-size:.62rem;font-weight:700;opacity:.7;margin-left:.1rem;
+  }
+
   @media(max-width:480px){
-    .folder-group-header{padding:.5rem .65rem;gap:.4rem;}
+    .folder-group-header{padding:.6rem .65rem;gap:.4rem;}
     .folder-group-name{font-size:.9rem;}
     .folder-group-meta{font-size:.65rem;width:100%;margin-left:0;margin-top:.15rem;padding-left:1.5rem;}
+    .folder-jump-bar{padding:.5rem .6rem;gap:.4rem;border-radius:20px;}
+    .folder-jump-label{display:none;}
+    .folder-jump-chip{padding:.28rem .65rem;font-size:.68rem;}
   }
 
   /* 로딩 */
@@ -510,45 +560,59 @@
   <div id="quiz-banner-container"></div>
   <div id="mock-banner-container"></div>
 
+  <!-- ★ 폴더 바로가기 칩 (동적 생성) -->
+  <div id="folder-jump-bar" class="folder-jump-bar" style="display:none">
+    <span class="folder-jump-label">바로가기</span>
+  </div>
+
   <!-- 폴더 그룹 1: 진도단어 -->
-  <div class="folder-group" data-folder="vocab">
-    <div class="folder-group-header" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
+  <div class="folder-group" data-folder="vocab" id="folder-group-vocab" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
+    <div class="folder-group-header" onclick="toggleFolderGroup('vocab')">
+      <span class="folder-group-toggle">▼</span>
       <span class="folder-group-icon">📘</span>
       <span class="folder-group-name">진도단어</span>
       <span class="folder-group-meta" id="vocab-meta-inline" style="display:none">
         <strong id="vocab-total">0</strong>개 단어 · <strong id="vocab-days">0</strong>개 Day
       </span>
     </div>
-    <div id="vocab-content">
-      <div class="loading-box"><div class="spinner"></div><span>진도단어 불러오는 중...</span></div>
+    <div class="folder-group-body">
+      <div id="vocab-content">
+        <div class="loading-box"><div class="spinner"></div><span>진도단어 불러오는 중...</span></div>
+      </div>
     </div>
   </div>
 
   <!-- 폴더 그룹 2: 모의고사 -->
-  <div class="folder-group" data-folder="mock">
-    <div class="folder-group-header" style="--fg-color:#1a7a5e;--fg-rgb:26,122,94;">
+  <div class="folder-group" data-folder="mock" id="folder-group-mock" style="--fg-color:#1a7a5e;--fg-rgb:26,122,94;">
+    <div class="folder-group-header" onclick="toggleFolderGroup('mock')">
+      <span class="folder-group-toggle">▼</span>
       <span class="folder-group-icon">📝</span>
       <span class="folder-group-name">모의고사</span>
       <span class="folder-group-meta" id="mock-meta-inline" style="display:none">
         <strong id="mock-total">0</strong>개 단어 · <strong id="mock-sets">0</strong>개 세트
       </span>
     </div>
-    <div id="mock-content">
-      <div class="loading-box"><div class="spinner" style="border-top-color:#1a7a5e"></div><span>모의고사 불러오는 중...</span></div>
+    <div class="folder-group-body">
+      <div id="mock-content">
+        <div class="loading-box"><div class="spinner" style="border-top-color:#1a7a5e"></div><span>모의고사 불러오는 중...</span></div>
+      </div>
     </div>
   </div>
 
   <!-- ★ 향후 새 폴더 그룹 추가 예시 (주석을 풀면 자동으로 표시됨):
-  <div class="folder-group" data-folder="school">
-    <div class="folder-group-header" style="--fg-color:#d97706;--fg-rgb:217,119,6;">
+  <div class="folder-group" data-folder="school" id="folder-group-school" style="--fg-color:#d97706;--fg-rgb:217,119,6;">
+    <div class="folder-group-header" onclick="toggleFolderGroup('school')">
+      <span class="folder-group-toggle">▼</span>
       <span class="folder-group-icon">🏫</span>
       <span class="folder-group-name">내신단어</span>
       <span class="folder-group-meta" id="school-meta-inline" style="display:none">
         <strong id="school-total">0</strong>개 단어 · <strong id="school-sets">0</strong>개 세트
       </span>
     </div>
-    <div id="school-content">
-      <div class="loading-box"><div class="spinner" style="border-top-color:#d97706"></div><span>내신단어 불러오는 중...</span></div>
+    <div class="folder-group-body">
+      <div id="school-content">
+        <div class="loading-box"><div class="spinner" style="border-top-color:#d97706"></div><span>내신단어 불러오는 중...</span></div>
+      </div>
     </div>
   </div>
   -->
@@ -569,8 +633,8 @@
    MOCK_CSV     : 모의고사 시트 CSV URL (해당 학생의 학년·학교에 맞는 gid)
    ─ 학년·학교별로 구글 시트 탭을 따로 만들고, 그 탭의 gid만 바꿔주세요
    ─ 모의고사가 없는 학생이면 MOCK_CSV = '' 로 두면 자동 안내 메시지 표시 */
-const STUDENT_NAME = '조문정';
-const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1590011270';
+const STUDENT_NAME = '조문주';
+const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=792901992';
 const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1055070695';
 
 /* ============================================================
@@ -2058,6 +2122,73 @@ function updateStudyCount() {
   const st = parseInt(document.getElementById('school-total')?.textContent) || 0;
   if(st > 0) { total += st; any = true; }
   el.textContent = any ? `전체 ${total}개 단어` : '불러오는 중...';
+  buildFolderJumpBar(); // 폴더가 로드될 때마다 칩 갱신
+}
+
+/* ============================================================
+   폴더 접기/펼치기 + 바로가기 칩
+   ============================================================ */
+/* 폴더별 펼침 상태 (true=펼침, false=접힘). 기본값: 둘 다 펼침 */
+const folderOpenState = { vocab:true, mock:true, school:true };
+
+function toggleFolderGroup(folderId) {
+  const el = document.getElementById('folder-group-' + folderId);
+  if(!el) return;
+  const body = el.querySelector('.folder-group-body');
+  const willCollapse = !el.classList.contains('collapsed');
+
+  if(willCollapse) {
+    // 펼침 → 접힘: 현재 높이를 maxHeight로 고정 후 0으로 transition
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      body.style.maxHeight = '0px';
+      el.classList.add('collapsed');
+    });
+  } else {
+    // 접힘 → 펼침
+    el.classList.remove('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    // 애니메이션 끝난 뒤 height auto로 풀어줌 (반응형 대응)
+    setTimeout(() => { if(!el.classList.contains('collapsed')) body.style.maxHeight = ''; }, 360);
+  }
+  folderOpenState[folderId] = !willCollapse;
+}
+
+function scrollToFolder(folderId) {
+  const el = document.getElementById('folder-group-' + folderId);
+  if(!el) return;
+  // 접혀 있으면 펼치고 스크롤
+  if(el.classList.contains('collapsed')) toggleFolderGroup(folderId);
+  const headerOffset = 80; // 상단 nav 여유
+  const top = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+/* 등록된 폴더 그룹들을 자동 탐색해서 칩 생성 (확장성) */
+function buildFolderJumpBar() {
+  const bar = document.getElementById('folder-jump-bar');
+  if(!bar) return;
+  // 라벨 외의 기존 칩 모두 제거
+  bar.querySelectorAll('.folder-jump-chip').forEach(c => c.remove());
+
+  const groups = document.querySelectorAll('.folder-group');
+  let any = false;
+  groups.forEach(group => {
+    const id   = group.dataset.folder;
+    const name = group.querySelector('.folder-group-name')?.textContent || id;
+    const icon = group.querySelector('.folder-group-icon')?.textContent || '📁';
+    const totalEl = group.querySelector('[id$="-total"]');
+    const count = parseInt(totalEl?.textContent) || 0;
+
+    const chip = document.createElement('span');
+    chip.className = 'folder-jump-chip' + (count===0 ? ' disabled' : '');
+    chip.style.cssText = group.getAttribute('style') || '';
+    chip.innerHTML = `<span class="folder-jump-chip-icon">${icon}</span>${esc(name)}${count>0?`<span class="folder-jump-chip-count">${count}</span>`:''}`;
+    if(count > 0) chip.addEventListener('click', () => scrollToFolder(id));
+    bar.appendChild(chip);
+    if(count > 0) any = true;
+  });
+  bar.style.display = any ? 'flex' : 'none';
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
