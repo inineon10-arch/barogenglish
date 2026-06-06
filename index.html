@@ -223,8 +223,8 @@
   .wrong-entry-arrow{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--accent);transition:transform .3s;flex-shrink:0;}
   .wrong-entry-btn:hover .wrong-entry-arrow{transform:translateX(5px);}
 
-  /* ── 진도단어 플래시카드 ── */
-  /* ── 진도단어 Day 폴더 카드 ── */
+  /* ── 단어장 플래시카드 ── */
+  /* ── 단어장 Day 폴더 카드 ── */
   .vocab-meta-bar{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;}
   .vocab-stat{font-family:'Inter',sans-serif;font-size:.75rem;color:var(--ink-mute);}
   .vocab-stat strong{color:var(--purple);font-weight:600;}
@@ -497,7 +497,7 @@
   <a href="wrong-words.html" class="wrong-entry-btn">
     <div class="wrong-entry-inner">
       <div class="wrong-entry-left">
-        <div class="wrong-entry-label">오답 단어장 열기</div>
+        <div class="wrong-entry-label">오답단어장 열기</div>
         <div class="wrong-entry-desc">날짜별 오답을 플래시카드로 복습해요</div>
       </div>
       <span class="wrong-entry-arrow">→</span>
@@ -505,18 +505,18 @@
   </a>
 </main>
 
-<!-- ★ 단어학습 — 진도단어 + 모의고사 (+ 향후 폴더들) 통합 -->
+<!-- ★ 단어학습 — 단어장 + 모의고사 (+ 향후 폴더들) 통합 -->
 <main class="materials-section" id="section-vocab">
   <div class="section-header">
     <h2 class="section-title vocab-title">단어 학습 <em></em></h2>
     <div class="section-count" id="count-study">불러오는 중...</div>
   </div>
 
-  <!-- 진도단어 퀴즈 풀스크린 -->
+  <!-- 단어장 퀴즈 풀스크린 -->
   <div class="qz-overlay" id="qz-overlay" style="display:none">
     <div class="qz-header">
       <div class="qz-header-left">
-        <div class="qz-name">바로그영어 · 진도단어</div>
+        <div class="qz-name">바로그영어 · 단어장</div>
         <div class="qz-title" id="qz-title">객관식 퀴즈</div>
       </div>
       <div class="qz-header-right">
@@ -556,7 +556,7 @@
     </div>
   </div>
 
-  <!-- 통합 시험 배너 영역 (진도단어 + 모의고사) -->
+  <!-- 통합 시험 배너 영역 (단어장 + 모의고사) -->
   <div id="quiz-banner-container"></div>
   <div id="mock-banner-container"></div>
 
@@ -565,19 +565,19 @@
     <span class="folder-jump-label">바로가기</span>
   </div>
 
-  <!-- 폴더 그룹 1: 진도단어 -->
+  <!-- 폴더 그룹 1: 단어장 -->
   <div class="folder-group collapsed" data-folder="vocab" id="folder-group-vocab" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
     <div class="folder-group-header" onclick="toggleFolderGroup('vocab')">
       <span class="folder-group-toggle">▼</span>
       <span class="folder-group-icon">📘</span>
-      <span class="folder-group-name">진도단어</span>
+      <span class="folder-group-name">단어장</span>
       <span class="folder-group-meta" id="vocab-meta-inline" style="display:none">
         <strong id="vocab-total">0</strong>개 단어 · <strong id="vocab-days">0</strong>개 Day
       </span>
     </div>
     <div class="folder-group-body">
       <div id="vocab-content">
-        <div class="loading-box"><div class="spinner"></div><span>진도단어 불러오는 중...</span></div>
+        <div class="loading-box"><div class="spinner"></div><span>단어장 불러오는 중...</span></div>
       </div>
     </div>
   </div>
@@ -629,7 +629,7 @@
    ★ 학생별 설정 — 이 줄들만 수정하면 됩니다
    ============================================================
    STUDENT_NAME : 학생 이름 (스케줄 탭의 B열과 정확히 일치)
-   VOCAB_CSV    : 진도단어 시트 CSV URL (해당 학생의 학년·반에 맞는 gid)
+   VOCAB_CSV    : 단어장 시트 CSV URL (해당 학생의 학년·반에 맞는 gid)
    MOCK_CSV     : 모의고사 시트 CSV URL (해당 학생의 학년·학교에 맞는 gid)
    ─ 학년·학교별로 구글 시트 탭을 따로 만들고, 그 탭의 gid만 바꿔주세요
    ─ 모의고사가 없는 학생이면 MOCK_CSV = '' 로 두면 자동 안내 메시지 표시 */
@@ -651,7 +651,7 @@ const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOi
 const STUDY_FOLDERS = [
   {
     id    : 'vocab',
-    name  : '진도단어',
+    name  : '단어장',
     icon  : '📘',
     csv   : VOCAB_CSV,
     color : '#7036e3',
@@ -697,7 +697,7 @@ function switchTab(t) {
 }
 
 /* ============================================================
-   진도단어 — CSV 로딩
+   단어장 — CSV 로딩
    ============================================================ */
 let vocabLoaded = false;
 let allWords = [];
@@ -768,7 +768,7 @@ async function loadVocab() {
 }
 
 /* ============================================================
-   진도단어 렌더 — Day별 폴더 카드 (오답단어와 동일한 UX)
+   단어장 렌더 — Day별 폴더 카드 (오답단어와 동일한 UX)
    ============================================================ */
 let openDayKey = null; // 현재 열린 Day
 
@@ -1112,7 +1112,7 @@ async function loadQuizConfig() {
         if((cols[1] || '') !== STUDENT_NAME) continue;
         const dayVal = cols[2] || '';
         if(!dayVal) continue;
-        if(isMockDay(dayVal)) continue; // ★ 모의고사 Day는 진도단어 탭에서 제외 (모의고사 탭에서만 표시)
+        if(isMockDay(dayVal)) continue; // ★ 모의고사 Day는 단어장 탭에서 제외 (모의고사 탭에서만 표시)
         const cntRaw = parseInt(cols[3] || '');
         const cntVal = isNaN(cntRaw) ? null : cntRaw;
         scheduleRows.push({ dateStr, day: dayVal, count: cntVal });
@@ -1122,7 +1122,7 @@ async function loadQuizConfig() {
 
   if(scheduleRows.length === 0) return; // 보여줄 게 없으면 종료
 
-  // 2-a. (제거됨) 모의고사 Day는 진도단어 탭에서 더 이상 처리하지 않음 — 모의고사 탭이 담당
+  // 2-a. (제거됨) 모의고사 Day는 단어장 탭에서 더 이상 처리하지 않음 — 모의고사 탭이 담당
 
   // 2. 제출 기록 조회 (로컬 + 서버)
   const localMap     = getLocalSubmitted();
@@ -2100,14 +2100,14 @@ function mqInitSwipe() {
 }
 
 /* ============================================================
-   통합 카운트 — 진도단어 + 모의고사(+ 향후 폴더) 합산해서 헤더에 표시
+   통합 카운트 — 단어장 + 모의고사(+ 향후 폴더) 합산해서 헤더에 표시
    ============================================================ */
 function updateStudyCount() {
   const el = document.getElementById('count-study');
   if(!el) return;
   let total = 0;
   let any = false;
-  // 진도단어
+  // 단어장
   const vt = parseInt(document.getElementById('vocab-total')?.textContent) || 0;
   if(vt > 0) { total += vt; any = true; }
   // 모의고사
@@ -2220,7 +2220,7 @@ function pushStudyNav(closeFn) {
 }
 
 /* 통합 popstate 핸들러 — 우선순위:
-   1) 진도단어 퀴즈 오버레이가 열려있으면 그것부터 닫기
+   1) 단어장 퀴즈 오버레이가 열려있으면 그것부터 닫기
    2) 모의고사 퀴즈 오버레이가 열려있으면 그것 닫기
    3) 학습 작업 스택이 있으면 가장 최근 작업 되돌리기 */
 window.addEventListener('popstate', function(e) {
