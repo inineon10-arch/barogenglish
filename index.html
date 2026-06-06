@@ -566,7 +566,7 @@
   </div>
 
   <!-- 폴더 그룹 1: 진도단어 -->
-  <div class="folder-group" data-folder="vocab" id="folder-group-vocab" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
+  <div class="folder-group collapsed" data-folder="vocab" id="folder-group-vocab" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
     <div class="folder-group-header" onclick="toggleFolderGroup('vocab')">
       <span class="folder-group-toggle">▼</span>
       <span class="folder-group-icon">📘</span>
@@ -583,7 +583,7 @@
   </div>
 
   <!-- 폴더 그룹 2: 모의고사 -->
-  <div class="folder-group" data-folder="mock" id="folder-group-mock" style="--fg-color:#1a7a5e;--fg-rgb:26,122,94;">
+  <div class="folder-group collapsed" data-folder="mock" id="folder-group-mock" style="--fg-color:#1a7a5e;--fg-rgb:26,122,94;">
     <div class="folder-group-header" onclick="toggleFolderGroup('mock')">
       <span class="folder-group-toggle">▼</span>
       <span class="folder-group-icon">📝</span>
@@ -871,6 +871,8 @@ function toggleDay(i, folder, detail) {
     folder.style.borderColor='rgba(112,54,227,.4)';
     folder.style.background='rgba(112,54,227,.03)';
     detail.scrollIntoView({behavior:'smooth', block:'nearest'});
+    /* ★ 뒤로가기로 되돌릴 수 있도록 history에 등록 */
+    pushStudyNav(() => closeDay(i));
   }
 }
 
@@ -1257,13 +1259,7 @@ function closeQuiz(fromPopState) {
   }
 }
 
-// 뒤로가기 감지 → 퀴즈 오버레이가 열려있으면 닫기만 하고 페이지는 유지
-window.addEventListener('popstate', function(e){
-  const overlay = document.getElementById('qz-overlay');
-  if(overlay && overlay.style.display === 'flex') {
-    closeQuiz(true);
-  }
-});
+// (popstate 핸들러는 통합 핸들러로 이동됨 — esc 함수 아래쪽 참조)
 
 function qzUpdatePill(){
   const p=document.getElementById('qz-pill');
@@ -1682,6 +1678,8 @@ function toggleMockDay(i, folder, detail) {
     folder.style.borderColor = 'rgba(26,122,94,.4)';
     folder.style.background  = 'rgba(26,122,94,.03)';
     detail.scrollIntoView({behavior:'smooth', block:'nearest'});
+    /* ★ 뒤로가기로 되돌릴 수 있도록 history에 등록 */
+    pushStudyNav(() => closeMockDay(i));
   }
 }
 function closeMockDay(i) {
@@ -1835,10 +1833,7 @@ function closeMockQuiz(fromPopState) {
   if(_audio) { try{_audio.pause();}catch(e){} _audio=null; }
   if(!fromPopState && history.state && history.state.mockQuiz) history.back();
 }
-window.addEventListener('popstate', function(e) {
-  const ov = document.getElementById('mock-qz-overlay');
-  if(ov && ov.style.display === 'flex') closeMockQuiz(true);
-});
+// (popstate 핸들러는 통합 핸들러로 이동됨)
 
 function mqUpdatePill() {
   const p = document.getElementById('mock-qz-pill');
@@ -2128,8 +2123,8 @@ function updateStudyCount() {
 /* ============================================================
    폴더 접기/펼치기 + 바로가기 칩
    ============================================================ */
-/* 폴더별 펼침 상태 (true=펼침, false=접힘). 기본값: 둘 다 펼침 */
-const folderOpenState = { vocab:true, mock:true, school:true };
+/* 폴더별 펼침 상태 (true=펼침, false=접힘). 기본값: 둘 다 접힘 */
+const folderOpenState = { vocab:false, mock:false, school:false };
 
 function toggleFolderGroup(folderId) {
   const el = document.getElementById('folder-group-' + folderId);
@@ -2144,14 +2139,30 @@ function toggleFolderGroup(folderId) {
       body.style.maxHeight = '0px';
       el.classList.add('collapsed');
     });
+    folderOpenState[folderId] = false;
   } else {
     // 접힘 → 펼침
     el.classList.remove('collapsed');
     body.style.maxHeight = body.scrollHeight + 'px';
     // 애니메이션 끝난 뒤 height auto로 풀어줌 (반응형 대응)
     setTimeout(() => { if(!el.classList.contains('collapsed')) body.style.maxHeight = ''; }, 360);
+    folderOpenState[folderId] = true;
+    // ★ 뒤로가기로 되돌릴 수 있도록 history에 등록
+    pushStudyNav(() => collapseFolderGroupSilent(folderId));
   }
-  folderOpenState[folderId] = !willCollapse;
+}
+
+/* 뒤로가기 시 호출되는 조용한 접기 (history에 영향 없음) */
+function collapseFolderGroupSilent(folderId) {
+  const el = document.getElementById('folder-group-' + folderId);
+  if(!el || el.classList.contains('collapsed')) return;
+  const body = el.querySelector('.folder-group-body');
+  body.style.maxHeight = body.scrollHeight + 'px';
+  requestAnimationFrame(() => {
+    body.style.maxHeight = '0px';
+    el.classList.add('collapsed');
+  });
+  folderOpenState[folderId] = false;
 }
 
 function scrollToFolder(folderId) {
@@ -2192,6 +2203,37 @@ function buildFolderJumpBar() {
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ============================================================
+   ★ 뒤로가기 처리 — 학습 페이지 작업 스택
+   ============================================================
+   모바일에서 뒤로가기 버튼을 누르면 페이지를 떠나지 않고
+   가장 최근에 한 작업(Day 카드 펼침, 폴더 펼침 등)을 되돌리도록 함.
+   - 어떤 "열기" 동작이든 pushStudyNav() 호출하면 자동으로 history에 등록
+   - 뒤로가기 → 가장 최근 항목의 close 함수를 실행
+   - 스택이 비면 그때 페이지를 자연스럽게 떠남 */
+const studyNavStack = [];
+
+function pushStudyNav(closeFn) {
+  studyNavStack.push(closeFn);
+  history.pushState({ studyNav: studyNavStack.length }, '', location.href);
+}
+
+/* 통합 popstate 핸들러 — 우선순위:
+   1) 진도단어 퀴즈 오버레이가 열려있으면 그것부터 닫기
+   2) 모의고사 퀴즈 오버레이가 열려있으면 그것 닫기
+   3) 학습 작업 스택이 있으면 가장 최근 작업 되돌리기 */
+window.addEventListener('popstate', function(e) {
+  const qzOv = document.getElementById('qz-overlay');
+  if(qzOv && qzOv.style.display === 'flex') { closeQuiz(true); return; }
+  const mqOv = document.getElementById('mock-qz-overlay');
+  if(mqOv && mqOv.style.display === 'flex') { closeMockQuiz(true); return; }
+  // 학습 페이지 작업
+  if(studyNavStack.length > 0) {
+    const fn = studyNavStack.pop();
+    try { fn && fn(); } catch(err) { console.warn(err); }
+  }
+}, true); // capture 단계에서 먼저 실행
 </script>
 </body>
 </html>
