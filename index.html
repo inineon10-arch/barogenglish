@@ -82,8 +82,24 @@
   .quiz-banner.overdue .quiz-banner-label{color:#d94040;}
   .quiz-banner.overdue .quiz-banner-btn{background:#d94040;}
   .quiz-banner.overdue .quiz-banner-overdue-tag{display:inline-block;background:#d94040;color:#fff;font-family:'Inter',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.08em;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;text-transform:uppercase;}
-  #quiz-banner-container{margin-bottom:2rem;display:flex;flex-direction:column;gap:.8rem;}
+  #quiz-banner-container{margin-bottom:.8rem;display:flex;flex-direction:column;gap:.8rem;}
   #quiz-banner-container:empty{margin-bottom:0;}
+  #mock-banner-container{display:flex;flex-direction:column;gap:.8rem;}
+  #mock-banner-container:empty{margin-bottom:0;}
+
+  /* 배너 영역과 단어장 영역 사이 구분선 */
+  .study-divider{
+    display:flex;align-items:center;gap:.75rem;
+    margin:1.6rem 0 1.4rem;
+  }
+  .study-divider-line{flex:1;height:1px;background:var(--line);}
+  .study-divider-label{
+    font-family:'Inter',sans-serif;font-size:.62rem;font-weight:700;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--ink-mute);
+    white-space:nowrap;
+  }
+  /* 배너가 없을 때(둘 다 empty)는 구분선 숨김 */
+  .study-divider.hidden{display:none;}
 
   /* ── 퀴즈 풀스크린 오버레이 ── */
   .qz-overlay{position:fixed;inset:0;z-index:500;background:#f5f0eb;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
@@ -560,6 +576,13 @@
   <div id="quiz-banner-container"></div>
   <div id="mock-banner-container"></div>
 
+  <!-- 배너 ↔ 단어장 구분선 (배너가 있을 때만 표시) -->
+  <div class="study-divider hidden" id="study-divider">
+    <div class="study-divider-line"></div>
+    <span class="study-divider-label">단어 학습</span>
+    <div class="study-divider-line"></div>
+  </div>
+
   <!-- ★ 폴더 바로가기 칩 (동적 생성) -->
   <div id="folder-jump-bar" class="folder-jump-bar" style="display:none">
     <span class="folder-jump-label">바로가기</span>
@@ -635,7 +658,16 @@
    ─ 모의고사가 없는 학생이면 MOCK_CSV = '' 로 두면 자동 안내 메시지 표시 */
 const STUDENT_NAME = '조문주';
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=792901992';
-const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1055070695';
+const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1027447664';
+
+/* ── 학생 이름을 섹션 타이틀에 자동 표시 ──  ← 여기에 추가 */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.section-title em').forEach(em => {
+    em.textContent = STUDENT_NAME;
+  });
+  document.title = STUDENT_NAME + ' · BAROG 학습 자료실';
+});
+
 
 /* ============================================================
    ★ 단어학습 탭 — 폴더 정의 (확장 가능!)
@@ -1198,6 +1230,7 @@ function renderQuizBanners() {
     banner.appendChild(btnEl);
     container.appendChild(banner);
   });
+  updateStudyDivider();
 }
 
 function startQuizByIdx(idx) {
@@ -1791,6 +1824,7 @@ function renderMockQuizBanners() {
     banner.appendChild(btnEl);
     container.appendChild(banner);
   });
+  updateStudyDivider();
 }
 
 /* ── 모의고사 퀴즈 엔진 ── */
@@ -2117,7 +2151,18 @@ function updateStudyCount() {
   const st = parseInt(document.getElementById('school-total')?.textContent) || 0;
   if(st > 0) { total += st; any = true; }
   el.textContent = any ? `전체 ${total}개 단어` : '불러오는 중...';
-  buildFolderJumpBar(); // 폴더가 로드될 때마다 칩 갱신
+  buildFolderJumpBar();
+  updateStudyDivider();
+}
+
+/* 배너가 하나라도 있으면 구분선 표시, 없으면 숨김 */
+function updateStudyDivider() {
+  const divider = document.getElementById('study-divider');
+  if(!divider) return;
+  const hasBanner =
+    document.querySelector('#quiz-banner-container .quiz-banner') ||
+    document.querySelector('#mock-banner-container .quiz-banner');
+  divider.classList.toggle('hidden', !hasBanner);
 }
 
 /* ============================================================
