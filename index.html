@@ -660,13 +660,7 @@ const STUDENT_NAME = '조문주';
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=792901992';
 const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1027447664';
 
-/* ── 학생 이름을 섹션 타이틀에 자동 표시 ──  ← 여기에 추가 */
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.section-title em').forEach(em => {
-    em.textContent = STUDENT_NAME;
-  });
-  document.title = STUDENT_NAME + ' · BAROG 학습 자료실';
-});
+document.title = STUDENT_NAME + ' · BAROG ';
 
 
 /* ============================================================
