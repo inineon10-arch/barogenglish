@@ -463,6 +463,22 @@
   /* 로딩 */
   .loading-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 2rem;color:var(--ink-mute);font-family:'Inter',sans-serif;font-size:.85rem;}
   .spinner{width:30px;height:30px;border:2.5px solid var(--line);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;}
+
+  /* ★ Daily Test 상태 박스 — 로딩 / 빈 상태 공용 */
+  .daily-status{
+    display:flex;flex-direction:column;align-items:center;gap:1.2rem;
+    padding:3.5rem 1.5rem;margin-top:1rem;
+    background:rgba(112,54,227,.03);border:1px dashed rgba(112,54,227,.18);
+    border-radius:14px;text-align:center;
+  }
+  .daily-status-text{
+    font-family:'Noto Serif KR',serif;font-size:1.05rem;font-weight:500;
+    color:var(--ink-soft);line-height:1.5;
+  }
+  .daily-status-sub{
+    margin-top:.4rem;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:400;
+    color:var(--ink-mute);letter-spacing:0;
+  }
   @keyframes spin{to{transform:rotate(360deg)}}
 
   .no-results{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--ink-mute);font-style:italic;}
@@ -576,12 +592,22 @@
   <div id="mock-banner-container"></div>
   <div id="weak-banner-container"></div>
 
-  <!-- 풀 시험이 없을 때 안내 -->
-  <div id="daily-empty" class="loading-box" style="display:none;text-align:center;color:var(--ink-mute)">
+  <!-- ★ 데이터 로딩 중 안내 (페이지 진입 시 기본 표시 — JS 가 끝나면 숨김) -->
+  <div id="daily-loading" class="daily-status">
+    <div class="spinner"></div>
+    <div class="daily-status-text">
+      오늘의 시험을 확인하고 있어요...
+      <div class="daily-status-sub">잠시만 기다려 주세요</div>
+    </div>
+  </div>
+
+  <!-- 풀 시험이 없을 때 안내 (로딩 완료 후에만 표시) -->
+  <div id="daily-empty" class="daily-status" style="display:none">
     <span style="font-size:1.8rem">🎉</span>
-    <span>오늘 풀어야 할 시험이 없어요.<br>
-      <span style="font-size:.85rem">단어 암기 탭에서 평소 학습을 이어가세요.</span>
-    </span>
+    <div class="daily-status-text">
+      오늘 풀어야 할 시험이 없어요.
+      <div class="daily-status-sub">단어 암기 탭에서 평소 학습을 이어가세요.</div>
+    </div>
   </div>
 </main>
 
@@ -792,23 +818,44 @@ function switchTab(t) {
   }
 }
 
-/* Daily Test 탭이 비어 있을 때 안내 + 시험 개수 뱃지 갱신 */
+/* ★ 배너 로더 완료 추적 — Daily Test 의 "로딩 중 / 시험 있음 / 빈 상태" 전환용
+   각 배너 로더(loadQuizConfig, loadMockQuizBanners, loadWeakQuizBanners)가
+   끝나면 _markBannerLoadDone() 가 호출됨 (아래 IIFE 에서 래핑) */
+const _bannersLoadStatus = { quiz: false, mock: false, weak: false };
+function _markBannerLoadDone(key) {
+  _bannersLoadStatus[key] = true;
+  updateDailyEmptyState();
+}
+
+/* Daily Test 탭 상태 갱신 — 3-상태 분기
+   1) 배너가 1개 이상 → 배너 표시, 로딩/빈 상태 숨김, 뱃지에 개수
+   2) 로딩 미완료      → 로딩 박스 표시
+   3) 로딩 완료 + 0개  → "오늘 시험 없어요" 표시 */
 function updateDailyEmptyState() {
   const banners = document.querySelectorAll(
     '#quiz-banner-container .quiz-banner, #mock-banner-container .quiz-banner, #weak-banner-container .quiz-banner'
   );
   const count = banners.length;
-  const empty = document.getElementById('daily-empty');
-  const badge = document.getElementById('daily-count-badge');
-  if(empty) empty.style.display = count ? 'none' : '';
-  if(badge) {
-    if(count > 0) {
-      badge.textContent = count + '개';
-      badge.style.display = 'inline-block';
-    } else {
-      badge.textContent = '';
-      badge.style.display = 'none';
-    }
+  const allLoaded = _bannersLoadStatus.quiz && _bannersLoadStatus.mock && _bannersLoadStatus.weak;
+  const empty   = document.getElementById('daily-empty');
+  const loading = document.getElementById('daily-loading');
+  const badge   = document.getElementById('daily-count-badge');
+
+  if (count > 0) {
+    /* 배너 있음 */
+    if (loading) loading.style.display = 'none';
+    if (empty)   empty.style.display   = 'none';
+    if (badge) { badge.textContent = count + '개'; badge.style.display = 'inline-block'; }
+  } else if (!allLoaded) {
+    /* 아직 로딩 중 */
+    if (loading) loading.style.display = '';
+    if (empty)   empty.style.display   = 'none';
+    if (badge) { badge.textContent = ''; badge.style.display = 'none'; }
+  } else {
+    /* 로딩 끝났는데 배너 0개 */
+    if (loading) loading.style.display = 'none';
+    if (empty)   empty.style.display   = '';
+    if (badge) { badge.textContent = ''; badge.style.display = 'none'; }
   }
 }
 
@@ -2626,6 +2673,29 @@ window.addEventListener('popstate', function(e) {
     try { fn && fn(); } catch(err) { console.warn(err); }
   }
 }, true); // capture 단계에서 먼저 실행
+
+/* ★ 배너 로더 3개를 try/finally 로 래핑 — early return / 에러 어떤 경로로 끝나도
+   _markBannerLoadDone() 가 보장 호출되도록. 이 IIFE 는 switchTab('daily') 직전에
+   실행되어야 함 (래핑 이후의 함수 참조에서만 효과가 있으므로) */
+(function() {
+  const orig = {
+    quiz: loadQuizConfig,
+    mock: loadMockQuizBanners,
+    weak: loadWeakQuizBanners
+  };
+  loadQuizConfig = async function() {
+    try { return await orig.quiz.apply(this, arguments); }
+    finally { _markBannerLoadDone('quiz'); }
+  };
+  loadMockQuizBanners = async function() {
+    try { return await orig.mock.apply(this, arguments); }
+    finally { _markBannerLoadDone('mock'); }
+  };
+  loadWeakQuizBanners = async function() {
+    try { return await orig.weak.apply(this, arguments); }
+    finally { _markBannerLoadDone('weak'); }
+  };
+})();
 
 /* ★ 페이지 진입 시 첫 화면이 'Daily Test' 이므로 관련 데이터 로딩 트리거 */
 switchTab('daily');
