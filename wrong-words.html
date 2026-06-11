@@ -39,6 +39,13 @@
   .folder-count.zero{color:var(--green);background:#e8f7f0;border-color:#b8e4d0;}
   .folder-arrow{font-size:1rem;color:var(--muted);}
   .folder:hover .folder-arrow{color:var(--wrong-col);}
+  /* ★ 별표 단어 전용 폴더 — 노란 강조 */
+  .folder.starred{grid-column:1 / -1;}
+  .folder.starred .folder-top{background:linear-gradient(90deg,#f5b300 0%,#ffd966 100%);}
+  .folder.starred .folder-no{color:#b88500;}
+  .folder.starred:hover{border-color:#f5b300;box-shadow:0 4px 14px rgba(245,179,0,0.18);}
+  .folder.starred .folder-count{color:#b88500;background:#fff8d6;border-color:#ffe88a;}
+  .folder.starred:hover .folder-arrow{color:#f5b300;}
   .back-link{display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text2);text-decoration:none;margin-bottom:12px;}
   .back-link:active{color:var(--accent);}
 </style>
@@ -169,6 +176,30 @@ async function loadFolders(){
     // 카드 렌더링
     const grid=document.getElementById('grid');
     grid.innerHTML='';
+
+    /* ★ 별표 단어 폴더 — 학생이 마크한 단어들 (있을 때만 상단에 표시) */
+    try {
+      const starredMap = JSON.parse(localStorage.getItem('starred_words_' + STUDENT_NAME) || '{}');
+      const starredCount = Object.keys(starredMap).length;
+      if (starredCount > 0) {
+        const sa = document.createElement('a');
+        sa.className = 'folder starred';
+        sa.href = 'wrong-flashcard.html?starred=1';
+        sa.innerHTML = `
+          <div class="folder-top"></div>
+          <div class="folder-no">⭐ My Stars</div>
+          <div>
+            <div class="folder-date">별표한 단어</div>
+            <div class="folder-day">내가 모른다고 표시한 단어 모음</div>
+          </div>
+          <div class="folder-foot">
+            <span class="folder-count">${starredCount}개</span>
+            <span class="folder-arrow">→</span>
+          </div>`;
+        grid.appendChild(sa);
+      }
+    } catch (e) { console.warn('별표 폴더 로드 실패:', e); }
+
     sorted.forEach((g,i)=>{
       const a=document.createElement('a');
       a.className='folder';
