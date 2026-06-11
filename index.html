@@ -1,4 +1,25 @@
 <!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════
+  BAROG English · 학습 자료실
+  현재 버전: v2.3  (2026-06-10)
+─────────────────────────────────────────────────────────────────
+  변경 이력:
+  v2.3 — Daily Test 로딩 중 상태 표시
+         (성격 급한 학생들이 "시험 없음"으로 오해하지 않도록)
+  v2.2 — 모바일 탭 라벨 축약 (오답/Test/암기) + 시험 개수 뱃지
+  v2.1 — 첫 화면을 Daily Test 로 변경
+  v2.0 — 3-탭 구조 (오답확인 / Daily Test / 단어 암기)
+  v1.4 — 추가단어 시험 (스케줄 기반, 모의고사와 동일 메커니즘)
+  v1.3 — 추가단어 시험 (학생명 기반, deprecated)
+  v1.2 — isMockDay 데이터 기반 분기 (시트 출처로 판단)
+  v1.1 — 모의고사 시스템
+  v1.0 — 단어장 + 오답단어 시스템
+
+  ★ 버전 업데이트 방법: 아래 자바스크립트 영역 최상단의 APP_VERSION 상수
+    하나만 바꾸면 푸터 표시·콘솔 로그가 동시에 갱신됩니다.
+═══════════════════════════════════════════════════════════════════
+-->
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
@@ -488,6 +509,14 @@
   .footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;}
   .footer-text{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--ink-mute);}
   .footer-text em{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--accent);}
+  /* ★ 앱 버전 — 푸터 우측에 차분히 표시 */
+  .footer-version{
+    font-family:'Inter',monospace,sans-serif;font-size:.7rem;font-weight:500;
+    color:var(--ink-mute);opacity:.55;letter-spacing:.04em;
+    padding:.25rem .55rem;border:1px solid var(--line);border-radius:.5rem;
+    background:rgba(0,0,0,.02);
+    user-select:none;
+  }
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   .hero > *,.section-header,.search-wrap{animation:fadeUp .8s ease both;}
@@ -724,6 +753,7 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-text">Barog English · <em>Crafted with care for our students</em></div>
+    <div class="footer-version" id="footer-version" title="앱 버전"></div>
   </div>
 </footer>
 
@@ -744,8 +774,14 @@
                     해당 학생에게 이 세트의 시험 배너가 자동 표시됨
                   - 모의고사와 같은 스케줄 기반 동작 (밀린 시험·자동 숨김 등)
                   - 빈 문자열 '' 이면 배너 표시 안 됨 */
+/* ════════════════════════════════════════════════════════════
+   ★ 앱 버전 — 변경할 때 이 값만 바꾸면 푸터·콘솔이 같이 갱신됨
+   ════════════════════════════════════════════════════════════ */
+const APP_VERSION      = 'v2.3';
+const APP_VERSION_DATE = '2026-06-10';
+
 const STUDENT_NAME = '조문주';
-const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=792901992';
+const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1174135286';
 const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=222284112';
 const WEAK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1027447664';
 
@@ -2695,6 +2731,15 @@ window.addEventListener('popstate', function(e) {
     try { return await orig.weak.apply(this, arguments); }
     finally { _markBannerLoadDone('weak'); }
   };
+})();
+
+/* ★ 푸터에 버전 표시 + 콘솔 로그 (배포 확인용) */
+(function() {
+  const el = document.getElementById('footer-version');
+  if (el) el.textContent = APP_VERSION + ' · ' + APP_VERSION_DATE;
+  console.log('%cBarog English ' + APP_VERSION,
+    'color:#7036e3;font-weight:600;font-size:13px',
+    '· ' + APP_VERSION_DATE);
 })();
 
 /* ★ 페이지 진입 시 첫 화면이 'Daily Test' 이므로 관련 데이터 로딩 트리거 */
