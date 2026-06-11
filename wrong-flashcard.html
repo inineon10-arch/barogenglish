@@ -450,6 +450,27 @@ async function loadData(){
   }
 }
 
+/* ★ 뒤로 가기로 돌아왔을 때 (bfcache 복원) 현재 카드의 별표 상태를 갱신
+   — 다른 탭/다른 페이지에서 별표가 추가·해제됐을 수 있으므로 */
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  // 별표 모드는 카드 목록 자체가 localStorage 기반이라 전체 재로딩이 더 깔끔
+  if (_starredMode) { location.reload(); return; }
+  // 일반 모드는 현재 보이는 카드의 별표 버튼만 동기화
+  if (!cardEl || idx >= cards.length) return;
+  const card = cards[idx];
+  if (!card) return;
+  const starred = isStarred(card.word);
+  const sb = cardEl.querySelector('.star-btn');
+  if (sb) {
+    sb.classList.toggle('starred', starred);
+    sb.textContent = starred ? '★' : '☆';
+    sb.title = starred ? '별표 해제' : '모르는 단어로 표시';
+  }
+  const face = cardEl.querySelector('.card-face');
+  if (face) face.classList.toggle('starred', starred);
+});
+
 loadData();
 </script>
 </body>
