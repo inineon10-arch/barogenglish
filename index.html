@@ -1,12 +1,14 @@
-
 <!DOCTYPE html>
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v2.3  (2026-06-10)
+  현재 버전: v2.3.7  (2026-06-15)
 ─────────────────────────────────────────────────────────────────
   변경 이력:
- v2.3.9 — 단어암기탭에서 모르는 단어 별표시
+ v2.3.7 — 단어암기탭에 self test 추가
+ v2.3.6 — 모르는 단어 별표시 버그 수정
+ v2.3.4 — 단어암기탭에 모르는 단어 별표시
+ v2.3.3 — daily test 에 모르는 단어 별표시
  v2.3.3 — 오답단어에 모르는 단어 별표시
  v2.3 — Daily Test 로딩 중 상태 표시
   v2.2 — 모바일 탭 라벨 축약 (오답/Test/암기) + 시험 개수 뱃지
@@ -17,6 +19,7 @@
   v1.2 — isMockDay 데이터 기반 분기 (시트 출처로 판단)
   v1.1 — 모의고사 시스템
   v1.0 — 단어장 + 오답단어 시스템
+
 
 
 ═══════════════════════════════════════════════════════════════════
@@ -286,27 +289,21 @@
   .day-folder-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--purple);transition:transform .3s;}
   .day-folder:hover .day-folder-arrow{transform:translateX(4px);}
 
-  /* ★ Self Test 버튼 — Day 카드 우측 상단 (vocab/mock) + 별표 폴더 진입 행 (starred) */
+  /* ★ Self Test 버튼 — Day 카드 footer에 임베드 */
   .self-test-btn{
-    font-family:'Inter',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.04em;
-    padding:.32rem .65rem;border-radius:14px;border:1px solid transparent;
+    font-family:'Inter',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.04em;
+    padding:.32rem .7rem;border-radius:14px;border:1px solid transparent;
     background:transparent;cursor:pointer;transition:all .15s;
     display:inline-flex;align-items:center;gap:.3rem;line-height:1;
   }
-  .self-test-btn:active{transform:scale(.92);}
-  /* 단어장 / 모의고사 변형 — Day 카드 우측 상단에 absolute 배치 */
-  .self-test-btn.vocab-self,
-  .self-test-btn.mock-self{
-    position:absolute;top:9px;right:9px;z-index:2;
-    box-shadow:0 1px 4px rgba(0,0,0,.04);
-  }
+  .self-test-btn:active{transform:scale(.95);}
   /* 단어장 변형 (보라) */
-  .self-test-btn.vocab-self{background:rgba(112,54,227,.10);color:var(--purple);border-color:rgba(112,54,227,.3);}
-  .self-test-btn.vocab-self:hover{background:var(--purple);color:#fff;border-color:var(--purple);}
+  .self-test-btn.vocab-self{background:rgba(112,54,227,.08);color:var(--purple);border-color:rgba(112,54,227,.25);}
+  .self-test-btn.vocab-self:hover{background:rgba(112,54,227,.16);border-color:rgba(112,54,227,.45);}
   /* 모의고사 변형 (초록) */
-  .self-test-btn.mock-self{background:rgba(26,122,94,.10);color:var(--green-mock);border-color:rgba(26,122,94,.3);}
-  .self-test-btn.mock-self:hover{background:var(--green-mock);color:#fff;border-color:var(--green-mock);}
-  /* 별표 변형 (노란) — 별표 폴더 진입 행에서 사용, 위치는 흐름 그대로 */
+  .self-test-btn.mock-self{background:rgba(26,122,94,.08);color:var(--green-mock);border-color:rgba(26,122,94,.25);}
+  .self-test-btn.mock-self:hover{background:rgba(26,122,94,.16);border-color:rgba(26,122,94,.45);}
+  /* 별표 변형 (노란) */
   .self-test-btn.starred-self{background:#fff8d6;color:#b88500;border-color:#ffe88a;font-size:.78rem;padding:.5rem 1.1rem;border-radius:18px;}
   .self-test-btn.starred-self:hover{background:#fff3b0;border-color:#f5b300;}
 
@@ -855,7 +852,7 @@
    ★ 앱 버전 — 변경할 때 이 값만 바꾸면 푸터·콘솔이 같이 갱신됨
    ════════════════════════════════════════════════════════════ */
 const APP_VERSION      = '2 · 3';
-const APP_VERSION_DATE = '9';
+const APP_VERSION_DATE = '7';
 
 const STUDENT_NAME = '조문정';
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1174135286';
@@ -1138,12 +1135,11 @@ function renderVocab(words) {
     folder.className='day-folder';
     folder.style.animationDelay=`${0.04*i}s`;
     folder.innerHTML=`
-      <button class="self-test-btn vocab-self" type="button" data-day="${esc(day)}">🎯 Self Test</button>
       <div class="day-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
       <div class="day-folder-title">${esc(day)}</div>
       <div class="day-folder-desc">${wordCount}개 단어</div>
       <div class="day-folder-footer">
-        <span class="day-folder-tag">단어장</span>
+        <button class="self-test-btn vocab-self" type="button" data-day="${esc(day)}">🎯 Self Test</button>
         <span class="day-folder-arrow" id="arrow-${i}">→</span>
       </div>`;
 
@@ -2263,12 +2259,11 @@ function renderMockVocab(words) {
     folder.className = 'mock-folder';
     folder.style.animationDelay = `${0.04*i}s`;
     folder.innerHTML = `
-      <button class="self-test-btn mock-self" type="button" data-day="${esc(day)}">🎯 Self Test</button>
       <div class="mock-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
       <div class="mock-folder-title">${esc(day)}</div>
       <div class="mock-folder-desc">${wordCount}개 단어</div>
       <div class="mock-folder-footer">
-        <span class="mock-folder-tag">모의고사</span>
+        <button class="self-test-btn mock-self" type="button" data-day="${esc(day)}">🎯 Self Test</button>
         <span class="mock-folder-arrow">→</span>
       </div>`;
 
