@@ -2,14 +2,13 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v2.3  (2026-06-10)
+  현재 버전: v2.5  (2026-06-15)
 ─────────────────────────────────────────────────────────────────
   변경 이력:
- v2.3.6 — 모르는 단어 별표시 버그 수정
- v2.3.4 — 단어암기탭에 모르는 단어 별표시
- v2.3.3 — daily test 에 모르는 단어 별표시
- v2.3.3 — 오답단어에 모르는 단어 별표시
- v2.3 — Daily Test 로딩 중 상태 표시
+  v2.5 — 오답 단어장에 Self Test 버튼 표시
+  v2.4 — 단어암기 탭에 Self Test 버튼 표시 
+  v2.3.3 — 오답단어에 모르는 단어 별표시
+  v2.3 — Daily Test 로딩 중 상태 표시
   v2.2 — 모바일 탭 라벨 축약 (오답/Test/암기) + 시험 개수 뱃지
   v2.1 — 첫 화면을 Daily Test 로 변경
   v2.0 — 3-탭 구조 (오답확인 / Daily Test / 단어 암기)
@@ -286,6 +285,39 @@
   .day-folder-tag{font-family:'Inter',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-mute);}
   .day-folder-arrow{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--purple);transition:transform .3s;}
   .day-folder:hover .day-folder-arrow{transform:translateX(4px);}
+
+  /* ★ Self Test 버튼 — Day 카드 우측 상단 (vocab/mock) + 별표 폴더 진입 행 (starred) */
+  .self-test-btn{
+    font-family:'Inter',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.04em;
+    padding:.32rem .65rem;border-radius:14px;border:1px solid transparent;
+    background:transparent;cursor:pointer;transition:all .15s;
+    display:inline-flex;align-items:center;gap:.3rem;line-height:1;
+  }
+  .self-test-btn:active{transform:scale(.92);}
+  /* 단어장 / 모의고사 변형 — Day 카드 우측 상단에 absolute 배치 */
+  .self-test-btn.vocab-self,
+  .self-test-btn.mock-self{
+    position:absolute;top:9px;right:9px;z-index:2;
+    box-shadow:0 1px 4px rgba(0,0,0,.04);
+  }
+  /* 단어장 변형 (보라) */
+  .self-test-btn.vocab-self{background:rgba(112,54,227,.10);color:var(--purple);border-color:rgba(112,54,227,.3);}
+  .self-test-btn.vocab-self:hover{background:var(--purple);color:#fff;border-color:var(--purple);}
+  /* 모의고사 변형 (초록) */
+  .self-test-btn.mock-self{background:rgba(26,122,94,.10);color:var(--green-mock);border-color:rgba(26,122,94,.3);}
+  .self-test-btn.mock-self:hover{background:var(--green-mock);color:#fff;border-color:var(--green-mock);}
+  /* 별표 변형 (노란) — 별표 폴더 진입 행에서 사용, 위치는 흐름 그대로 */
+  .self-test-btn.starred-self{background:#fff8d6;color:#b88500;border-color:#ffe88a;font-size:.78rem;padding:.5rem 1.1rem;border-radius:18px;}
+  .self-test-btn.starred-self:hover{background:#fff3b0;border-color:#f5b300;}
+
+  /* ★ 별표 폴더 내부 Self Test 진입 행 — 카드 그리드 위 */
+  .starred-action-row{
+    display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+    padding:.7rem .9rem;margin:.2rem 0 .7rem;
+    background:linear-gradient(180deg,#fffbe6 0%,#fff8d6 100%);
+    border:1px solid #ffe88a;border-radius:10px;
+  }
+  .starred-action-info{font-size:.72rem;color:#8a6500;line-height:1.4;}
 
   /* Day 상세 패널 (열렸을 때) */
   .day-detail{display:none;margin-top:1.5rem;padding:1.5rem;background:rgba(112,54,227,.02);border:1px solid rgba(112,54,227,.15);border-radius:6px;animation:fadeUp .3s ease both;}
@@ -822,8 +854,8 @@
 /* ════════════════════════════════════════════════════════════
    ★ 앱 버전 — 변경할 때 이 값만 바꾸면 푸터·콘솔이 같이 갱신됨
    ════════════════════════════════════════════════════════════ */
-const APP_VERSION      = '2 · 3';
-const APP_VERSION_DATE = '6';
+const APP_VERSION      = '2 · 5';
+const APP_VERSION_DATE = '0';
 
 const STUDENT_NAME = '조문정';
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1174135286';
@@ -1106,6 +1138,7 @@ function renderVocab(words) {
     folder.className='day-folder';
     folder.style.animationDelay=`${0.04*i}s`;
     folder.innerHTML=`
+      <button class="self-test-btn vocab-self" type="button" data-day="${esc(day)}">🎯 Self Test</button>
       <div class="day-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
       <div class="day-folder-title">${esc(day)}</div>
       <div class="day-folder-desc">${wordCount}개 단어</div>
@@ -1113,6 +1146,13 @@ function renderVocab(words) {
         <span class="day-folder-tag">단어장</span>
         <span class="day-folder-arrow" id="arrow-${i}">→</span>
       </div>`;
+
+    /* ★ Self Test 버튼 — 카드 펼침 이벤트와 분리 (stopPropagation) */
+    const selfBtn = folder.querySelector('.self-test-btn');
+    selfBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startSelfTestForDay(day, 'vocab');
+    });
 
     /* 상세 패널 (폴더 아래 펼쳐짐) */
     const detail = document.createElement('div');
@@ -1734,9 +1774,104 @@ function qzBuildOpts(target, pool) {
   return qzShuffle(opts);
 }
 
+/* ============================================================
+   ★ Self Test — 학생이 직접 시작하는 객관식 퀴즈 (제출 없음)
+   ────────────────────────────────────────────────────────────
+   - 선생님이 지정한 Daily Test 와 분리: currentQuiz = null 로 둠
+     → 결과화면에서 "선생님께 제출" 버튼 자동 숨김
+   - 진입 경로 3가지:
+     1) 단어장 Day 카드 footer 의 🎯 Self Test 버튼 → startSelfTestForDay(day, 'vocab')
+     2) 모의고사 Day 카드 footer 의 🎯 Self Test 버튼 → startSelfTestForDay(day, 'mock')
+     3) ⭐별표 단어 폴더의 🎯 Self Test 버튼      → startSelfTestForStarred()
+   - 다시 풀기: _lastSelfTest 정보 기반으로 같은 종류 재시작
+   ============================================================ */
+let _lastSelfTest = null; // { type:'day'|'starred', day?, source? }
+
+function startSelfTestForDay(day, source) {
+  const pool = source === 'mock' ? mockWords : allWords;
+  const dayWords = pool.filter(w => w.day === day);
+  if(!dayWords.length){
+    alert(`"${day}" 단어가 없어요.`);
+    return;
+  }
+  /* 보기 후보 풀: 같은 출처 전체 (다양한 보기 확보) */
+  const optsPool = pool.length >= 4 ? pool : dayWords;
+  if(optsPool.length < 4){
+    alert('객관식 4지선다를 만들기에 단어가 부족해요.');
+    return;
+  }
+  const selected = qzShuffle([...dayWords]);
+  qzQueue = selected.map(w => ({
+    ...w,
+    _opts:   qzBuildOpts(w, optsPool),
+    _result: null,
+    _picked: null
+  }));
+  qzPos = 0; qzAnswered = false; qzWrong = [];
+  qzStage = 'mc';
+  qzOriginalTotal = selected.length;
+  qzStartTime = Date.now();
+  currentQuiz = null;
+  QUIZ_CONFIG = { day: day, count: qzQueue.length };
+  _lastSelfTest = { type:'day', day, source };
+  document.getElementById('qz-title').textContent = `${day} · Self Test`;
+  document.getElementById('qz-overlay').style.display = 'flex';
+  history.pushState({ quiz: true }, '', location.href);
+  qzUpdatePill();
+  qzBuildDots();
+  qzRenderQ(1);
+  qzInitSwipe();
+}
+
+function startSelfTestForStarred() {
+  const starred = getVocabStarredCards();
+  if(!starred.length){ alert('별표한 단어가 없어요.'); return; }
+  const pool = [...allWords, ...mockWords];
+  const optsPool = pool.length >= 4 ? pool : starred;
+  if(optsPool.length < 4){
+    alert('객관식 4지선다를 만들기에 단어가 부족해요.\n단어장/모의고사 데이터가 로드된 후 다시 시도해 주세요.');
+    return;
+  }
+  const cards = starred.map(s => ({ word: s.word, meaning: s.meaning, day: s.day || '⭐' }));
+  qzQueue = cards.map(w => ({
+    ...w,
+    _opts:   qzBuildOpts(w, optsPool),
+    _result: null,
+    _picked: null
+  }));
+  qzPos = 0; qzAnswered = false; qzWrong = [];
+  qzStage = 'mc';
+  qzOriginalTotal = qzQueue.length;
+  qzStartTime = Date.now();
+  currentQuiz = null;
+  QUIZ_CONFIG = { day: '⭐ 별표 단어', count: qzQueue.length };
+  _lastSelfTest = { type:'starred' };
+  document.getElementById('qz-title').textContent = '⭐ 별표 단어 · Self Test';
+  document.getElementById('qz-overlay').style.display = 'flex';
+  history.pushState({ quiz: true }, '', location.href);
+  qzUpdatePill();
+  qzBuildDots();
+  qzRenderQ(1);
+  qzInitSwipe();
+}
+
+/* 결과화면의 "다시 풀기" 통합 진입점 — currentQuiz 유무에 따라 분기 */
+function restartCurrentQuiz() {
+  if(currentQuiz) { startQuiz(); return; }
+  if(_lastSelfTest && _lastSelfTest.type === 'starred') { startSelfTestForStarred(); return; }
+  if(_lastSelfTest && _lastSelfTest.type === 'day') {
+    startSelfTestForDay(_lastSelfTest.day, _lastSelfTest.source);
+    return;
+  }
+  /* fallback */
+  startQuiz();
+}
+
 let qzStartTime = null; // 퀴즈 시작 시각
 
 function startQuiz() {
+  /* 정규 시험(currentQuiz 기준) 시작 — Self Test 와 충돌 방지를 위해 _lastSelfTest 클리어 */
+  _lastSelfTest = null;
   const pool = activeWords.length ? activeWords : allWords;
   const dayWords = pool.filter(w => w.day === QUIZ_CONFIG.day);
   if(!dayWords.length){
@@ -1964,10 +2099,10 @@ function qzRenderResult(){
       <div class="qz-result-sub">정답률 ${pct}%</div>
       ${wrongHTML}
       <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-        <button class="qz-submit-btn" id="qz-submit-btn" onclick="submitResult(${correct}, ${allTotal})">
+        ${currentQuiz ? `<button class="qz-submit-btn" id="qz-submit-btn" onclick="submitResult(${correct}, ${allTotal})">
           📤 선생님께 제출하기
-        </button>
-        <button class="qz-start-btn" style="width:100%" onclick="startQuiz()">↻ 다시 풀기</button>
+        </button>` : ''}
+        <button class="qz-start-btn" style="width:100%" onclick="restartCurrentQuiz()">↻ 다시 풀기</button>
       </div>
     </div>`,1);
 }
@@ -2128,6 +2263,7 @@ function renderMockVocab(words) {
     folder.className = 'mock-folder';
     folder.style.animationDelay = `${0.04*i}s`;
     folder.innerHTML = `
+      <button class="self-test-btn mock-self" type="button" data-day="${esc(day)}">🎯 Self Test</button>
       <div class="mock-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
       <div class="mock-folder-title">${esc(day)}</div>
       <div class="mock-folder-desc">${wordCount}개 단어</div>
@@ -2135,6 +2271,13 @@ function renderMockVocab(words) {
         <span class="mock-folder-tag">모의고사</span>
         <span class="mock-folder-arrow">→</span>
       </div>`;
+
+    /* ★ Self Test 버튼 — 카드 펼침 이벤트와 분리 */
+    const selfBtn = folder.querySelector('.self-test-btn');
+    selfBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      startSelfTestForDay(day, 'mock');
+    });
 
     const detail = document.createElement('div');
     detail.className = 'mock-detail';
@@ -2844,6 +2987,16 @@ function renderStarredWordsSection() {
   /* vcard 그리드 렌더 — 단어장과 같은 .vocab-cards 클래스 재사용 */
   if(!content) return;
   content.innerHTML = '';
+
+  /* ★ Self Test 진입 행 — 별표 단어로 객관식 테스트 시작 (그리드 위쪽) */
+  const actionRow = document.createElement('div');
+  actionRow.className = 'starred-action-row';
+  actionRow.innerHTML = `
+    <span class="starred-action-info">별표한 ${starred.length}개 단어로 객관식 Self Test 를 해볼 수 있어요</span>
+    <button type="button" class="self-test-btn starred-self">🎯 Self Test</button>`;
+  actionRow.querySelector('.self-test-btn').addEventListener('click', () => startSelfTestForStarred());
+  content.appendChild(actionRow);
+
   const grid = document.createElement('div');
   grid.className = 'vocab-cards';
   grid.style.marginTop = '.4rem';

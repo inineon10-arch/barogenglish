@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f5f0eb">
+<meta name="referrer" content="no-referrer">
+<title>오답 Self Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f5f0eb;--card:#ffffff;--accent:#2d5be3;
+    --wrong-col:#d94040;--text:#1a1a2e;--text2:#6b6b80;--muted:#b0aab8;
+    --border:#e2dcd8;--green:#1a9e6f;--pill-wrong:#fff0f0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+  html,body{width:100%;height:100%;background:var(--bg);font-family:'Gowun Dodum',sans-serif;color:var(--text);overflow:hidden;-webkit-text-size-adjust:100%;overscroll-behavior:none;}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+
+  /* 헤더 */
+  .header{flex-shrink:0;padding:12px 16px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+  .header-left{min-width:0;flex:1;}
+  .name{font-family:'Space Grotesk',sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--wrong-col);}
+  .title{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-top:2px;letter-spacing:-0.5px;}
+  .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+  .pill{font-family:'Space Grotesk',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:var(--pill-wrong);color:var(--wrong-col);border:1px solid #ffcccc;}
+  .idx{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:var(--text);}
+  .idx span{color:var(--muted);font-weight:400;}
+
+  /* 진행도 dots */
+  .prog{flex-shrink:0;padding:0 16px 10px;}
+  .dots{display:flex;justify-content:space-between;gap:3px;}
+  .dot{flex:1;height:4px;border-radius:3px;background:var(--border);transition:background 0.3s;}
+  .dot.correct{background:var(--green);}
+  .dot.wrong{background:var(--wrong-col);}
+  .dot.current{background:var(--wrong-col);opacity:0.45;}
+
+  /* 카드 영역 */
+  .viewport{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:0 12px;min-height:0;touch-action:pan-y;}
+  .qcard{position:absolute;width:calc(100% - 24px);max-width:430px;height:100%;max-height:640px;background:var(--card);border-radius:22px;border:1.5px solid var(--border);box-shadow:0 8px 40px rgba(217,64,64,0.08),0 2px 8px rgba(0,0,0,0.05);display:flex;flex-direction:column;overflow:hidden;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;will-change:transform,opacity;}
+  .qcard.no-tr{transition:none!important;}
+  .qcard-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--wrong-col) 0%,#ff9980 100%);}
+  .qcard-line.result{background:linear-gradient(90deg,var(--wrong-col) 0%,var(--green) 100%);}
+
+  /* TTS 버튼 (우상단) */
+  .tts-corner{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.9);border:1.5px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:1.05rem;transition:all 0.18s;z-index:10;backdrop-filter:blur(4px);}
+  .tts-corner:active{transform:scale(.88);}
+  .tts-corner.playing{border-color:var(--wrong-col);color:var(--wrong-col);background:var(--pill-wrong);animation:pulseTts 0.8s ease-in-out infinite alternate;}
+  @keyframes pulseTts{from{box-shadow:0 0 0 0 rgba(217,64,64,0.15)}to{box-shadow:0 0 0 6px rgba(217,64,64,0)}}
+
+  /* 카드 내용 */
+  .qcontent{flex:1;display:flex;flex-direction:column;padding:14px 18px 10px;min-height:0;overflow:hidden;}
+  .qbadges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;flex-shrink:0;}
+  .qbadge{font-family:'Space Grotesk',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:var(--border);color:var(--text2);}
+  .qbadge.wrong{background:var(--pill-wrong);color:var(--wrong-col);border:1px solid #ffcccc;}
+  .qprompt{text-align:center;padding:8px 0 14px;flex-shrink:0;}
+  .qprompt-lbl{font-family:'Space Grotesk',sans-serif;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+  .qprompt-word{font-family:'Space Grotesk',sans-serif;font-size:1.95rem;font-weight:700;color:var(--text);letter-spacing:-1px;line-height:1.15;word-break:break-word;}
+  .qprompt-pos{font-size:.75rem;color:var(--text2);margin-top:4px;}
+
+  /* 보기 */
+  .qopts{display:flex;flex-direction:column;gap:7px;flex:1;min-height:0;overflow-y:auto;padding:2px;-webkit-overflow-scrolling:touch;}
+  .qopt{width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'Gowun Dodum',sans-serif;font-size:.95rem;color:var(--text);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px;line-height:1.4;}
+  .qopt:active{transform:scale(.98);}
+  .qopt-key{font-family:'Space Grotesk',sans-serif;font-size:.7rem;font-weight:700;width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--text2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+  @media(hover:hover){
+    .qopt:hover:not(.disabled){border-color:var(--wrong-col);background:#fff8f8;}
+    .qopt:hover:not(.disabled) .qopt-key{background:var(--wrong-col);color:#fff;}
+  }
+  .qopt.correct{background:#ecfdf5;border-color:var(--green);color:#065f46;pointer-events:none;}
+  .qopt.correct .qopt-key{background:var(--green);color:#fff;}
+  .qopt.wrong{background:var(--pill-wrong);border-color:var(--wrong-col);color:#991b1b;pointer-events:none;}
+  .qopt.wrong .qopt-key{background:var(--wrong-col);color:#fff;}
+  .qopt.show-answer{background:#ecfdf5;border-color:var(--green);color:#065f46;pointer-events:none;}
+  .qopt.show-answer .qopt-key{background:var(--green);color:#fff;}
+  .qopt.disabled{pointer-events:none;}
+
+  /* 피드백 */
+  .qfb{padding:9px 12px;border-radius:11px;margin-top:8px;flex-shrink:0;font-size:.8rem;line-height:1.5;display:none;}
+  .qfb.show{display:block;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .qfb.correct{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;}
+  .qfb.wrong{background:var(--pill-wrong);border:1px solid #fecaca;color:#991b1b;}
+  .qfb-title{font-family:'Space Grotesk',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+  .qfb-ans{font-weight:600;font-size:.9rem;margin-bottom:2px;}
+
+  /* 다음 문제 안내 */
+  .qhint{text-align:center;padding:8px 0 4px;font-size:.65rem;color:var(--muted);letter-spacing:0.5px;flex-shrink:0;display:none;}
+  .qhint.show{display:block;animation:fadeIn .3s ease;}
+
+  /* 결과 */
+  .qresult{flex:1;display:flex;flex-direction:column;padding:18px 20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .qscore-circle{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;position:relative;flex-shrink:0;}
+  .qscore-circle::before{content:'';position:absolute;inset:9px;background:#fff;border-radius:50%;}
+  .qscore-inner{position:relative;text-align:center;}
+  .qscore-num{font-family:'Space Grotesk',sans-serif;font-size:2.1rem;font-weight:700;color:var(--text);line-height:1;}
+  .qscore-tot{font-family:'Space Grotesk',sans-serif;font-size:.66rem;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+  .qresult-ttl{text-align:center;font-size:1.2rem;font-weight:400;color:var(--text);margin-bottom:4px;}
+  .qresult-sub{text-align:center;font-size:.78rem;color:var(--text2);margin-bottom:10px;}
+  .qwrong-list{margin-top:6px;display:flex;flex-direction:column;gap:6px;}
+  .qwrong-item{background:var(--pill-wrong);border:1px solid #ffcccc;border-radius:10px;padding:8px 11px;font-size:.78rem;color:var(--wrong-col);}
+  .qwrong-word{font-family:'Space Grotesk',sans-serif;font-weight:700;}
+  .qwrong-meaning{color:var(--text2);margin-left:6px;}
+  .qresult-actions{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .qbtn{padding:13px 24px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;min-height:46px;transition:transform .15s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .qbtn:active{transform:scale(.97);}
+  .qbtn-primary{background:var(--wrong-col);color:#fff;box-shadow:0 4px 16px rgba(217,64,64,0.25);}
+  .qbtn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border);}
+  .qbtn-ghost:hover{border-color:var(--text2);}
+
+  /* 닫기 바 */
+  .close-bar{flex-shrink:0;padding:8px 16px 10px;}
+  .close-btn{width:100%;padding:.65rem;background:none;border:1.5px solid var(--border);border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:.78rem;color:var(--text2);cursor:pointer;transition:border-color .2s;text-decoration:none;display:block;text-align:center;}
+  .close-btn:active{border-color:var(--text2);}
+
+  /* 상태 메시지 */
+  .status{text-align:center;padding:60px 20px;color:var(--text2);font-size:0.9rem;line-height:1.6;}
+  .status .emoji{font-size:2.4rem;margin-bottom:10px;display:block;}
+
+  @media(max-height:700px){
+    .qprompt-word{font-size:1.65rem;}
+    .qprompt{padding:5px 0 10px;}
+    .qopt{padding:10px 12px;font-size:.88rem;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-left">
+      <div class="name" id="hdr-name">바로그영어</div>
+      <div class="title" id="hdr-title">오답 Self Test</div>
+    </div>
+    <div class="header-right">
+      <span class="pill">Self Test</span>
+      <div class="idx"><span id="cur">0</span><span> / <span id="tot">0</span></span></div>
+    </div>
+  </div>
+  <div class="prog"><div class="dots" id="dots"></div></div>
+  <div class="viewport" id="viewport">
+    <div id="status-msg" class="status" style="display:none;"></div>
+  </div>
+  <div class="close-bar">
+    <a class="close-btn" href="wrong-words.html">✕ 종료하고 폴더로</a>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ★ 학생별 설정 — wrong-flashcard.html / wrong-words.html 과 동일하게 맞춰주세요
+   ============================================================ */
+const STUDENT_NAME = '조문주';
+const SHEET_GID    = '865669929';
+const SHEET_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyO-Sx_N0LFENgIcQp-3ATAHrYOUvLCuEr2Nls8qYKYMnOTRyo5_zJY1hbyA1ONfzcf2UK7kwe3fTP/pub?output=csv';
+/* ============================================================ */
+
+/* URL 파라미터 */
+const _params = new URLSearchParams(location.search);
+const _date  = _params.get('date')  || '';
+const _start = _params.get('start') || _date;
+const _end   = _params.get('end')   || _date;
+const _set   = _params.get('set')   || '';
+const _starredMode = _params.get('starred') === '1';
+
+/* 별표 단어 storage 키 — wrong-flashcard.html 과 공유 */
+const STARRED_KEY = 'starred_words_' + STUDENT_NAME;
+function getStarred() {
+  try { return JSON.parse(localStorage.getItem(STARRED_KEY) || '{}'); }
+  catch { return {}; }
+}
+function getStarredCards() {
+  return Object.values(getStarred())
+    .sort((a, b) => (b.starredAt || 0) - (a.starredAt || 0));
+}
+
+/* 퀴즈 상태 */
+let queue = [];        // 문제 큐 [{ word, correct, pos, _opts, _result, _picked }]
+let pos = 0;
+let wrongList = [];
+let totalCount = 0;
+let cardEl = null;
+let isAnimating = false;
+let _audio = null;
+
+/* ============================================================
+   유틸: CSV 파싱, 날짜 정규화, HTML 이스케이프, 셔플
+   ============================================================ */
+function parseCSV(text){
+  const rows=[];
+  let row=[],cur='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){
+        if(text[i+1]==='"'){cur+='"';i++;}
+        else inQ=false;
+      } else cur+=ch;
+    } else {
+      if(ch==='"') inQ=true;
+      else if(ch===','){row.push(cur);cur='';}
+      else if(ch==='\n'){row.push(cur);rows.push(row);row=[];cur='';}
+      else if(ch==='\r'){/* skip */}
+      else cur+=ch;
+    }
+  }
+  if(cur||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+function normDate(s){
+  if(!s) return '';
+  const m=String(s).trim().match(/(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
+  if(!m) return '';
+  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+}
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function haptic(ms=8){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(_){}}
+
+/* ============================================================
+   객관식 보기 4개 구성 — target.correct + 같은 풀에서 다른 정답 3개
+   ============================================================ */
+function buildOpts(target, pool) {
+  const opts=[target.correct];
+  const others=shuffle(pool.filter(w => w.correct !== target.correct));
+  for(const w of others){
+    if(opts.length>=4) break;
+    if(!opts.includes(w.correct)) opts.push(w.correct);
+  }
+  return shuffle(opts);
+}
+
+/* ============================================================
+   상태 메시지 / 헤더
+   ============================================================ */
+function showStatus(html){
+  const m=document.getElementById('status-msg');
+  m.innerHTML=html;
+  m.style.display='block';
+}
+function hideStatus(){document.getElementById('status-msg').style.display='none';}
+
+function updateHeader(name,title){
+  document.getElementById('hdr-name').textContent=`바로그영어 · ${name}`;
+  if(title) document.getElementById('hdr-title').textContent=title;
+  document.title=`오답 Self Test – ${name}`;
+}
+
+/* ============================================================
+   진행도 dots
+   ============================================================ */
+function buildDots(){
+  const wrap=document.getElementById('dots');
+  wrap.innerHTML='';
+  queue.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot';
+    d.id=`dot-${i}`;
+    wrap.appendChild(d);
+  });
+  updateDots();
+}
+function updateDots(){
+  const isEnd = pos >= queue.length;
+  queue.forEach((q,i)=>{
+    const d=document.getElementById(`dot-${i}`);
+    if(!d) return;
+    d.className='dot'+(q._result==='correct'?' correct':q._result==='wrong'?' wrong':i===pos?' current':'');
+  });
+  document.getElementById('cur').textContent = isEnd ? '✓' : (pos+1);
+  document.getElementById('tot').textContent = queue.length;
+}
+
+/* ============================================================
+   TTS — Google Translate 무료 엔드포인트 (wrong-flashcard 와 동일)
+   ============================================================ */
+function ttsPlay(word, btn) {
+  if(_audio) {
+    try{_audio.pause();}catch(e){}
+    _audio=null;
+    document.querySelectorAll('.tts-corner.playing').forEach(b=>b.classList.remove('playing'));
+    if(btn && btn.dataset.playing==='true'){btn.dataset.playing='';return;}
+  }
+  const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;
+  const audio=new Audio(url);
+  _audio=audio;
+  if(btn){btn.classList.add('playing');btn.dataset.playing='true';}
+  audio.onended=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}_audio=null;};
+  audio.onerror=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}_audio=null;};
+  audio.play().catch(()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}_audio=null;});
+}
+function ttsAutoPlay(word, btn) {
+  /* 새 카드 진입 시 자동 발음 — 사용자가 직접 누른 게 아니므로 토글 인자 없음 */
+  if(_audio){try{_audio.pause();}catch(e){}_audio=null;}
+  const url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(word)}`;
+  const audio=new Audio(url);
+  _audio=audio;
+  if(btn){btn.classList.add('playing');btn.dataset.playing='true';}
+  audio.onended=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}_audio=null;};
+  audio.onerror=()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}_audio=null;};
+  audio.play().catch(()=>{if(btn){btn.classList.remove('playing');btn.dataset.playing='';}_audio=null;});
+}
+
+/* ============================================================
+   문제 카드 렌더링
+   ============================================================ */
+function renderQ(dir) {
+  if(pos >= queue.length) { renderResult(); return; }
+  const q = queue[pos];
+  const optsHTML = q._opts.map((opt,i)=>{
+    const key=String.fromCharCode(65+i);
+    const cls = q._result
+      ? (opt===q.correct
+          ? (q._result==='correct'?'qopt correct disabled':'qopt show-answer disabled')
+          : opt===q._picked ? 'qopt wrong disabled' : 'qopt disabled')
+      : 'qopt';
+    const dataAttr = q._result ? '' : `data-opt="${esc(opt)}"`;
+    return `<button class="${cls}" type="button" ${dataAttr}><span class="qopt-key">${key}</span><span>${esc(opt)}</span></button>`;
+  }).join('');
+
+  const fb = q._result
+    ? (q._result==='correct'
+        ? `<div class="qfb correct show"><div class="qfb-title">✓ 정답!</div><div class="qfb-ans">${esc(q.word)} — ${esc(q.correct)}</div></div>`
+        : `<div class="qfb wrong show"><div class="qfb-title">✗ 오답</div><div class="qfb-ans">정답: ${esc(q.correct)}</div></div>`)
+    : '';
+  const hint = q._result
+    ? `<div class="qhint show">${pos<queue.length-1?'← 스와이프해서 다음 문제':'← 스와이프해서 결과 보기'}</div>`
+    : '';
+
+  swapCard(`
+    <div class="qcard-line"></div>
+    <button class="tts-corner" type="button" data-word="${esc(q.word)}">🔊</button>
+    <div class="qcontent">
+      <div class="qbadges"><span class="qbadge wrong">오답</span>${q.pos && q.pos!=='-'?`<span class="qbadge">${esc(q.pos)}</span>`:''}</div>
+      <div class="qprompt">
+        <div class="qprompt-lbl">English</div>
+        <div class="qprompt-word">${esc(q.word)}</div>
+      </div>
+      <div class="qopts">${optsHTML}</div>
+      ${fb}
+    </div>${hint}`, dir);
+
+  if(cardEl) {
+    if(document.activeElement && typeof document.activeElement.blur==='function') document.activeElement.blur();
+    cardEl.querySelectorAll('.qopt[data-opt]').forEach(btn => {
+      btn.addEventListener('click', () => answer(btn, btn.dataset.opt));
+    });
+    const tts = cardEl.querySelector('.tts-corner');
+    if(tts) tts.addEventListener('click', e => { e.stopPropagation(); ttsPlay(tts.dataset.word, tts); });
+  }
+  updateDots();
+  /* 미입력 상태일 때만 새 문제마다 자동 발음 */
+  if(!q._result) {
+    setTimeout(() => {
+      const btn = cardEl ? cardEl.querySelector('.tts-corner') : null;
+      ttsAutoPlay(q.word, btn);
+    }, 220);
+  }
+}
+
+function swapCard(innerHTML, dir) {
+  const vp = document.getElementById('viewport');
+  const old = cardEl;
+  const el = document.createElement('div');
+  el.className = 'qcard no-tr';
+  el.innerHTML = innerHTML;
+  if(dir!==0) el.style.transform = `translateX(${dir>0?'100%':'-100%'})`;
+  vp.appendChild(el);
+  cardEl = el;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.classList.remove('no-tr');
+    el.style.transform = 'translateX(0)';
+  }));
+  if(old) {
+    old.classList.remove('no-tr');
+    old.style.transform = `translateX(${dir>0?'-100%':'100%'})`;
+    old.style.opacity = '0.3';
+    isAnimating = true;
+    setTimeout(()=>{
+      if(old.parentNode) old.remove();
+      isAnimating = false;
+    }, 350);
+  }
+}
+
+/* ============================================================
+   정답 처리
+   ============================================================ */
+function answer(btn, chosen) {
+  const q = queue[pos];
+  if(q._result) return;
+  const isOk = chosen === q.correct;
+  q._picked = chosen;
+  q._result = isOk ? 'correct' : 'wrong';
+  haptic(isOk ? 8 : 15);
+  if(!isOk) wrongList.push(q);
+
+  document.querySelectorAll('.qopt').forEach(b => {
+    b.classList.add('disabled');
+    const txt = b.querySelector('span:last-child').textContent;
+    if(txt === q.correct) b.classList.add(isOk ? 'correct' : 'show-answer');
+    else if(b === btn && !isOk) b.classList.add('wrong');
+  });
+
+  /* 카드 안에 피드백 + 다음 문제 안내 직접 삽입 */
+  const fb = isOk
+    ? `<div class="qfb correct show"><div class="qfb-title">✓ 정답!</div><div class="qfb-ans">${esc(q.word)} — ${esc(q.correct)}</div></div>`
+    : `<div class="qfb wrong show"><div class="qfb-title">✗ 오답</div><div class="qfb-ans">정답: ${esc(q.correct)}</div></div>`;
+  cardEl.querySelector('.qcontent').insertAdjacentHTML('beforeend', fb);
+  const hint = document.createElement('div');
+  hint.className = 'qhint show';
+  hint.textContent = pos < queue.length-1 ? '잠시 후 다음 문제 · 탭하면 바로 이동' : '잠시 후 결과 보기 · 탭하면 바로 이동';
+  cardEl.appendChild(hint);
+  updateDots();
+
+  /* ★ 답 입력 후 자동 진행 — 정답 1.0초 / 오답 1.6초 (오답은 정답 확인 시간 더 길게) */
+  const delay = isOk ? 1000 : 1600;
+  const autoTimer = setTimeout(() => goNext(), delay);
+
+  /* ★ 카드 어디나 탭하면 즉시 다음으로 (자동 타이머는 취소) */
+  const tapToAdvance = (e) => {
+    /* 보기 / TTS / 결과 버튼은 자체 동작 우선 */
+    if(e.target.closest('.qopt') || e.target.closest('.tts-corner') || e.target.closest('.qbtn')) return;
+    clearTimeout(autoTimer);
+    cardEl.removeEventListener('click', tapToAdvance);
+    goNext();
+  };
+  /* 답 선택 직후 같은 클릭 이벤트가 다시 잡히지 않도록 다음 tick 에 등록 */
+  setTimeout(() => {
+    if(cardEl) cardEl.addEventListener('click', tapToAdvance);
+  }, 100);
+}
+
+/* 다음 문제(또는 결과)로 이동 — 자동 진행 / 탭 / 스와이프 모두 호출 */
+function goNext() {
+  if(isAnimating) return;
+  if(pos >= queue.length) return; // 이미 결과 화면
+  pos++;
+  haptic(8);
+  renderQ(1);
+}
+
+/* ============================================================
+   결과 화면
+   ============================================================ */
+function renderResult() {
+  const total = queue.length;
+  const correct = queue.filter(q => q._result==='correct').length;
+  const pct = total ? Math.round(100*correct/total) : 0;
+  const col = pct>=80 ? 'var(--green)' : pct>=50 ? '#d97a20' : 'var(--wrong-col)';
+  const deg = (pct/100)*360;
+  const wrongHTML = wrongList.length === 0
+    ? '<div style="text-align:center;color:var(--green);margin-top:8px;font-size:.85rem">🎉 모두 정답이에요!</div>'
+    : `<div class="qwrong-list">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--wrong-col);margin-bottom:4px">틀린 ${wrongList.length}개</div>
+        ${wrongList.map(w=>`<div class="qwrong-item"><span class="qwrong-word">${esc(w.word)}</span><span class="qwrong-meaning">— ${esc(w.correct)}</span></div>`).join('')}
+       </div>`;
+
+  swapCard(`
+    <div class="qcard-line result"></div>
+    <div class="qresult">
+      <div class="qscore-circle" style="background:conic-gradient(${col} 0deg ${deg}deg,var(--border) ${deg}deg 360deg)">
+        <div class="qscore-inner">
+          <div class="qscore-num">${pct}<span style="font-size:1.1rem">%</span></div>
+          <div class="qscore-tot">${correct}/${total}</div>
+        </div>
+      </div>
+      <div class="qresult-ttl">수고했어요! 🎉</div>
+      <div class="qresult-sub">정답률 ${pct}%</div>
+      ${wrongHTML}
+      <div class="qresult-actions">
+        <button class="qbtn qbtn-primary" onclick="restart()">↻ 다시 풀기</button>
+        <a class="qbtn qbtn-ghost" href="wrong-words.html">오답 폴더로 돌아가기</a>
+      </div>
+    </div>`, 1);
+}
+
+function restart() {
+  queue.forEach(q => { q._result=null; q._picked=null; q._opts = buildOpts(q, queue); });
+  queue = shuffle(queue);
+  pos = 0; wrongList = []; isAnimating=false;
+  buildDots();
+  renderQ(-1);
+}
+
+/* ============================================================
+   좌우 스와이프 / 키보드 — 답 입력 후에만 다음 문제로 이동
+   ============================================================ */
+function initSwipe() {
+  const vp = document.getElementById('viewport');
+  let sX=0, sY=0, sT=0, tracking=false, hasMoved=false, locked=null, pid=null;
+  const DL=6, SD=60, SV=30, ST=400;
+
+  function startT(x,y,t) {
+    if(isAnimating) return false;
+    if(t && t.closest && (t.closest('.qopt') || t.closest('.tts-corner') || t.closest('.qbtn'))) return false;
+    tracking=true; hasMoved=false; locked=null;
+    sX=x; sY=y; sT=Date.now();
+    return true;
+  }
+  function moveT(x,y,ev) {
+    if(!tracking) return;
+    const dx=x-sX, dy=y-sY;
+    if(locked===null) {
+      if(Math.abs(dx)>DL || Math.abs(dy)>DL) {
+        locked = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
+      }
+    }
+    if(locked==='h') {
+      if(ev && ev.cancelable && ev.type==='touchmove') ev.preventDefault();
+      hasMoved=true;
+      const c = cardEl;
+      if(c) c.style.transform = `translateX(${dx*((dx>0&&pos===0)||(dx<0&&pos>=queue.length)?0.25:0.55)}px)`;
+    }
+  }
+  function endT(ex,ey) {
+    if(!tracking) return;
+    tracking=false;
+    const dx=ex-sX, dy=ey-sY, dt=Date.now()-sT;
+    const c = cardEl;
+    const isHorizSwipe = locked==='h' && hasMoved && (dt<ST && Math.abs(dx)>SV || Math.abs(dx)>SD);
+    if(isHorizSwipe) {
+      if(c) c.style.transform = '';
+      const curQ = queue[pos];
+      const canForward = curQ && curQ._result; // 답 입력 후에만 다음으로
+      if(dx > 0 && pos > 0) {
+        /* 이전 문제 */
+        pos--; haptic(10);
+        renderQ(-1);
+      } else if(dx < 0 && pos < queue.length && canForward) {
+        /* 다음 문제 (또는 결과) */
+        pos++; haptic(10);
+        renderQ(1);
+      } else if(c) {
+        c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';
+        c.style.transform='translateX(0)';
+        setTimeout(()=>{ if(c) c.style.transition=''; }, 280);
+      }
+    } else if(c) {
+      c.style.transition='transform 0.25s cubic-bezier(.4,0,.2,1)';
+      c.style.transform='translateX(0)';
+      setTimeout(()=>{ if(c) c.style.transition=''; }, 280);
+    }
+    locked=null;
+  }
+  function cancelT() {
+    tracking=false; hasMoved=false; locked=null;
+    const c = cardEl;
+    if(c) {
+      c.style.transition='transform 0.25s';
+      c.style.transform='translateX(0)';
+      setTimeout(()=>{ if(c) c.style.transition=''; }, 280);
+    }
+  }
+
+  if(window.PointerEvent) {
+    vp.addEventListener('pointerdown', e => {
+      if(e.pointerType==='mouse' && e.button!==0) return;
+      if(pid!==null) return;
+      if(!startT(e.clientX, e.clientY, e.target)) return;
+      pid = e.pointerId;
+    });
+    vp.addEventListener('pointermove', e => { if(e.pointerId===pid) moveT(e.clientX, e.clientY, e); });
+    vp.addEventListener('pointerup', e => { if(e.pointerId===pid) { pid=null; endT(e.clientX, e.clientY); } });
+    vp.addEventListener('pointercancel', e => { if(e.pointerId===pid) { pid=null; cancelT(); } });
+  } else {
+    vp.addEventListener('touchstart', e => { if(e.touches.length!==1) return; startT(e.touches[0].clientX, e.touches[0].clientY, e.target); }, {passive:true});
+    vp.addEventListener('touchmove',  e => { if(!tracking||e.touches.length!==1) return; moveT(e.touches[0].clientX, e.touches[0].clientY, e); }, {passive:false});
+    vp.addEventListener('touchend',   e => { if(e.changedTouches && e.changedTouches.length) endT(e.changedTouches[0].clientX, e.changedTouches[0].clientY); }, {passive:true});
+    vp.addEventListener('touchcancel', cancelT, {passive:true});
+  }
+
+  document.addEventListener('keydown', e => {
+    if(isAnimating) return;
+    if(e.key==='ArrowLeft' && pos>0) { pos--; renderQ(-1); }
+    else if(e.key==='ArrowRight' && pos<queue.length) {
+      const curQ = queue[pos];
+      if(curQ && curQ._result) goNext();
+    }
+  });
+}
+
+/* ============================================================
+   데이터 로딩 — 별표 모드 또는 시트 fetch
+   ============================================================ */
+async function loadData() {
+  updateHeader(STUDENT_NAME);
+
+  /* ★ 별표 단어 Self Test 모드 — localStorage 만 읽음, 단 보기 풀 부족하면 시트에서 보충 */
+  if(_starredMode) {
+    updateHeader(STUDENT_NAME, '⭐ 별표 단어 · Self Test');
+    const starred = getStarredCards();
+    if(!starred.length) {
+      showStatus('<span class="emoji">⭐</span>아직 별표한 단어가 없어요.<br><span style="font-size:0.78rem;color:var(--muted)">플래시카드에서 ☆ 버튼으로 표시해 주세요</span>');
+      return;
+    }
+    const cards = starred.map(s => ({
+      word:    s.word,
+      correct: s.correct,
+      pos:     s.pos || ''
+    }));
+    /* 보기 풀: 별표 단어 자체. 4개 미만이면 시트에서 다른 오답 단어들로 보충 */
+    let optsPool = cards.slice();
+    if(cards.length < 4) {
+      showStatus('<span class="emoji">⏳</span>보기를 만들기 위해 다른 오답 단어를 불러오는 중...');
+      try {
+        const url = `${SHEET_CSV_BASE}&gid=${SHEET_GID}&t=${Date.now()}`;
+        const res = await fetch(url);
+        if(res.ok) {
+          const rows = parseCSV(await res.text());
+          let startRow = 0;
+          if(rows.length && String(rows[0][0]||'').trim()==='날짜') startRow = 1;
+          for(let i=startRow; i<rows.length; i++){
+            const r = rows[i];
+            if(!r || r.length<5) continue;
+            const word = String(r[2]||'').trim();
+            const correct = String(r[4]||'').trim();
+            if(!word || !correct) continue;
+            /* 중복 제거: 별표에 이미 있는 단어/뜻은 건너뜀 */
+            if(optsPool.some(c => c.correct === correct)) continue;
+            optsPool.push({ word, correct, pos: String(r[5]||'').trim() });
+          }
+        }
+      } catch(e) { console.warn('보기 풀 보충 실패:', e); }
+    }
+    if(optsPool.length < 4) {
+      showStatus(`<span class="emoji">📊</span>객관식 4지선다를 만들기에 단어가 부족해요.<br><span style="font-size:0.78rem;color:var(--muted)">별표 ${cards.length}개 / 전체 풀 ${optsPool.length}개</span>`);
+      return;
+    }
+    queue = cards.map(w => ({ ...w, _opts: buildOpts(w, optsPool), _result:null, _picked:null }));
+    queue = shuffle(queue);
+    pos = 0; wrongList = []; totalCount = queue.length;
+    hideStatus();
+    buildDots();
+    initSwipe();
+    renderQ(0);
+    return;
+  }
+
+  /* ★ 날짜+세트 모드 — wrong-flashcard 와 동일하게 시트 fetch */
+  if(!_start) {
+    showStatus('<span class="emoji">⚠️</span>날짜 정보가 없어요.<br><span style="font-size:0.8rem;color:var(--muted)">예: wrong-quiz.html?date=2026-05-17</span>');
+    return;
+  }
+  showStatus('<span class="emoji">⏳</span>데이터를 불러오는 중...');
+  try {
+    const url = `${SHEET_CSV_BASE}&gid=${SHEET_GID}&t=${Date.now()}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    let startRow = 0;
+    if(rows.length && String(rows[0][0]||'').trim()==='날짜') startRow = 1;
+
+    const cards = [];
+    let groupTitle = '';
+    for(let i=startRow; i<rows.length; i++) {
+      const r = rows[i];
+      if(!r || r.length<5) continue;
+      const dateStr = normDate(r[0]);
+      if(!dateStr) continue;
+      if(dateStr < _start || dateStr > _end) continue;
+      const set = String(r[8]||'').trim();
+      if(_set && set!==_set) continue;
+
+      const word = String(r[2]||'').trim();
+      const correct = String(r[4]||'').trim();
+      const pos = String(r[5]||'').trim();
+      const title = String(r[9]||'').trim();
+      if(!word || !correct) continue;
+      if(!groupTitle && title) groupTitle = title;
+      cards.push({ word, correct, pos: pos||'' });
+    }
+
+    if(cards.length === 0) {
+      showStatus(`<span class="emoji">📭</span>${STUDENT_NAME}의 ${_start} 오답 데이터가 없어요.`);
+      return;
+    }
+    if(cards.length < 4) {
+      showStatus(`<span class="emoji">📊</span>객관식을 만들려면 최소 4개 단어가 필요해요.<br><span style="font-size:0.78rem;color:var(--muted)">현재 ${cards.length}개</span>`);
+      return;
+    }
+
+    /* 헤더 갱신 */
+    const subTitle = groupTitle || `${parseInt(_start.split('-')[1])}월 ${parseInt(_start.split('-')[2])}일 오답`;
+    updateHeader(STUDENT_NAME, `${subTitle} · Self Test`);
+
+    queue = cards.map(w => ({ ...w, _opts: buildOpts(w, cards), _result:null, _picked:null }));
+    queue = shuffle(queue);
+    pos = 0; wrongList = []; totalCount = queue.length;
+    hideStatus();
+    buildDots();
+    initSwipe();
+    renderQ(0);
+  } catch(err) {
+    showStatus(`<span class="emoji">⚠️</span>데이터를 불러오지 못했어요.<br><span style="font-size:0.78rem;color:var(--muted)">${err.message}</span>`);
+  }
+}
+
+/* 더블탭 줌 방지 (모바일) */
+let lte=0;
+document.addEventListener('touchend', e => {
+  const n=Date.now();
+  if(n-lte<=300) e.preventDefault();
+  lte=n;
+}, {passive:false});
+
+loadData();
+</script>
+</body>
+</html>
