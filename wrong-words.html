@@ -42,7 +42,7 @@
 
   /* ★ Self Test 버튼 — 폴더 카드 우측 상단 (객관식 자가학습 진입) */
   .self-test-btn{
-    position:absolute;top:10px;right:10px;z-index:2;
+    position:absolute;top:10px;right:10px;z-index:5;
     font-family:'Space Grotesk',sans-serif;font-size:0.58rem;font-weight:700;
     letter-spacing:0.6px;padding:5px 9px;border-radius:14px;
     background:var(--pill-wrong);color:var(--wrong-col);
@@ -198,6 +198,7 @@ async function loadFolders(){
     renderStarredFolder(grid);
 
     sorted.forEach((g,i)=>{
+      /* ★ 폴더 자체를 <div> 로 만들어 nested <a> 문제 회피 */
       const a=document.createElement('div');
       a.className='folder';
       a.setAttribute('role','link');
@@ -206,13 +207,13 @@ async function loadFolders(){
       const mainHref = g.set
         ? `wrong-flashcard.html?date=${g.date}&set=${encodeURIComponent(g.set)}`
         : `wrong-flashcard.html?date=${g.date}`;
-      /* Self Test URL 도 같은 파라미터 — wrong-quiz.html 로 분기 */
-      const quizHref=g.set
+      /* Self Test URL — wrong-quiz.html 로 분기 */
+      const quizHref = g.set
         ? `wrong-quiz.html?date=${g.date}&set=${encodeURIComponent(g.set)}`
         : `wrong-quiz.html?date=${g.date}`;
       // 제목 있으면 제목, 없으면 날짜
       const mainLabel=g.title || fmtDate(g.date);
-      // 보조 라벨
+      // 보조 라벨: 제목이 있으면 날짜+요일, 없으면 요일만 / 세트가 있으면 세트도 표시
       const subParts=[];
       if(g.title) subParts.push(fmtDate(g.date));
       subParts.push(getDow(g.date));
@@ -229,12 +230,11 @@ async function loadFolders(){
           <span class="folder-count">오답 ${g.count}개</span>
           <span class="folder-arrow">→</span>
         </div>`;
-      /* ★ 폴더 본체 클릭 → 플래시카드 (Self Test 버튼이 a 였을 때의 nested 문제 회피) */
+      /* ★ 본체 클릭 → 플래시카드 / Self Test 클릭은 자체 a 의 href 로 이동 */
       a.addEventListener('click', (e) => {
         if(e.target.closest('[data-self-test]')) return; // Self Test 클릭이면 본체 이동 막음
         location.href = mainHref;
       });
-      /* 접근성: 엔터/스페이스로도 진입 가능 */
       a.addEventListener('keydown', (e) => {
         if((e.key==='Enter' || e.key===' ') && !e.target.closest('[data-self-test]')) {
           e.preventDefault();
@@ -262,6 +262,7 @@ function renderStarredFolder(grid) {
     const starredMap = JSON.parse(localStorage.getItem('starred_words_' + STUDENT_NAME) || '{}');
     const starredCount = Object.keys(starredMap).length;
     if (starredCount > 0) {
+      /* ★ 별표 폴더도 div 로 (nested a 문제 회피) */
       const sa = document.createElement('div');
       sa.className = 'folder starred';
       sa.setAttribute('role','link');
@@ -279,7 +280,6 @@ function renderStarredFolder(grid) {
           <span class="folder-count">${starredCount}개</span>
           <span class="folder-arrow">→</span>
         </div>`;
-      /* ★ 폴더 본체 클릭 → 플래시카드 (Self Test 클릭은 별도) */
       sa.addEventListener('click', (e) => {
         if(e.target.closest('[data-self-test]')) return;
         location.href = mainHref;
