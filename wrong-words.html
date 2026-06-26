@@ -39,23 +39,6 @@
   .folder-count.zero{color:var(--green);background:#e8f7f0;border-color:#b8e4d0;}
   .folder-arrow{font-size:1rem;color:var(--muted);}
   .folder:hover .folder-arrow{color:var(--wrong-col);}
-
-  /* ★ Self Test 버튼 — 폴더 카드 우측 상단 (객관식 자가학습 진입) */
-  .self-test-btn{
-    position:absolute;top:10px;right:10px;z-index:5;
-    font-family:'Space Grotesk',sans-serif;font-size:0.58rem;font-weight:700;
-    letter-spacing:0.6px;padding:5px 9px;border-radius:14px;
-    background:var(--pill-wrong);color:var(--wrong-col);
-    border:1px solid #ffcccc;cursor:pointer;
-    display:inline-flex;align-items:center;gap:3px;line-height:1;
-    transition:all .15s;text-decoration:none;
-    box-shadow:0 1px 4px rgba(217,64,64,0.08);
-  }
-  .self-test-btn:hover{background:var(--wrong-col);color:#fff;border-color:var(--wrong-col);}
-  .self-test-btn:active{transform:scale(.9);}
-  /* 별표 폴더 변형 — 노란 강조 */
-  .folder.starred .self-test-btn{background:#fff8d6;color:#b88500;border-color:#ffe88a;box-shadow:0 1px 4px rgba(245,179,0,0.10);}
-  .folder.starred .self-test-btn:hover{background:#f5b300;color:#fff;border-color:#f5b300;}
   /* ★ 별표 단어 전용 폴더 — 노란 강조 */
   .folder.starred{grid-column:1 / -1;}
   .folder.starred .folder-top{background:linear-gradient(90deg,#f5b300 0%,#ffd966 100%);}
@@ -91,7 +74,7 @@
    ★ 학생별 설정 (이 두 줄만 변경)
    ============================================================ */
 const STUDENT_NAME = '조문정';
-const SHEET_GID    = '1168557374';
+const SHEET_GID    = '701229371';
 const SHEET_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyO-Sx_N0LFENgIcQp-3ATAHrYOUvLCuEr2Nls8qYKYMnOTRyo5_zJY1hbyA1ONfzcf2UK7kwe3fTP/pub?output=csv';
 /* ============================================================ */
 
@@ -198,19 +181,12 @@ async function loadFolders(){
     renderStarredFolder(grid);
 
     sorted.forEach((g,i)=>{
-      /* ★ 폴더 자체를 <div> 로 만들어 nested <a> 문제 회피 */
-      const a=document.createElement('div');
+      const a=document.createElement('a');
       a.className='folder';
-      a.setAttribute('role','link');
-      a.setAttribute('tabindex','0');
-      // 본체 클릭 시 이동할 URL (플래시카드)
-      const mainHref = g.set
+      // 세트가 있으면 URL에 set 파라미터 추가
+      a.href=g.set
         ? `wrong-flashcard.html?date=${g.date}&set=${encodeURIComponent(g.set)}`
         : `wrong-flashcard.html?date=${g.date}`;
-      /* Self Test URL — wrong-quiz.html 로 분기 */
-      const quizHref = g.set
-        ? `wrong-quiz.html?date=${g.date}&set=${encodeURIComponent(g.set)}`
-        : `wrong-quiz.html?date=${g.date}`;
       // 제목 있으면 제목, 없으면 날짜
       const mainLabel=g.title || fmtDate(g.date);
       // 보조 라벨: 제목이 있으면 날짜+요일, 없으면 요일만 / 세트가 있으면 세트도 표시
@@ -220,7 +196,6 @@ async function loadFolders(){
       if(g.set) subParts.push(`· ${g.set}`);
       a.innerHTML=`
         <div class="folder-top"></div>
-        <a class="self-test-btn" href="${quizHref}" data-self-test>🎯 Self Test</a>
         <div class="folder-no">No. ${String(i+1).padStart(2,'0')}</div>
         <div>
           <div class="folder-date">${mainLabel}</div>
@@ -230,17 +205,6 @@ async function loadFolders(){
           <span class="folder-count">오답 ${g.count}개</span>
           <span class="folder-arrow">→</span>
         </div>`;
-      /* ★ 본체 클릭 → 플래시카드 / Self Test 클릭은 자체 a 의 href 로 이동 */
-      a.addEventListener('click', (e) => {
-        if(e.target.closest('[data-self-test]')) return; // Self Test 클릭이면 본체 이동 막음
-        location.href = mainHref;
-      });
-      a.addEventListener('keydown', (e) => {
-        if((e.key==='Enter' || e.key===' ') && !e.target.closest('[data-self-test]')) {
-          e.preventDefault();
-          location.href = mainHref;
-        }
-      });
       grid.appendChild(a);
     });
 
@@ -262,15 +226,11 @@ function renderStarredFolder(grid) {
     const starredMap = JSON.parse(localStorage.getItem('starred_words_' + STUDENT_NAME) || '{}');
     const starredCount = Object.keys(starredMap).length;
     if (starredCount > 0) {
-      /* ★ 별표 폴더도 div 로 (nested a 문제 회피) */
-      const sa = document.createElement('div');
+      const sa = document.createElement('a');
       sa.className = 'folder starred';
-      sa.setAttribute('role','link');
-      sa.setAttribute('tabindex','0');
-      const mainHref = 'wrong-flashcard.html?starred=1';
+      sa.href = 'wrong-flashcard.html?starred=1';
       sa.innerHTML = `
         <div class="folder-top"></div>
-        <a class="self-test-btn" href="wrong-quiz.html?starred=1" data-self-test>🎯 Self Test</a>
         <div class="folder-no">⭐ My Stars</div>
         <div>
           <div class="folder-date">별표한 단어</div>
@@ -280,16 +240,6 @@ function renderStarredFolder(grid) {
           <span class="folder-count">${starredCount}개</span>
           <span class="folder-arrow">→</span>
         </div>`;
-      sa.addEventListener('click', (e) => {
-        if(e.target.closest('[data-self-test]')) return;
-        location.href = mainHref;
-      });
-      sa.addEventListener('keydown', (e) => {
-        if((e.key==='Enter' || e.key===' ') && !e.target.closest('[data-self-test]')) {
-          e.preventDefault();
-          location.href = mainHref;
-        }
-      });
       // 항상 그리드 맨 앞에 삽입
       grid.insertBefore(sa, grid.firstChild);
     }
