@@ -2,9 +2,10 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v2.4  (2026-06-26)
+  현재 버전: v2.3.5  (2026-06-26)
 ─────────────────────────────────────────────────────────────────
   변경 이력:
+  v2.3.5 — 숙어장 Daily Test 연동 (quiz_config "ID xx" 자동 인식) + 폴더 순서 단어장→숙어장→모의고사
   v2.3.4 — 숙어장 폴더 활성화 (별도 시트, ID 컬럼 기반)
   v2.3 — Daily Test 로딩 중 상태 표시
   v2.2 — 모바일 탭 라벨 축약 (오답/Test/암기) + 시험 개수 뱃지
@@ -725,7 +726,24 @@
     </div>
   </div>
 
-  <!-- 폴더 그룹 2: 모의고사 -->
+  <!-- 폴더 그룹 2: 숙어장 -->
+  <div class="folder-group collapsed" data-folder="school" id="folder-group-school" style="--fg-color:#d97706;--fg-rgb:217,119,6;">
+    <div class="folder-group-header" onclick="toggleFolderGroup('school')">
+      <span class="folder-group-toggle">▼</span>
+      <span class="folder-group-icon">💬</span>
+      <span class="folder-group-name">숙어장</span>
+      <span class="folder-group-meta" id="school-meta-inline" style="display:none">
+        <strong id="school-total">0</strong>개 표현 · <strong id="school-sets">0</strong>개 ID
+      </span>
+    </div>
+    <div class="folder-group-body">
+      <div id="school-content">
+        <div class="loading-box"><div class="spinner" style="border-top-color:#d97706"></div><span>숙어장 불러오는 중...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 폴더 그룹 3: 모의고사 -->
   <div class="folder-group collapsed" data-folder="mock" id="folder-group-mock" style="--fg-color:#1a7a5e;--fg-rgb:26,122,94;">
     <div class="folder-group-header" onclick="toggleFolderGroup('mock')">
       <span class="folder-group-toggle">▼</span>
@@ -738,23 +756,6 @@
     <div class="folder-group-body">
       <div id="mock-content">
         <div class="loading-box"><div class="spinner" style="border-top-color:#1a7a5e"></div><span>모의고사 불러오는 중...</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ★ 숙어장 폴더 그룹 -->
-  <div class="folder-group" data-folder="school" id="folder-group-school" style="--fg-color:#d97706;--fg-rgb:217,119,6;">
-    <div class="folder-group-header" onclick="toggleFolderGroup('school')">
-      <span class="folder-group-toggle">▼</span>
-      <span class="folder-group-icon">💬</span>
-      <span class="folder-group-name">숙어장</span>
-      <span class="folder-group-meta" id="school-meta-inline" style="display:none">
-        <strong id="school-total">0</strong>개 표현 · <strong id="school-sets">0</strong>개 ID
-      </span>
-    </div>
-    <div class="folder-group-body">
-      <div id="school-content">
-        <div class="loading-box"><div class="spinner" style="border-top-color:#d97706"></div><span>숙어장 불러오는 중...</span></div>
       </div>
     </div>
   </div>
@@ -833,10 +834,10 @@
    ★ 앱 버전 — 변경할 때 이 값만 바꾸면 푸터·콘솔이 같이 갱신됨
    ════════════════════════════════════════════════════════════ */
 const APP_VERSION      = 'v2 · 3';
-const APP_VERSION_DATE = '4';
+const APP_VERSION_DATE = '5';
 
 const STUDENT_NAME = '조문주';
-const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1436259475';
+const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1174135286';
 const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=222284112';
 const WEAK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1027447664';
 /* ★ 숙어장 시트 URL (별도 스프레드시트, "보기 가능" 공유 필수) */
@@ -864,16 +865,7 @@ const STUDY_FOLDERS = [
     csv   : VOCAB_CSV,
     color : '#7036e3',
     rgb   : '112,54,227',
-    quizSrc: 'vocab',          // 시험 배너에서 사용할 단어 풀 종류 (vocab=기본단어장, mock=모의고사)
-  },
-  {
-    id    : 'mock',
-    name  : '모의고사',
-    icon  : '📝',
-    csv   : MOCK_CSV,
-    color : '#1a7a5e',
-    rgb   : '26,122,94',
-    quizSrc: 'mock',
+    quizSrc: 'vocab',          // 시험 배너에서 사용할 단어 풀 종류
   },
   {
     id    : 'school',
@@ -883,6 +875,15 @@ const STUDY_FOLDERS = [
     color : '#d97706',
     rgb   : '217,119,6',
     quizSrc: 'school',
+  },
+  {
+    id    : 'mock',
+    name  : '모의고사',
+    icon  : '📝',
+    csv   : MOCK_CSV,
+    color : '#1a7a5e',
+    rgb   : '26,122,94',
+    quizSrc: 'mock',
   },
 ];
 
@@ -1241,29 +1242,37 @@ let mockLoaded = false;
    - loadVocab() / loadMockWords() 가 끝날 때 resolve
    - 다른 함수에서 await 해서 race condition 방지
    ────────────────────────────────────────────── */
-let _resolveVocabReady, _resolveMockReady;
-const vocabDataReady = new Promise(r => { _resolveVocabReady = r; });
-const mockDataReady  = new Promise(r => { _resolveMockReady  = r; });
+let _resolveVocabReady, _resolveMockReady, _resolveSchoolReady;
+const vocabDataReady  = new Promise(r => { _resolveVocabReady  = r; });
+const mockDataReady   = new Promise(r => { _resolveMockReady   = r; });
+const schoolDataReady = new Promise(r => { _resolveSchoolReady = r; });
 
 /* ──────────────────────────────────────────────
-   ★ Day 출처 라우터 — vocab / weak / mock 중 어느 시트의 Day인지 판단
-   - 우선순위: 단어장(allWords) > 추가단어(weakWords) > 모의고사(mockWords)
+   ★ Day 출처 라우터 — vocab / weak / mock / school 중 어느 시트의 Day인지 판단
+   - 우선순위: 단어장(allWords) > 추가단어(weakWords) > 모의고사(mockWords) > 숙어장(schoolWords)
      · 같은 이름이 추가단어와 모의고사 양쪽에 있으면 추가단어 우선
        (예: 시트를 모의고사 → 추가단어로 옮길 때 weak 가 win)
-   - 세 시트에 모두 없으면 패턴 추정 (Day 숫자 → vocab, 그 외 → mock)
+   - 네 시트에 모두 없으면 패턴 추정:
+     · "Day 숫자" → vocab
+     · "ID 숫자"  → school
+     · 그 외      → mock
    ────────────────────────────────────────────── */
 function getDaySource(dayVal) {
   if (!dayVal) return null;
   const trimmed = dayVal.trim();
-  if (allWords   && allWords.some(w   => w.day === trimmed)) return 'vocab';
-  if (weakWords  && weakWords.some(w  => w.day === trimmed)) return 'weak';
-  if (mockWords  && mockWords.some(w  => w.day === trimmed)) return 'mock';
-  // fallback (데이터 미로딩 등): 기존 패턴 추정
-  return /^Day\s*\d+$/i.test(trimmed) ? 'vocab' : 'mock';
+  if (allWords    && allWords.some(w    => w.day === trimmed)) return 'vocab';
+  if (weakWords   && weakWords.some(w   => w.day === trimmed)) return 'weak';
+  if (mockWords   && mockWords.some(w   => w.day === trimmed)) return 'mock';
+  if (schoolWords && schoolWords.some(w => w.day === trimmed)) return 'school';
+  // fallback (데이터 미로딩 등): 패턴 추정
+  if (/^ID\s*\d+$/i.test(trimmed))  return 'school';
+  if (/^Day\s*\d+$/i.test(trimmed)) return 'vocab';
+  return 'mock';
 }
-function isVocabDay(dayVal){ return getDaySource(dayVal) === 'vocab'; }
-function isMockDay(dayVal) { return getDaySource(dayVal) === 'mock'; }
-function isWeakDay(dayVal) { return getDaySource(dayVal) === 'weak'; }
+function isVocabDay(dayVal) { return getDaySource(dayVal) === 'vocab'; }
+function isMockDay(dayVal)  { return getDaySource(dayVal) === 'mock'; }
+function isWeakDay(dayVal)  { return getDaySource(dayVal) === 'weak'; }
+function isSchoolDay(dayVal){ return getDaySource(dayVal) === 'school'; }
 
 async function loadMockWords() {
   if(mockLoaded) return;
@@ -1525,8 +1534,8 @@ async function loadQuizConfig() {
   const container = document.getElementById('quiz-banner-container');
   container.innerHTML = '';
 
-  // ★ 분류 정확도를 위해 모의고사·추가단어 데이터도 로딩 완료까지 대기
-  //   (isMockDay / isWeakDay 가 시트 데이터를 참조하기 때문)
+  // ★ 분류 정확도를 위해 모의고사·추가단어·숙어장 데이터도 로딩 완료까지 대기
+  //   (isMockDay / isWeakDay / isSchoolDay 가 시트 데이터를 참조하기 때문)
   if (MOCK_CSV) {
     if (!mockLoaded) loadMockWords();
     await mockDataReady;
@@ -1534,6 +1543,10 @@ async function loadQuizConfig() {
   if (WEAK_CSV) {
     if (!weakLoaded) loadWeakWords();
     await weakDataReady;
+  }
+  if (SCHOOL_CSV) {
+    if (!schoolTabLoaded) loadSchoolTab();
+    await schoolDataReady;
   }
 
   // 1. 스케줄 시트에서 7일치(오늘~6일 전) 학생 데이터 읽기
@@ -1616,7 +1629,9 @@ function renderQuizBanners() {
       tag.textContent = `${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
       labelEl.appendChild(tag);
     } else {
-      const prefix = isMockDay(q.day) ? '모의고사 단어' : '오늘의 단어';
+      const prefix = isMockDay(q.day)   ? '모의고사 단어'
+                   : isSchoolDay(q.day) ? '오늘의 숙어'
+                   : '오늘의 단어';
       labelEl.textContent = `${prefix} · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
     }
 
@@ -1651,8 +1666,10 @@ function startQuizByIdx(idx) {
   currentQuiz = quizList[idx];
   if(!currentQuiz) return;
   QUIZ_CONFIG = { day: currentQuiz.day, count: currentQuiz.count };
-  /* 모의고사 Day이면 mockWords를 활성 단어 풀로 설정, 아니면 기존 allWords */
-  activeWords = isMockDay(currentQuiz.day) ? mockWords : allWords;
+  /* 모의고사/숙어장 Day이면 해당 풀, 아니면 기존 allWords */
+  activeWords = isMockDay(currentQuiz.day)   ? mockWords
+              : isSchoolDay(currentQuiz.day) ? schoolWords
+              : allWords;
   startQuiz();
 }
 
@@ -1676,7 +1693,9 @@ function startQuiz() {
   const pool = activeWords.length ? activeWords : allWords;
   const dayWords = pool.filter(w => w.day === QUIZ_CONFIG.day);
   if(!dayWords.length){
-    const src = isMockDay(QUIZ_CONFIG.day) ? '모의고사 시트(MOCK_CSV)' : '단어장';
+    const src = isMockDay(QUIZ_CONFIG.day)   ? '모의고사 시트(MOCK_CSV)'
+              : isSchoolDay(QUIZ_CONFIG.day) ? '숙어장 시트(SCHOOL_CSV)'
+              : '단어장';
     alert(`"${QUIZ_CONFIG.day}" 단어가 없어요.\n${src}에 해당 Day명이 있는지 확인해 주세요.`);
     return;
   }
@@ -2165,6 +2184,7 @@ async function loadSchoolTab() {
         <span style="font-size:.78rem">상단의 SCHOOL_CSV에 구글 시트 URL을 입력해 주세요.</span></span>
       </div>`;
     updateStudyCount();
+    _resolveSchoolReady && _resolveSchoolReady();   // ★ URL 없어도 신호 (대기 해제)
     return;
   }
   try {
@@ -2198,6 +2218,9 @@ async function loadSchoolTab() {
     document.getElementById('school-content').innerHTML =
       `<div class="loading-box" style="color:#d94040">⚠️ ${e.message}</div>`;
     updateStudyCount();
+  } finally {
+    /* ★ 성공/실패 무관 신호 — Daily Test 의 schoolDataReady 대기 해제 */
+    _resolveSchoolReady && _resolveSchoolReady();
   }
 }
 
@@ -2814,7 +2837,7 @@ function updateStudyDivider() {
    폴더 접기/펼치기 + 바로가기 칩
    ============================================================ */
 /* 폴더별 펼침 상태 (true=펼침, false=접힘). 기본값: 둘 다 접힘 */
-const folderOpenState = { vocab:false, mock:false, school:false };
+const folderOpenState = { vocab:false, school:false, mock:false };
 
 function toggleFolderGroup(folderId) {
   const el = document.getElementById('folder-group-' + folderId);
