@@ -2,9 +2,10 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v3.3  (2026-07-13)
+  현재 버전: v3.3.1  (2026-07-13)
 ─────────────────────────────────────────────────────────────────
   변경 이력 (v3.x ~):
+  v3.3.1 — parseVocabCsv 필터 정규식 엄격화 ("(21번) suspect" 처럼 문제 번호가 앞에 붙은 단어가 필터에 걸리던 버그 수정)
   v3.3 — quiz_config 에 오타/미매칭 Day 가 있을 때 학생 화면 배너에서 자동 제외 + 콘솔 경고 (선생님 오타 은폐 방지). getDaySource 의 fallback 정규식 제거.
   v3.2 — SLOTS 통합 리팩토링 1단계: dead code 정리 (renderMockVocab·renderSchoolVocab 옛 정의 + 관련 toggle/close/flip 함수 제거, 총 -203줄). 렌더링·Daily Test·퀴즈 동작은 그대로 유지.
   v3.1.1 — vocab-groups-container 아래 여백 보정
@@ -846,7 +847,7 @@
                        → 푸터에는 '3 · 1'만 표시, 채우면 '3 · 1 · 2'처럼 표시
    ════════════════════════════════════════════════════════════ */
 const APP_VERSION      = '3 · 3';
-const APP_VERSION_DATE = '0';
+const APP_VERSION_DATE = '1';
 
 const STUDENT_NAME = '김현수';
 /* ════════════════════════════════════════════════════════════
@@ -876,13 +877,13 @@ const SLOTS = [
   },
   {
     id:'euhwikkeut', name:'어휘끝수능',
-    csv:'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=782317449',  // gid만 넣으면 첫 슬롯의 base URL 재사용
+    csv:'782317449',  // gid만 넣으면 첫 슬롯의 base URL 재사용
     color:'#7036e3', icon:'📘',
     unit:'단어', subUnit:'Day', dayLabel:'오늘의 단어', quizName:'어휘끝수능'
   },
   {
     id:'idioms', name:'숙어장',
-    csv:'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1671929824',
+    csv:'https://docs.google.com/spreadsheets/d/1oGar-eFGhSHCORf5HnqyGEoYuVEO6hb2QK73UvF9lRE/export?format=csv&gid=1381190355',
     color:'#d97706', icon:'💬',
     unit:'표현', subUnit:'ID', dayLabel:'오늘의 숙어', quizName:'숙어장'
   },
@@ -1083,7 +1084,14 @@ function parseVocabCsv(text) {
         const meaning=v.slice(1).join(',').trim();
         return {day:'',word,meaning,pos:''};
       }
-    }).filter(w=>w.word&&w.meaning&&!/^\S+\s*\d/.test(w.word));
+    /* ★ 필터: 최소한의 안전장치.
+       - word와 meaning은 반드시 있어야 함
+       - "Day 01" / "ID 03" 같이 word 컬럼에 헤더 접두어가 잘못 들어간 케이스만 제외.
+       ────
+       이전에는 /^\S+\s*\d/ 로 광범위하게 매칭했는데, 이는 legitimate 데이터
+       (예: "(21번) suspect" — 문제 번호 표시가 앞에 있는 어휘)까지 걸러버리는
+       버그의 원인이었습니다. 이제는 정확히 "Day/ID + 공백 + 숫자로 끝" 패턴만 필터. */
+    }).filter(w => w.word && w.meaning && !/^(Day|ID)\s+\d+$/i.test(w.word));
   }
 }
 
@@ -1093,24 +1101,42 @@ function parseVocabCsv(text) {
    • /edit#gid=123           → /export?format=csv&gid=123
    • .../pub?output=csv&gid= → 그대로 (변경 없음)
    • .../export?format=csv&… → 그대로 (변경 없음) */
-function normalizeSheetUrl(url) {
+function normalizeSheetUrl(url, fallbackUrl) {
   if(!url) return '';
+  const s = String(url).trim();
   try {
-    // 이미 export 또는 pub CSV endpoint 이면 그대로 사용
-    if(/[?&]output=csv|\/export\?format=csv/i.test(url)) return url;
+    // 1) 이미 완전한 CSV endpoint 이면 그대로 사용
+    if(/[?&]output=csv|\/export\?format=csv/i.test(s)) return s;
 
-    // /edit URL 패턴에서 spreadsheet ID와 gid 추출
-    const idMatch  = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-    const gidMatch = url.match(/[?#&]gid=(\d+)/);
+    // 2) ★ gid 숫자만 넣은 경우 → fallbackUrl(첫 슬롯) 의 spreadsheet ID·base 재사용
+    //    "782317449" 같은 값을 자연스럽게 지원. 같은 스프레드시트의 다른 탭 지정용.
+    if(/^\d+$/.test(s)) {
+      if(!fallbackUrl) {
+        console.error('[SHEET URL] gid만 지정됐지만 참조할 첫 슬롯 URL이 없음:', s);
+        return s;
+      }
+      let fixed;
+      if(/[?&]gid=\d+/.test(fallbackUrl)) {
+        fixed = fallbackUrl.replace(/([?&]gid=)\d+/, `$1${s}`);
+      } else {
+        fixed = fallbackUrl + (fallbackUrl.includes('?') ? '&' : '?') + 'gid=' + s;
+      }
+      console.log(`[SHEET URL 자동 교정] gid=${s} → ${fixed}`);
+      return fixed;
+    }
+
+    // 3) /edit URL 패턴에서 spreadsheet ID·gid 추출 → export 엔드포인트로 변환
+    const idMatch  = s.match(/\/spreadsheets\/d\/(?:e\/)?([a-zA-Z0-9_-]+)/);
+    const gidMatch = s.match(/[?#&]gid=(\d+)/);
     if(idMatch) {
       const id  = idMatch[1];
       const gid = gidMatch ? gidMatch[1] : '0';
       const fixed = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
-      console.log(`[VOCAB URL 자동 교정] ${url}\n              → ${fixed}`);
+      console.log(`[SHEET URL 자동 교정] ${s}\n              → ${fixed}`);
       return fixed;
     }
-    return url; // 인식 불가 → 그대로 넘겨 fetch가 실패하도록
-  } catch { return url; }
+    return s; // 인식 불가 → 그대로 넘겨 fetch 가 실패하도록
+  } catch { return s; }
 }
 
 /* ============================================================
@@ -1130,17 +1156,24 @@ async function loadSlots() {
 
     const firstUrl = SLOTS[0].csv;
     console.log(`[SLOTS] ${SLOTS.length}개 슬롯 로딩 시작:`,
-      SLOTS.map(s => `${s.id}(${s.name})`).join(', '));
+      SLOTS.map(s => `${s.id}(${s.name})${s.csv ? '' : ' [csv 비어있음 → 스킵]'}`).join(', '));
 
-    /* ── 각 슬롯 병렬 fetch (첫 슬롯 URL 을 fallback 으로 넘겨 gid-only 케이스 처리) ── */
+    /* ── 각 슬롯 병렬 fetch (첫 슬롯 URL 을 fallback 으로 넘겨 gid-only 케이스 처리)
+       ★ csv 가 빈 슬롯은 fetch 자체를 건너뛰고 빈 응답으로 처리 (숙어장/모의고사를 이 학생이 안 쓸 때) */
     const normalizedUrls = SLOTS.map((s, i) =>
-      normalizeSheetUrl(s.csv, i > 0 ? firstUrl : null));
+      s.csv ? normalizeSheetUrl(s.csv, i > 0 ? firstUrl : null) : '');
 
     const responses = await Promise.all(
-      normalizedUrls.map(url => fetch(url).catch(err => ({ ok:false, _err:err })))
+      normalizedUrls.map(url => url
+        ? fetch(url).catch(err => ({ ok:false, _err:err }))
+        : Promise.resolve({ ok:false, _skip:true }))
     );
     const texts = await Promise.all(responses.map(async (res, i) => {
       const slot = SLOTS[i];
+      if(res._skip) {
+        console.log(`[SLOTS] 슬롯 "${slot.name}"(${slot.id}) csv 비어있음 — 이 학생은 사용 안 함`);
+        return '';
+      }
       if(!res.ok) {
         console.error(`❌ [SLOTS] 슬롯 "${slot.name}"(${slot.id}) fetch 실패`, {
           url: normalizedUrls[i],
