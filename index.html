@@ -877,10 +877,16 @@ const APP_VERSION_DATE = '1';
 
 const STUDENT_NAME = '김현수';
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1436259475';
-/* ★ 두 번째 단어장 시트 URL (선택) — 필요 시 URL을 채워 넣으세요.
-   빈 문자열이면 첫 번째 단어장만 사용됩니다.
+/* ★ 두 번째 단어장 시트 URL (선택) — 빈 문자열이면 첫 번째 단어장만 사용됩니다.
+   허용되는 세 가지 형식:
+     ① 완전한 CSV URL:
+        'https://docs.google.com/.../pub?output=csv&gid=782317449'
+     ② 편집 URL(자동 교정):
+        'https://docs.google.com/spreadsheets/d/…/edit?gid=782317449'
+     ③ gid 숫자만 (첫 번째 단어장과 같은 스프레드시트일 때만):
+        '782317449'  ← 이 경우 VOCAB_CSV의 base URL 을 그대로 재사용
    두 번째 시트의 Day 이름은 첫 번째와 겹치지 않는 접두어를 쓰세요
-   (예: 첫 번째 "Day 01~", 두 번째 "고3 01~" / "심화 01~") */
+   (예: 첫 번째 "Day 01~", 두 번째 "고3 01~" / "어휘끝수능_01~") */
 const VOCAB2_CSV = '782317449';
 /* Day 접두어 → 서브그룹 표시명 매핑 (선택).
    비어 있으면 접두어 자체가 헤더로 표시됩니다.
@@ -1070,25 +1076,46 @@ function parseVocabCsv(text) {
    • /edit?gid=123           → /export?format=csv&gid=123
    • /edit#gid=123           → /export?format=csv&gid=123
    • .../pub?output=csv&gid= → 그대로 (변경 없음)
-   • .../export?format=csv&… → 그대로 (변경 없음) */
-function normalizeSheetUrl(url) {
+   • .../export?format=csv&… → 그대로 (변경 없음)
+   • '782317449' 처럼 gid 숫자만 → fallbackUrl(첫 번째 시트) 기반으로 자동 완성
+       (같은 스프레드시트의 다른 탭을 편하게 지정할 수 있게 함) */
+function normalizeSheetUrl(url, fallbackUrl) {
   if(!url) return '';
+  const s = String(url).trim();
   try {
-    // 이미 export 또는 pub CSV endpoint 이면 그대로 사용
-    if(/[?&]output=csv|\/export\?format=csv/i.test(url)) return url;
+    // 1) 이미 완전한 CSV endpoint이면 그대로 사용
+    if(/[?&]output=csv|\/export\?format=csv/i.test(s)) return s;
 
-    // /edit URL 패턴에서 spreadsheet ID와 gid 추출
-    const idMatch  = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
-    const gidMatch = url.match(/[?#&]gid=(\d+)/);
+    // 2) gid 숫자만 넣은 경우 → 첫 번째 시트 URL에서 gid만 교체
+    if(/^\d+$/.test(s)) {
+      if(!fallbackUrl) {
+        console.error('[VOCAB URL] gid만 지정됐지만 참조할 첫 번째 시트 URL이 없음:', s);
+        return s;
+      }
+      // fallbackUrl 의 gid 파라미터만 새 값으로 치환
+      let fixed;
+      if(/[?&]gid=\d+/.test(fallbackUrl)) {
+        fixed = fallbackUrl.replace(/([?&]gid=)\d+/, `$1${s}`);
+      } else {
+        // fallback에 gid가 없으면 뒤에 붙임
+        fixed = fallbackUrl + (fallbackUrl.includes('?') ? '&' : '?') + 'gid=' + s;
+      }
+      console.log(`[VOCAB URL 자동 교정] gid=${s} → ${fixed}`);
+      return fixed;
+    }
+
+    // 3) /edit URL 패턴에서 spreadsheet ID와 gid 추출
+    const idMatch  = s.match(/\/spreadsheets\/d\/(?:e\/)?([a-zA-Z0-9_-]+)/);
+    const gidMatch = s.match(/[?#&]gid=(\d+)/);
     if(idMatch) {
       const id  = idMatch[1];
       const gid = gidMatch ? gidMatch[1] : '0';
       const fixed = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
-      console.log(`[VOCAB URL 자동 교정] ${url}\n              → ${fixed}`);
+      console.log(`[VOCAB URL 자동 교정] ${s}\n              → ${fixed}`);
       return fixed;
     }
-    return url; // 인식 불가 → 그대로 넘겨 fetch가 실패하도록
-  } catch { return url; }
+    return s; // 인식 불가 → 그대로 넘겨 fetch가 실패하도록
+  } catch { return s; }
 }
 
 async function loadVocab() {
@@ -1096,7 +1123,9 @@ async function loadVocab() {
   try {
     /* ── 두 시트를 병렬 fetch (VOCAB2_CSV 비어 있으면 첫 번째만) ── */
     const rawSources = [VOCAB_CSV, VOCAB2_CSV].filter(u => u);
-    const sources = rawSources.map(normalizeSheetUrl);
+    /* ★ 두 번째 시트부터는 첫 번째 URL을 fallback으로 전달
+       → gid 숫자만 넣은 경우 첫 번째 URL 기반으로 자동 완성됨 */
+    const sources = rawSources.map((u, i) => normalizeSheetUrl(u, i > 0 ? rawSources[0] : null));
     console.log(`[VOCAB] ${sources.length}개 시트 로딩 시작:`, sources);
     const responses = await Promise.all(
       sources.map(url => fetch(url).catch(err => ({ ok:false, _err:err })))
