@@ -2,9 +2,10 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v3.0  (2026-07-13)
+  현재 버전: v3.1  (2026-07-13)
 ─────────────────────────────────────────────────────────────────
   변경 이력 (v3.x ~):
+  v3.1 — 단어장 트랙별 폴더 그룹 분리 (숙어장·모의고사와 동등한 레벨). extractPrefix가 언더스코어(_)도 인식.
   v3.0 — 버전 번호 체계 리셋 (v2.3.6 → v3.0). 이전 이력은 하단 아카이브 참고.
 
   ─────────────────────────────────────────────────────────────
@@ -744,18 +745,16 @@
     <span class="folder-jump-label">바로가기</span>
   </div>
 
-  <!-- 폴더 그룹 1: 단어장 -->
-  <div class="folder-group collapsed" data-folder="vocab" id="folder-group-vocab" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
-    <div class="folder-group-header" onclick="toggleFolderGroup('vocab')">
-      <span class="folder-group-toggle">▼</span>
-      <span class="folder-group-icon">📘</span>
-      <span class="folder-group-name">단어장</span>
-      <span class="folder-group-meta" id="vocab-meta-inline" style="display:none">
-        <strong id="vocab-total">0</strong>개 단어 · <strong id="vocab-days">0</strong>개 Day
-      </span>
-    </div>
-    <div class="folder-group-body">
-      <div id="vocab-content">
+  <!-- 폴더 그룹 1: 단어장 트랙들 (동적으로 트랙 개수만큼 folder-group 요소가 생성됨) -->
+  <div id="vocab-groups-container">
+    <!-- 초기 로딩 상태: 임시 folder-group 하나로 스피너 표시. loadVocab 성공 시 이 요소를 대체함 -->
+    <div class="folder-group" data-folder="vocab-loading" id="folder-group-vocab-loading" style="--fg-color:#7036e3;--fg-rgb:112,54,227;">
+      <div class="folder-group-header">
+        <span class="folder-group-toggle">▼</span>
+        <span class="folder-group-icon">📘</span>
+        <span class="folder-group-name">단어장</span>
+      </div>
+      <div class="folder-group-body">
         <div class="loading-box"><div class="spinner"></div><span>단어장 불러오는 중...</span></div>
       </div>
     </div>
@@ -872,22 +871,16 @@
    APP_VERSION_DATE : 같은 날 나온 패치 번호(선택). 안 쓰면 빈 문자열 ''
                        → 푸터에는 '3 · 1'만 표시, 채우면 '3 · 1 · 2'처럼 표시
    ════════════════════════════════════════════════════════════ */
-const APP_VERSION      = '3 · 0';
-const APP_VERSION_DATE = '2';
+const APP_VERSION      = '3 · 1';
+const APP_VERSION_DATE = '';
 
 const STUDENT_NAME = '김현수';
-const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=782317449';
-/* ★ 두 번째 단어장 시트 URL (선택) — 빈 문자열이면 첫 번째 단어장만 사용됩니다.
-   허용되는 세 가지 형식:
-     ① 완전한 CSV URL:
-        'https://docs.google.com/.../pub?output=csv&gid=782317449'
-     ② 편집 URL(자동 교정):
-        'https://docs.google.com/spreadsheets/d/…/edit?gid=782317449'
-     ③ gid 숫자만 (첫 번째 단어장과 같은 스프레드시트일 때만):
-        '782317449'  ← 이 경우 VOCAB_CSV의 base URL 을 그대로 재사용
+const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1436259475';
+/* ★ 두 번째 단어장 시트 URL (선택) — 필요 시 URL을 채워 넣으세요.
+   빈 문자열이면 첫 번째 단어장만 사용됩니다.
    두 번째 시트의 Day 이름은 첫 번째와 겹치지 않는 접두어를 쓰세요
-   (예: 첫 번째 "Day 01~", 두 번째 "고3 01~" / "어휘끝수능_01~") */
-const VOCAB2_CSV = '1617084488';
+   (예: 첫 번째 "Day 01~", 두 번째 "고3 01~" / "심화 01~") */
+const VOCAB2_CSV = '782317449';
 /* Day 접두어 → 서브그룹 표시명 매핑 (선택).
    비어 있으면 접두어 자체가 헤더로 표시됩니다.
    예: { 'Day': '수능 단어', '고3': '고3 심화' } */
@@ -1076,46 +1069,25 @@ function parseVocabCsv(text) {
    • /edit?gid=123           → /export?format=csv&gid=123
    • /edit#gid=123           → /export?format=csv&gid=123
    • .../pub?output=csv&gid= → 그대로 (변경 없음)
-   • .../export?format=csv&… → 그대로 (변경 없음)
-   • '782317449' 처럼 gid 숫자만 → fallbackUrl(첫 번째 시트) 기반으로 자동 완성
-       (같은 스프레드시트의 다른 탭을 편하게 지정할 수 있게 함) */
-function normalizeSheetUrl(url, fallbackUrl) {
+   • .../export?format=csv&… → 그대로 (변경 없음) */
+function normalizeSheetUrl(url) {
   if(!url) return '';
-  const s = String(url).trim();
   try {
-    // 1) 이미 완전한 CSV endpoint이면 그대로 사용
-    if(/[?&]output=csv|\/export\?format=csv/i.test(s)) return s;
+    // 이미 export 또는 pub CSV endpoint 이면 그대로 사용
+    if(/[?&]output=csv|\/export\?format=csv/i.test(url)) return url;
 
-    // 2) gid 숫자만 넣은 경우 → 첫 번째 시트 URL에서 gid만 교체
-    if(/^\d+$/.test(s)) {
-      if(!fallbackUrl) {
-        console.error('[VOCAB URL] gid만 지정됐지만 참조할 첫 번째 시트 URL이 없음:', s);
-        return s;
-      }
-      // fallbackUrl 의 gid 파라미터만 새 값으로 치환
-      let fixed;
-      if(/[?&]gid=\d+/.test(fallbackUrl)) {
-        fixed = fallbackUrl.replace(/([?&]gid=)\d+/, `$1${s}`);
-      } else {
-        // fallback에 gid가 없으면 뒤에 붙임
-        fixed = fallbackUrl + (fallbackUrl.includes('?') ? '&' : '?') + 'gid=' + s;
-      }
-      console.log(`[VOCAB URL 자동 교정] gid=${s} → ${fixed}`);
-      return fixed;
-    }
-
-    // 3) /edit URL 패턴에서 spreadsheet ID와 gid 추출
-    const idMatch  = s.match(/\/spreadsheets\/d\/(?:e\/)?([a-zA-Z0-9_-]+)/);
-    const gidMatch = s.match(/[?#&]gid=(\d+)/);
+    // /edit URL 패턴에서 spreadsheet ID와 gid 추출
+    const idMatch  = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+    const gidMatch = url.match(/[?#&]gid=(\d+)/);
     if(idMatch) {
       const id  = idMatch[1];
       const gid = gidMatch ? gidMatch[1] : '0';
       const fixed = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`;
-      console.log(`[VOCAB URL 자동 교정] ${s}\n              → ${fixed}`);
+      console.log(`[VOCAB URL 자동 교정] ${url}\n              → ${fixed}`);
       return fixed;
     }
-    return s; // 인식 불가 → 그대로 넘겨 fetch가 실패하도록
-  } catch { return s; }
+    return url; // 인식 불가 → 그대로 넘겨 fetch가 실패하도록
+  } catch { return url; }
 }
 
 async function loadVocab() {
@@ -1123,9 +1095,7 @@ async function loadVocab() {
   try {
     /* ── 두 시트를 병렬 fetch (VOCAB2_CSV 비어 있으면 첫 번째만) ── */
     const rawSources = [VOCAB_CSV, VOCAB2_CSV].filter(u => u);
-    /* ★ 두 번째 시트부터는 첫 번째 URL을 fallback으로 전달
-       → gid 숫자만 넣은 경우 첫 번째 URL 기반으로 자동 완성됨 */
-    const sources = rawSources.map((u, i) => normalizeSheetUrl(u, i > 0 ? rawSources[0] : null));
+    const sources = rawSources.map(normalizeSheetUrl);
     console.log(`[VOCAB] ${sources.length}개 시트 로딩 시작:`, sources);
     const responses = await Promise.all(
       sources.map(url => fetch(url).catch(err => ({ ok:false, _err:err })))
@@ -1170,7 +1140,7 @@ async function loadVocab() {
     _resolveVocabReady && _resolveVocabReady();   // ★ 단어장 로딩 완료 신호
     loadQuizConfig();
   } catch(e) {
-    document.getElementById('vocab-content').innerHTML=`<div class="loading-box" style="color:#d94040">⚠️ ${e.message}</div>`;
+    document.getElementById('vocab-groups-container').innerHTML=`<div class="loading-box" style="color:#d94040">⚠️ ${e.message}</div>`;
     _resolveVocabReady && _resolveVocabReady();   // ★ 실패해도 신호 (다른 await 가 무한 대기하지 않도록)
     updateStudyCount();
   }
@@ -1181,14 +1151,15 @@ async function loadVocab() {
    ============================================================ */
 let openDayKey = null; // 현재 열린 Day
 
-/* Day 이름에서 접두어 추출 (첫 공백 이전 문자열).
-   예: "Day 01" → "Day", "고3 01" → "고3", "심화 03" → "심화"
-   공백이 없으면 전체를 접두어로 취급, 빈 값이면 "기타". */
+/* Day 이름에서 접두어(트랙명) 추출 — 첫 공백 또는 언더스코어(_) 이전 문자열.
+   예: "Day 01" → "Day", "고3 01" → "고3", "어휘끝수능_01" → "어휘끝수능"
+   구분자가 없으면 전체를 접두어로 취급, 빈 값이면 "기타". */
 function extractPrefix(day) {
   if(!day) return '기타';
   const trimmed = day.trim();
-  const space = trimmed.indexOf(' ');
-  return space === -1 ? trimmed : trimmed.substring(0, space);
+  if(!trimmed) return '기타';
+  const m = trimmed.match(/^([^\s_]+)/);
+  return m ? m[1] : trimmed;
 }
 
 function renderVocab(words) {
@@ -1196,7 +1167,7 @@ function renderVocab(words) {
   words.forEach(w=>{ const d=w.day||'기타'; if(!groups[d])groups[d]=[]; groups[d].push(w); });
   const days = Object.keys(groups);
 
-  /* ── ★ 접두어별 서브그룹핑 (등장 순서 유지) ── */
+  /* ── ★ 접두어별 그룹핑 (등장 순서 유지). 각 접두어 = 하나의 트랙 = 하나의 folder-group ── */
   const prefixOrder = [];
   const subgroups = {};   // { prefix: [day, ...] }
   days.forEach(day => {
@@ -1208,34 +1179,50 @@ function renderVocab(words) {
     subgroups[prefix].push(day);
   });
 
-  document.getElementById('vocab-total').textContent=words.length;
-  document.getElementById('vocab-days').textContent=days.length;
-  document.getElementById('vocab-meta-inline').style.display='inline';
-  updateStudyCount();
+  /* ── DOM 초기화: 이전 vocab 그룹 모두 제거 + 컨테이너 비우기 ── */
+  const container = document.getElementById('vocab-groups-container');
+  container.innerHTML = '';
 
-  const box = document.getElementById('vocab-content');
-  box.innerHTML='';
+  /* ── 이전에 등록된 vocab-* 폴더 상태 정리 (다시 렌더 시 stale 방지) ── */
+  Object.keys(folderOpenState).forEach(k => {
+    if(k.startsWith('vocab-')) delete folderOpenState[k];
+  });
 
   let globalIdx = 0;   // 전체 폴더에 걸친 unique 인덱스 (flipDay/closeDay/toggleDay 참조용)
 
-  prefixOrder.forEach(prefix => {
-    /* 서브그룹이 2개 이상일 때만 헤더 표시 (하나뿐이면 기존 UI와 동일) */
-    if(prefixOrder.length > 1) {
-      const header = document.createElement('div');
-      header.className = 'vocab-subgroup-header';
-      const label = VOCAB_GROUP_LABELS[prefix] || prefix;
-      const daysInGroup  = subgroups[prefix].length;
-      const wordsInGroup = subgroups[prefix].reduce((s,d) => s + groups[d].length, 0);
-      header.innerHTML = `<span class="vocab-subgroup-label">${esc(label)}</span>
-        <span class="vocab-subgroup-meta">${daysInGroup}개 Day · ${wordsInGroup}개 단어</span>`;
-      box.appendChild(header);
-    }
+  prefixOrder.forEach((prefix, ti) => {
+    const trackDays = subgroups[prefix];
+    const trackWordCount = trackDays.reduce((s,d) => s + groups[d].length, 0);
+    const displayName = VOCAB_GROUP_LABELS[prefix] || prefix;
+    const folderKey = 'vocab-' + ti;   // ID는 안전하게 인덱스 기반 (한글·특수문자 회피)
 
-    /* 각 서브그룹마다 별도의 grid 생성 */
-    const grid = document.createElement('div');
-    grid.className='vocab-day-grid';
+    /* ── folder-group 요소 생성 (숙어장·모의고사와 동일한 구조) ── */
+    const fgroup = document.createElement('div');
+    fgroup.className = 'folder-group collapsed';
+    fgroup.setAttribute('data-folder', folderKey);
+    fgroup.id = 'folder-group-' + folderKey;
+    fgroup.style.cssText = '--fg-color:#7036e3;--fg-rgb:112,54,227;'; // 모든 vocab 트랙 보라 통일
 
-    subgroups[prefix].forEach(day => {
+    fgroup.innerHTML = `
+      <div class="folder-group-header" onclick="toggleFolderGroup('${folderKey}')">
+        <span class="folder-group-toggle">▼</span>
+        <span class="folder-group-icon">📘</span>
+        <span class="folder-group-name">${esc(displayName)}</span>
+        <span class="folder-group-meta">
+          <strong id="${folderKey}-total">${trackWordCount}</strong>개 단어 · <strong id="${folderKey}-days">${trackDays.length}</strong>개 Day
+        </span>
+      </div>
+      <div class="folder-group-body">
+        <div class="vocab-day-grid" id="grid-${folderKey}"></div>
+      </div>`;
+
+    container.appendChild(fgroup);
+    folderOpenState[folderKey] = false;
+
+    /* ── Day 폴더 카드를 이 트랙의 그리드에 채움 ── */
+    const grid = fgroup.querySelector(`#grid-${folderKey}`);
+
+    trackDays.forEach(day => {
       const i = globalIdx++;
       const wordCount = groups[day].length;
 
@@ -1248,7 +1235,7 @@ function renderVocab(words) {
         <div class="day-folder-title">${esc(day)}</div>
         <div class="day-folder-desc">${wordCount}개 단어</div>
         <div class="day-folder-footer">
-          <span class="day-folder-tag">단어장</span>
+          <span class="day-folder-tag">${esc(displayName)}</span>
           <span class="day-folder-arrow" id="arrow-${i}">→</span>
         </div>`;
 
@@ -1297,9 +1284,9 @@ function renderVocab(words) {
       folder._detail = detail;
       folder._idx = i;
     });
-
-    box.appendChild(grid);
   });
+
+  updateStudyCount();
 }
 
 function toggleDay(i, folder, detail) {
@@ -2998,9 +2985,11 @@ function updateStudyCount() {
   if(!el) return;
   let total = 0;
   let any = false;
-  // 단어장
-  const vt = parseInt(document.getElementById('vocab-total')?.textContent) || 0;
-  if(vt > 0) { total += vt; any = true; }
+  // 단어장 (트랙별로 여러 folder-group 이 있을 수 있음 — 모두 합산)
+  document.querySelectorAll('#vocab-groups-container .folder-group [id$="-total"]').forEach(t => {
+    const n = parseInt(t.textContent) || 0;
+    if(n > 0) { total += n; any = true; }
+  });
   // 모의고사
   const mt = parseInt(document.getElementById('mock-total')?.textContent) || 0;
   if(mt > 0) { total += mt; any = true; }
@@ -3026,8 +3015,9 @@ function updateStudyDivider() {
 /* ============================================================
    폴더 접기/펼치기 + 바로가기 칩
    ============================================================ */
-/* 폴더별 펼침 상태 (true=펼침, false=접힘). 기본값: 둘 다 접힘 */
-const folderOpenState = { vocab:false, school:false, mock:false };
+/* 폴더별 펼침 상태 (true=펼침, false=접힘). 기본값: 접힘
+   vocab-N (단어장 트랙) 키는 renderVocab 시 동적으로 등록됨 */
+const folderOpenState = { school:false, mock:false };
 
 function toggleFolderGroup(folderId) {
   const el = document.getElementById('folder-group-' + folderId);
