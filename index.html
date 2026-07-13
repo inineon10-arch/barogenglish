@@ -2,9 +2,10 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v3.3.1  (2026-07-13)
+  현재 버전: v3.4  (2026-07-13)
 ─────────────────────────────────────────────────────────────────
   변경 이력 (v3.x ~):
+  v3.4 — SLOTS 통합 리팩토링 2단계: renderMockQuizBanners / renderWeakQuizBanners 를 슬롯 색상·라벨 인라인 주입 방식으로 통합. 하드코딩된 mock-banner/weak-banner 클래스 부여 제거. WEAK_STYLE 상수 도입.
   v3.3.1 — parseVocabCsv 필터 정규식 엄격화 ("(21번) suspect" 처럼 문제 번호가 앞에 붙은 단어가 필터에 걸리던 버그 수정)
   v3.3 — quiz_config 에 오타/미매칭 Day 가 있을 때 학생 화면 배너에서 자동 제외 + 콘솔 경고 (선생님 오타 은폐 방지). getDaySource 의 fallback 정규식 제거.
   v3.2 — SLOTS 통합 리팩토링 1단계: dead code 정리 (renderMockVocab·renderSchoolVocab 옛 정의 + 관련 toggle/close/flip 함수 제거, 총 -203줄). 렌더링·Daily Test·퀴즈 동작은 그대로 유지.
@@ -101,12 +102,16 @@
   .section-count{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--ink-mute);letter-spacing:.05em;}
 
   /* ── 오늘의 퀴즈 배너 ── */
-  .quiz-banner{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--card);border:1.5px solid rgba(112,54,227,.25);border-radius:10px;padding:1.1rem 1.4rem;box-shadow:0 2px 12px rgba(112,54,227,.08);position:relative;overflow:hidden;}
-  .quiz-banner::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--purple);}
-  .quiz-banner-label{font-family:'Inter',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);margin-bottom:.3rem;}
+  /* ── Daily Test 배너 (CSS 변수 --fg-color, --fg-rgb 로 색상 커스터마이즈)
+     인라인 스타일로 SLOTS 슬롯 색상을 주입하면 자동으로 배너 색이 바뀜.
+     주입 안 하면 기본값(보라)로 표시. */
+  .quiz-banner{--fg-color:#7036e3;--fg-rgb:112,54,227;
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--card);border:1.5px solid rgba(var(--fg-rgb),.25);border-radius:10px;padding:1.1rem 1.4rem;box-shadow:0 2px 12px rgba(var(--fg-rgb),.08);position:relative;overflow:hidden;}
+  .quiz-banner::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--fg-color);}
+  .quiz-banner-label{font-family:'Inter',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-color);margin-bottom:.3rem;}
   .quiz-banner-day{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--ink);line-height:1.1;}
   .quiz-banner-sub{font-size:.75rem;color:var(--ink-mute);margin-top:.2rem;}
-  .quiz-banner-btn{font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.65rem 1.3rem;background:var(--purple);color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .2s,transform .15s;flex-shrink:0;}
+  .quiz-banner-btn{font-family:'Inter',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.65rem 1.3rem;background:var(--fg-color);color:#fff;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .2s,transform .15s;flex-shrink:0;}
   .quiz-banner-btn:hover{opacity:.88;} .quiz-banner-btn:active{transform:scale(.96);}
   .quiz-banner-loading{font-family:'Inter',sans-serif;font-size:.72rem;color:var(--ink-mute);font-style:italic;}
 
@@ -397,24 +402,10 @@
   .mcard-tts:hover{background:rgba(26,122,94,.18);transform:scale(1.08);}
   .mcard-tts:active{transform:scale(.92);}
 
-  .quiz-banner.mock-banner{border-color:rgba(26,122,94,.25);background:var(--card);box-shadow:0 2px 12px rgba(26,122,94,.08);}
-  .quiz-banner.mock-banner::before{background:var(--green-mock);}
-  .quiz-banner.mock-banner .quiz-banner-label{color:var(--green-mock);}
-  .quiz-banner.mock-banner .quiz-banner-btn{background:var(--green-mock);}
-  .quiz-banner.mock-banner.overdue{border-color:rgba(217,64,64,.35);background:#fff5f5;}
-  .quiz-banner.mock-banner.overdue::before{background:#d94040;}
-  .quiz-banner.mock-banner.overdue .quiz-banner-label{color:#d94040;}
-  .quiz-banner.mock-banner.overdue .quiz-banner-btn{background:#d94040;}
-
-  /* ── 추가 단어(취약 단어) 배너 — 앰버 ── */
-  .quiz-banner.weak-banner{border-color:rgba(217,119,6,.25);background:var(--card);box-shadow:0 2px 12px rgba(217,119,6,.08);}
-  .quiz-banner.weak-banner::before{background:var(--amber-weak);}
-  .quiz-banner.weak-banner .quiz-banner-label{color:var(--amber-weak);}
-  .quiz-banner.weak-banner .quiz-banner-btn{background:var(--amber-weak);}
-  .quiz-banner.weak-banner.overdue{border-color:rgba(217,64,64,.35);background:#fff5f5;}
-  .quiz-banner.weak-banner.overdue::before{background:#d94040;}
-  .quiz-banner.weak-banner.overdue .quiz-banner-label{color:#d94040;}
-  .quiz-banner.weak-banner.overdue .quiz-banner-btn{background:#d94040;}
+  /* ── mock/weak/school 배너 override CSS 는 v3.4 에서 제거됨 (총 -18줄) —
+     .quiz-banner 기본 스타일이 --fg-color/--fg-rgb 변수 참조 방식으로 리팩토링됐고,
+     각 배너 렌더 지점(renderQuizBanners, loadMockQuizBanners, loadWeakQuizBanners)에서
+     인라인 style 로 슬롯 색상을 주입하는 방식으로 통일됨. */
 
   .qz-card-line.mock{background:linear-gradient(90deg,var(--green-mock) 0%,var(--green-mock-soft) 100%);}
   .qz-pill.mock-pill{background:#e6f7f3;color:var(--green-mock);border:1px solid #b3dfd4;}
@@ -846,8 +837,8 @@
    APP_VERSION_DATE : 같은 날 나온 패치 번호(선택). 안 쓰면 빈 문자열 ''
                        → 푸터에는 '3 · 1'만 표시, 채우면 '3 · 1 · 2'처럼 표시
    ════════════════════════════════════════════════════════════ */
-const APP_VERSION      = '3 · 3';
-const APP_VERSION_DATE = '1';
+const APP_VERSION      = '3 · 4';
+const APP_VERSION_DATE = '0';
 
 const STUDENT_NAME = '김현수';
 /* ════════════════════════════════════════════════════════════
@@ -877,19 +868,19 @@ const SLOTS = [
   },
   {
     id:'euhwikkeut', name:'어휘끝수능',
-    csv:'',  // gid만 넣으면 첫 슬롯의 base URL 재사용
+    csv:'782317449',  // gid만 넣으면 첫 슬롯의 base URL 재사용
     color:'#7036e3', icon:'📘',
     unit:'단어', subUnit:'Day', dayLabel:'오늘의 단어', quizName:'어휘끝수능'
   },
   {
     id:'idioms', name:'숙어장',
-    csv:'',
+    csv:'https://docs.google.com/spreadsheets/d/1oGar-eFGhSHCORf5HnqyGEoYuVEO6hb2QK73UvF9lRE/export?format=csv&gid=1671929824',
     color:'#d97706', icon:'💬',
     unit:'표현', subUnit:'ID', dayLabel:'오늘의 숙어', quizName:'숙어장'
   },
   {
     id:'mock', name:'모의고사',
-    csv:'',
+    csv:'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=222284112',
     color:'#1a7a5e', icon:'📝',
     unit:'단어', subUnit:'세트', dayLabel:'모의고사 단어', quizName:'모의고사'
   },
@@ -897,6 +888,14 @@ const SLOTS = [
 
 /* 추가 단어(취약 단어) — 슬롯과 별도. 스케줄 기반 시험만 (단어 암기 탭엔 안 보임). */
 const WEAK_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1027447664';
+/* ★ 추가단어(weak) 배너 스타일 — weak 은 SLOTS 가 아닌 별도 시스템이므로 별도 정의.
+   슬롯 스키마와 동일한 형태를 유지해서 렌더 로직이 통일되게 함. */
+const WEAK_STYLE = {
+  color   : '#2563eb',        // 블루 (v2.3.6 에서 결정)
+  rgb     : '37,99,235',
+  dayLabel: '오늘의 추가 단어',
+  overdueLabel: '밀린 추가 단어'
+};
 
 /* ── 색상 헬퍼: hex → "R,G,B" 문자열 (rgba() 조합용) ── */
 function hexToRgb(hex) {
@@ -1673,7 +1672,10 @@ function renderWeakQuizBanners() {
   container.innerHTML = '';
   weakQuizList.forEach((q, idx) => {
     const banner = document.createElement('div');
-    banner.className = 'quiz-banner weak-banner' + (q.overdue ? ' overdue' : '');
+    /* ★ WEAK_STYLE 인라인 주입 (2단계 리팩토링) — 하드코딩 CSS 클래스 대신 변수 사용 */
+    banner.className = 'quiz-banner' + (q.overdue ? ' overdue' : '');
+    banner.style.setProperty('--fg-color', WEAK_STYLE.color);
+    banner.style.setProperty('--fg-rgb', WEAK_STYLE.rgb);
 
     const left = document.createElement('div');
     left.className = 'quiz-banner-left';
@@ -1681,13 +1683,13 @@ function renderWeakQuizBanners() {
     const labelEl = document.createElement('div');
     labelEl.className = 'quiz-banner-label';
     if (q.overdue) {
-      labelEl.textContent = '밀린 추가 단어 ';
+      labelEl.textContent = WEAK_STYLE.overdueLabel + ' ';
       const tag = document.createElement('span');
       tag.className = 'quiz-banner-overdue-tag';
       tag.textContent = `${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
       labelEl.appendChild(tag);
     } else {
-      labelEl.textContent = `오늘의 추가 단어 · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
+      labelEl.textContent = `${WEAK_STYLE.dayLabel} · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
     }
 
     const dayEl = document.createElement('div');
@@ -1894,8 +1896,21 @@ function renderQuizBanners() {
   container.innerHTML = '';
 
   quizList.forEach((q, idx) => {
+    /* ★ 슬롯 조회 + 색상·라벨 결정 (v3.4 SLOTS 통합)
+       - SLOTS 매칭 우선 → slot.color / slot.dayLabel 사용
+       - 매칭 실패 시 weak 검사 → WEAK_STYLE 사용 (안전장치, 원래 quiz-banner-container 에
+         weak 배너가 렌더될 일은 없지만 fallback 으로 유지)
+       - 둘 다 아니면 fallback 보라 (v3.3 필터링 덕분에 여기 도달할 일 거의 없음) */
+    const slot = getSlotForDay(q.day);
+    const isWeakItem = !slot && weakWords && weakWords.some(w => w.day === q.day);
+    const bColor = slot ? slot.color            : (isWeakItem ? WEAK_STYLE.color    : '#7036e3');
+    const bRgb   = slot ? hexToRgb(slot.color)  : (isWeakItem ? WEAK_STYLE.rgb      : '112,54,227');
+    const bLabel = slot ? slot.dayLabel         : (isWeakItem ? WEAK_STYLE.dayLabel : '오늘의 단어');
+
     const banner = document.createElement('div');
     banner.className = 'quiz-banner' + (q.overdue ? ' overdue' : '');
+    banner.style.setProperty('--fg-color', bColor);
+    banner.style.setProperty('--fg-rgb', bRgb);
     banner.dataset.idx = idx;
 
     /* ── 배너 왼쪽 영역 ── */
@@ -1912,10 +1927,7 @@ function renderQuizBanners() {
       tag.textContent = `${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
       labelEl.appendChild(tag);
     } else {
-      const prefix = isMockDay(q.day)   ? '모의고사 단어'
-                   : isSchoolDay(q.day) ? '오늘의 숙어'
-                   : '오늘의 단어';
-      labelEl.textContent = `${prefix} · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
+      labelEl.textContent = `${bLabel} · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
     }
 
     /* q.day — 시트 데이터이므로 반드시 textContent 로 삽입 */
@@ -2416,9 +2428,17 @@ async function loadMockQuizBanners() {
 function renderMockQuizBanners() {
   const container = document.getElementById('mock-banner-container');
   container.innerHTML = '';
+  /* ★ mock 슬롯의 색상·라벨을 사용 (2단계 리팩토링) — 슬롯 없으면 안전 fallback */
+  const mockSlot = getSlotById('mock');
+  const bColor = mockSlot?.color                    || '#1a7a5e';
+  const bRgb   = mockSlot ? hexToRgb(mockSlot.color) : '26,122,94';
+  const bLabel = mockSlot?.dayLabel                 || '모의고사 단어';
+
   mockQuizList.forEach((q, idx) => {
     const banner = document.createElement('div');
-    banner.className = 'quiz-banner mock-banner' + (q.overdue ? ' overdue' : '');
+    banner.className = 'quiz-banner' + (q.overdue ? ' overdue' : '');
+    banner.style.setProperty('--fg-color', bColor);
+    banner.style.setProperty('--fg-rgb', bRgb);
     const left = document.createElement('div');
     left.className = 'quiz-banner-left';
 
@@ -2431,7 +2451,7 @@ function renderMockQuizBanners() {
       tag.textContent = `${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
       labelEl.appendChild(tag);
     } else {
-      labelEl.textContent = `오늘의 모의고사 · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
+      labelEl.textContent = `${bLabel} · ${fmtMMDD(q.dateStr)} (${getDow(q.dateStr)})`;
     }
 
     const dayEl = document.createElement('div');
