@@ -2,9 +2,10 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v3.2  (2026-07-13)
+  현재 버전: v3.3  (2026-07-13)
 ─────────────────────────────────────────────────────────────────
   변경 이력 (v3.x ~):
+  v3.3 — quiz_config 에 오타/미매칭 Day 가 있을 때 학생 화면 배너에서 자동 제외 + 콘솔 경고 (선생님 오타 은폐 방지). getDaySource 의 fallback 정규식 제거.
   v3.2 — SLOTS 통합 리팩토링 1단계: dead code 정리 (renderMockVocab·renderSchoolVocab 옛 정의 + 관련 toggle/close/flip 함수 제거, 총 -203줄). 렌더링·Daily Test·퀴즈 동작은 그대로 유지.
   v3.1.1 — vocab-groups-container 아래 여백 보정
   v3.1 — 단어장 트랙별 폴더 그룹 분리 (숙어장·모의고사와 동등한 레벨). extractPrefix가 언더스코어(_)도 인식.
@@ -844,7 +845,7 @@
    APP_VERSION_DATE : 같은 날 나온 패치 번호(선택). 안 쓰면 빈 문자열 ''
                        → 푸터에는 '3 · 1'만 표시, 채우면 '3 · 1 · 2'처럼 표시
    ════════════════════════════════════════════════════════════ */
-const APP_VERSION      = '3 · 2';
+const APP_VERSION      = '3 · 3';
 const APP_VERSION_DATE = '0';
 
 const STUDENT_NAME = '김현수';
@@ -1514,10 +1515,11 @@ function getDaySource(dayVal) {
     if (slot.id === 'idioms') return 'school';
     return 'vocab';
   }
-  // 3) fallback (데이터 미로딩 등): 패턴 추정
-  if (/^ID\s*\d+$/i.test(trimmed))  return 'school';
-  if (/^Day\s*\d+$/i.test(trimmed)) return 'vocab';
-  return 'mock';
+  // 3) 실제 슬롯 데이터·weak 어디에도 없음 → null 반환
+  //    (이전 버전은 fallback 으로 'mock' 등 강제 반환했지만, 이는 선생님의 오타를
+  //     은폐하고 학생 화면에 잘못된 배너를 띄우는 원인이 되어 제거함.
+  //     호출부에서 null 이면 배너 제외 + 콘솔 경고를 띄우도록 처리됩니다.)
+  return null;
 }
 function isVocabDay(dayVal) { return getDaySource(dayVal) === 'vocab'; }
 function isMockDay(dayVal)  { return getDaySource(dayVal) === 'mock'; }
@@ -1818,10 +1820,21 @@ async function loadQuizConfig() {
   const isSubmitted = (dateStr, day) =>
     localMap[`${dateStr}_${day}`] === true || serverList.includes(day);
 
-  // 3. 미제출 항목만 필터링 + overdue 플래그
+  // 3. 미제출 항목만 필터링 + overdue 플래그 + ★ 실데이터 매칭 검증
   const today = todayStr();
+  const unknownDays = [];  // 실데이터에 없는 Day 수집용 (선생님 경고)
   quizList = scheduleRows
     .filter(r => !isSubmitted(r.dateStr, r.day))
+    .filter(r => {
+      // ★ SLOTS / weakWords 어디에도 없는 Day 는 학생 화면에 배너 표시하지 않음
+      //   (선생님이 quiz_config 에 오타를 냈거나, 시트에 없는 이름을 지정한 경우)
+      const src = getDaySource(r.day);
+      if (!src) {
+        unknownDays.push(r);
+        return false;
+      }
+      return true;
+    })
     .map(r => ({ ...r, overdue: r.dateStr !== today }))
     .sort((a, b) => {
       // 오늘이 위로, 그 다음 최신순
@@ -1829,6 +1842,15 @@ async function loadQuizConfig() {
       if(b.dateStr === today && a.dateStr !== today) return 1;
       return b.dateStr.localeCompare(a.dateStr);
     });
+
+  // ★ 실데이터에 없는 Day 를 콘솔에 명확히 경고 (선생님이 F12 로 확인 가능)
+  if (unknownDays.length) {
+    console.warn(
+      `⚠️ [quiz_config] 실제 시트 데이터에 없는 Day 가 ${unknownDays.length}건 있어 배너에서 제외했습니다:\n` +
+      unknownDays.map(r => `  • "${r.day}"  (${r.dateStr}) — SLOTS 어느 시트에도, 추가단어에도 없음`).join('\n') +
+      `\n\n선생님께: quiz_config 시트의 Day 열 이름을 실제 단어장/숙어장/모의고사 시트의 Day 명과 정확히 일치시켜 주세요 (예: "블랙라벨_01" ← "블랙라벨_1" 실수).`
+    );
+  }
 
   // 4. 배너 렌더링
   renderQuizBanners();
