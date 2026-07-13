@@ -2,9 +2,15 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v2.3.5  (2026-06-26)
+  현재 버전: v3.0  (2026-07-13)
 ─────────────────────────────────────────────────────────────────
-  변경 이력:
+  변경 이력 (v3.x ~):
+  v3.0 — 버전 번호 체계 리셋 (v2.3.6 → v3.0). 이전 이력은 하단 아카이브 참고.
+
+  ─────────────────────────────────────────────────────────────
+  이전 버전 아카이브 (v0.x ~ v2.x, 참고용 — 이 시점부터 새로 카운트)
+  ─────────────────────────────────────────────────────────────
+  v2.3.6 — 단어장 두 시트 지원 (VOCAB2_CSV 병합, Day 접두어별 소그룹 자동 렌더)
   v2.3.5 — 숙어장 Daily Test 연동 (quiz_config "ID xx" 자동 인식) + 폴더 순서 단어장→숙어장→모의고사
   v2.3.4 — 숙어장 폴더 활성화 (별도 시트, ID 컬럼 기반)
   v2.3 — Daily Test 로딩 중 상태 표시
@@ -271,6 +277,35 @@
   .vocab-stat strong{color:var(--purple);font-weight:600;}
 
   /* Day 폴더 그리드 — 오답단어처럼 */
+  /* ── 단어장 서브그룹 헤더 (Day 접두어별 소그룹 구분) ── */
+  .vocab-subgroup-header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    padding:.6rem 0 .5rem 0;
+    margin-top:1.6rem;
+    border-bottom:1px solid var(--line);
+  }
+  .vocab-subgroup-header:first-child{margin-top:.3rem;}
+  .vocab-subgroup-label{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.05rem;
+    font-weight:500;
+    color:var(--purple);
+    letter-spacing:.02em;
+  }
+  .vocab-subgroup-meta{
+    font-family:'Inter',sans-serif;
+    font-size:.68rem;
+    color:var(--ink-mute);
+    letter-spacing:.02em;
+  }
+  @media(max-width:768px){
+    .vocab-subgroup-header{margin-top:1.2rem;padding:.5rem 0 .4rem 0;}
+    .vocab-subgroup-label{font-size:.95rem;}
+    .vocab-subgroup-meta{font-size:.62rem;}
+  }
+
   .vocab-day-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;}
 
   .day-folder{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:.85rem .8rem;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:.35rem;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;user-select:none;animation:fadeUp .5s ease both;}
@@ -832,12 +867,25 @@
                   - 빈 문자열 '' 이면 배너 표시 안 됨 */
 /* ════════════════════════════════════════════════════════════
    ★ 앱 버전 — 변경할 때 이 값만 바꾸면 푸터·콘솔이 같이 갱신됨
+   ────────────────────────────────────────────────────────────
+   APP_VERSION      : 'major · minor' 형태 (예: '3 · 1')
+   APP_VERSION_DATE : 같은 날 나온 패치 번호(선택). 안 쓰면 빈 문자열 ''
+                       → 푸터에는 '3 · 1'만 표시, 채우면 '3 · 1 · 2'처럼 표시
    ════════════════════════════════════════════════════════════ */
-const APP_VERSION      = 'v2 · 3';
-const APP_VERSION_DATE = '5';
+const APP_VERSION      = '3 · 0';
+const APP_VERSION_DATE = '0';
 
-const STUDENT_NAME = '조문주';
+const STUDENT_NAME = '김현수';
 const VOCAB_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1174135286';
+/* ★ 두 번째 단어장 시트 URL (선택) — 필요 시 URL을 채워 넣으세요.
+   빈 문자열이면 첫 번째 단어장만 사용됩니다.
+   두 번째 시트의 Day 이름은 첫 번째와 겹치지 않는 접두어를 쓰세요
+   (예: 첫 번째 "Day 01~", 두 번째 "고3 01~" / "심화 01~") */
+const VOCAB2_CSV = '';
+/* Day 접두어 → 서브그룹 표시명 매핑 (선택).
+   비어 있으면 접두어 자체가 헤더로 표시됩니다.
+   예: { 'Day': '수능 단어', '고3': '고3 심화' } */
+const VOCAB_GROUP_LABELS = {};
 const MOCK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=222284112';
 const WEAK_CSV  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwVyD25PYnOiPEOZhMGy2ZQpt8jQmG6DYM7mXB_2FaR2hCPDTk8kmqAUT4xiUSO-fHhT56N4symdII/pub?output=csv&gid=1027447664';
 /* ★ 숙어장 시트 URL (별도 스프레드시트, "보기 가능" 공유 필수) */
@@ -966,52 +1014,79 @@ function csvSplit(line) {
   r.push(cur); return r;
 }
 
+/* ============================================================
+   단어장 CSV 파싱 헬퍼 — text → words 배열
+   ============================================================
+   기존 loadVocab 내부의 파싱 로직을 그대로 옮긴 것.
+   loadVocab 이 여러 시트를 병합할 수 있도록 분리했습니다.
+   ============================================================ */
+function parseVocabCsv(text) {
+  if(!text) return [];
+  const lines = text.trim().split('\n').map(l=>l.replace(/\r$/,''));
+  if(!lines.length) return [];
+
+  /* ── 헤더 감지: 첫 줄에 '단어'가 있으면 헤더형, 없으면 데이터형 ── */
+  const firstCols = csvSplit(lines[0]);
+  const hasHeader = firstCols.some(c=>/^단어$/i.test(c.trim()));
+
+  if(hasHeader) {
+    /* 형식 A: 헤더행 있음 — 단어, 뜻, 품사, 출처날짜 */
+    const heads = firstCols.map(c=>c.trim());
+    const wi=heads.findIndex(h=>/^단어$/i.test(h));
+    const mi=heads.findIndex(h=>/^뜻$/i.test(h));
+    const pi=heads.findIndex(h=>/^품사$/i.test(h));
+    const di=heads.findIndex(h=>/출처|날짜|date/i.test(h));
+    return lines.slice(1).map(l=>csvSplit(l)).filter(v=>v[wi]&&v[mi]).map(v=>({
+      day:  di>=0?(v[di]||'').trim():'',
+      word: v[wi].trim(),
+      meaning: v[mi].trim(),
+      pos:  pi>=0?(v[pi]||'').trim():''
+    }));
+  } else {
+    /* 형식 B: 헤더 없음 — 컬럼 수로 판단
+       3컬럼: Day, 단어, 뜻   (첫 컬럼이 접두어+숫자 패턴)
+       2컬럼: 단어, 뜻       */
+    /* 첫 컬럼이 접두어+숫자 패턴(예: "Day 01", "고3 01", "심화 03")이면 3컬럼 형식으로 간주 */
+    const isDayFmt = /^\S+\s*\d/.test((firstCols[0]||'').trim());
+    return lines.map(l=>{
+      const v=csvSplit(l);
+      if(isDayFmt){
+        const day=(v[0]||'').trim();
+        const word=(v[1]||'').trim();
+        /* 뜻은 3번째~끝 컬럼 합치기 (뜻 안에 쉼표 있어도 OK) */
+        const meaning=v.slice(2).join(',').trim();
+        return {day,word,meaning,pos:''};
+      } else {
+        const word=(v[0]||'').trim();
+        const meaning=v.slice(1).join(',').trim();
+        return {day:'',word,meaning,pos:''};
+      }
+    }).filter(w=>w.word&&w.meaning&&!/^\S+\s*\d/.test(w.word));
+  }
+}
+
 async function loadVocab() {
   vocabLoaded = true;
   try {
-    const res = await fetch(VOCAB_CSV);
-    if(!res.ok) throw new Error('시트를 불러올 수 없습니다 ('+res.status+')');
-    const text = await res.text();
-    const lines = text.trim().split('\n').map(l=>l.replace(/\r$/,''));
+    /* ── 두 시트를 병렬 fetch (VOCAB2_CSV 비어 있으면 첫 번째만) ── */
+    const sources = [VOCAB_CSV, VOCAB2_CSV].filter(u => u);
+    const responses = await Promise.all(
+      sources.map(url => fetch(url).catch(err => ({ ok:false, _err:err })))
+    );
+    const texts = await Promise.all(responses.map(async (res, i) => {
+      if(!res.ok) {
+        console.warn(`단어장 시트 #${i+1} 로딩 실패:`, res._err || res.status);
+        return '';
+      }
+      try { return await res.text(); } catch { return ''; }
+    }));
 
-    /* ── 헤더 감지: 첫 줄에 '단어'가 있으면 헤더형, 없으면 데이터형 ── */
-    const firstCols = csvSplit(lines[0]);
-    const hasHeader = firstCols.some(c=>/^단어$/i.test(c.trim()));
-
-    if(hasHeader) {
-      /* 형식 A: 헤더행 있음 — 단어, 뜻, 품사, 출처날짜 */
-      const heads = firstCols.map(c=>c.trim());
-      const wi=heads.findIndex(h=>/^단어$/i.test(h));
-      const mi=heads.findIndex(h=>/^뜻$/i.test(h));
-      const pi=heads.findIndex(h=>/^품사$/i.test(h));
-      const di=heads.findIndex(h=>/출처|날짜|date/i.test(h));
-      allWords = lines.slice(1).map(l=>csvSplit(l)).filter(v=>v[wi]&&v[mi]).map(v=>({
-        day:  di>=0?(v[di]||'').trim():'',
-        word: v[wi].trim(),
-        meaning: v[mi].trim(),
-        pos:  pi>=0?(v[pi]||'').trim():''
-      }));
-    } else {
-      /* 형식 B: 헤더 없음 — 컬럼 수로 판단
-         3컬럼: Day, 단어, 뜻
-         2컬럼: 단어, 뜻  */
-      /* 첫 컬럼이 'Day 숫자' 패턴이면 3컬럼 형식 */
-      const isDayFmt = /^Day\s*\d/i.test((firstCols[0]||'').trim());
-      allWords = lines.map(l=>{
-        const v=csvSplit(l);
-        if(isDayFmt){
-          const day=(v[0]||'').trim();
-          const word=(v[1]||'').trim();
-          /* 뜻은 3번째~끝 컬럼 합치기 (뜻 안에 쉼표 있어도 OK) */
-          const meaning=v.slice(2).join(',').trim();
-          return {day,word,meaning,pos:''};
-        } else {
-          const word=(v[0]||'').trim();
-          const meaning=v.slice(1).join(',').trim();
-          return {day:'',word,meaning,pos:''};
-        }
-      }).filter(w=>w.word&&w.meaning&&!/^Day\s*\d/i.test(w.word));
-    }
+    /* ── 각 시트 파싱 후 순서대로 병합 (첫 번째 시트가 먼저 나오도록) ── */
+    let combined = [];
+    texts.forEach(text => {
+      combined = combined.concat(parseVocabCsv(text));
+    });
+    allWords = combined;
 
     if(!allWords.length) throw new Error('단어가 없습니다.');
     activeWords = allWords; // 기본 풀은 기존 단어장
@@ -1030,10 +1105,32 @@ async function loadVocab() {
    ============================================================ */
 let openDayKey = null; // 현재 열린 Day
 
+/* Day 이름에서 접두어 추출 (첫 공백 이전 문자열).
+   예: "Day 01" → "Day", "고3 01" → "고3", "심화 03" → "심화"
+   공백이 없으면 전체를 접두어로 취급, 빈 값이면 "기타". */
+function extractPrefix(day) {
+  if(!day) return '기타';
+  const trimmed = day.trim();
+  const space = trimmed.indexOf(' ');
+  return space === -1 ? trimmed : trimmed.substring(0, space);
+}
+
 function renderVocab(words) {
   const groups={};
   words.forEach(w=>{ const d=w.day||'기타'; if(!groups[d])groups[d]=[]; groups[d].push(w); });
   const days = Object.keys(groups);
+
+  /* ── ★ 접두어별 서브그룹핑 (등장 순서 유지) ── */
+  const prefixOrder = [];
+  const subgroups = {};   // { prefix: [day, ...] }
+  days.forEach(day => {
+    const prefix = extractPrefix(day);
+    if(!subgroups[prefix]) {
+      subgroups[prefix] = [];
+      prefixOrder.push(prefix);
+    }
+    subgroups[prefix].push(day);
+  });
 
   document.getElementById('vocab-total').textContent=words.length;
   document.getElementById('vocab-days').textContent=days.length;
@@ -1043,73 +1140,90 @@ function renderVocab(words) {
   const box = document.getElementById('vocab-content');
   box.innerHTML='';
 
-  /* Day 폴더 그리드 */
-  const grid = document.createElement('div');
-  grid.className='vocab-day-grid';
+  let globalIdx = 0;   // 전체 폴더에 걸친 unique 인덱스 (flipDay/closeDay/toggleDay 참조용)
 
-  days.forEach((day, i) => {
-    const wordCount = groups[day].length;
+  prefixOrder.forEach(prefix => {
+    /* 서브그룹이 2개 이상일 때만 헤더 표시 (하나뿐이면 기존 UI와 동일) */
+    if(prefixOrder.length > 1) {
+      const header = document.createElement('div');
+      header.className = 'vocab-subgroup-header';
+      const label = VOCAB_GROUP_LABELS[prefix] || prefix;
+      const daysInGroup  = subgroups[prefix].length;
+      const wordsInGroup = subgroups[prefix].reduce((s,d) => s + groups[d].length, 0);
+      header.innerHTML = `<span class="vocab-subgroup-label">${esc(label)}</span>
+        <span class="vocab-subgroup-meta">${daysInGroup}개 Day · ${wordsInGroup}개 단어</span>`;
+      box.appendChild(header);
+    }
 
-    /* 폴더 카드 */
-    const folder = document.createElement('div');
-    folder.className='day-folder';
-    folder.style.animationDelay=`${0.04*i}s`;
-    folder.innerHTML=`
-      <div class="day-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
-      <div class="day-folder-title">${esc(day)}</div>
-      <div class="day-folder-desc">${wordCount}개 단어</div>
-      <div class="day-folder-footer">
-        <span class="day-folder-tag">단어장</span>
-        <span class="day-folder-arrow" id="arrow-${i}">→</span>
-      </div>`;
+    /* 각 서브그룹마다 별도의 grid 생성 */
+    const grid = document.createElement('div');
+    grid.className='vocab-day-grid';
 
-    /* 상세 패널 (폴더 아래 펼쳐짐) */
-    const detail = document.createElement('div');
-    detail.className='day-detail';
-    detail.id=`detail-${i}`;
-    detail.innerHTML=`
-      <div class="day-detail-header">
-        <div class="day-detail-title">${esc(day)} <span style="font-size:.85rem;font-weight:400;color:var(--ink-mute)">${wordCount}개</span></div>
-        <div class="day-detail-actions">
-          <button class="day-flip-btn" onclick="flipDay(${i})">전체 뒤집기</button>
-          <button class="day-close-btn" onclick="closeDay(${i})">닫기 ✕</button>
+    subgroups[prefix].forEach(day => {
+      const i = globalIdx++;
+      const wordCount = groups[day].length;
+
+      /* 폴더 카드 */
+      const folder = document.createElement('div');
+      folder.className='day-folder';
+      folder.style.animationDelay=`${0.04*i}s`;
+      folder.innerHTML=`
+        <div class="day-folder-num">No. ${String(i+1).padStart(2,'0')}</div>
+        <div class="day-folder-title">${esc(day)}</div>
+        <div class="day-folder-desc">${wordCount}개 단어</div>
+        <div class="day-folder-footer">
+          <span class="day-folder-tag">단어장</span>
+          <span class="day-folder-arrow" id="arrow-${i}">→</span>
+        </div>`;
+
+      /* 상세 패널 (폴더 아래 펼쳐짐) */
+      const detail = document.createElement('div');
+      detail.className='day-detail';
+      detail.id=`detail-${i}`;
+      detail.innerHTML=`
+        <div class="day-detail-header">
+          <div class="day-detail-title">${esc(day)} <span style="font-size:.85rem;font-weight:400;color:var(--ink-mute)">${wordCount}개</span></div>
+          <div class="day-detail-actions">
+            <button class="day-flip-btn" onclick="flipDay(${i})">전체 뒤집기</button>
+            <button class="day-close-btn" onclick="closeDay(${i})">닫기 ✕</button>
+          </div>
         </div>
-      </div>
-      <div class="vocab-cards" id="cards-${i}"></div>`;
+        <div class="vocab-cards" id="cards-${i}"></div>`;
 
-    /* 단어 카드 생성 */
-    const cardsWrap = detail.querySelector(`#cards-${i}`);
-    groups[day].forEach(w => {
-      const c = document.createElement('div');
-      c.className='vcard';
-      c.innerHTML=`<div class="vcard-tts" title="발음 듣기">🔊</div>
-        <div class="vcard-en">${esc(w.word)}</div>
-        <div class="vcard-ko">${esc(w.meaning)}</div>
-        <div class="vcard-hint">탭해서 뜻 보기</div>`;
-      c.addEventListener('click', (e) => {
-        if(e.target.closest('.vcard-tts')) return; // TTS 버튼은 toggle 안 함
-        c.classList.toggle('open');
-        if(c.classList.contains('open')) ttsPlay(w.word, c.querySelector('.vcard-tts'));
+      /* 단어 카드 생성 */
+      const cardsWrap = detail.querySelector(`#cards-${i}`);
+      groups[day].forEach(w => {
+        const c = document.createElement('div');
+        c.className='vcard';
+        c.innerHTML=`<div class="vcard-tts" title="발음 듣기">🔊</div>
+          <div class="vcard-en">${esc(w.word)}</div>
+          <div class="vcard-ko">${esc(w.meaning)}</div>
+          <div class="vcard-hint">탭해서 뜻 보기</div>`;
+        c.addEventListener('click', (e) => {
+          if(e.target.closest('.vcard-tts')) return; // TTS 버튼은 toggle 안 함
+          c.classList.toggle('open');
+          if(c.classList.contains('open')) ttsPlay(w.word, c.querySelector('.vcard-tts'));
+        });
+        const ttsBtn = c.querySelector('.vcard-tts');
+        ttsBtn.addEventListener('click', (e) => { e.stopPropagation(); ttsPlay(w.word, ttsBtn); });
+        cardsWrap.appendChild(c);
       });
-      const ttsBtn = c.querySelector('.vcard-tts');
-      ttsBtn.addEventListener('click', (e) => { e.stopPropagation(); ttsPlay(w.word, ttsBtn); });
-      cardsWrap.appendChild(c);
+
+      folder.addEventListener('click', ()=>toggleDay(i, folder, detail));
+
+      /* 폴더 + 상세를 감싸는 wrapper */
+      const wrap = document.createElement('div');
+      wrap.style.cssText='grid-column:1/-1;'; // 상세패널은 전체 너비
+      wrap.appendChild(detail);
+
+      grid.appendChild(folder);
+      folder._detailWrap = wrap;
+      folder._detail = detail;
+      folder._idx = i;
     });
 
-    folder.addEventListener('click', ()=>toggleDay(i, folder, detail));
-
-    /* 폴더 + 상세를 감싸는 wrapper */
-    const wrap = document.createElement('div');
-    wrap.style.cssText='grid-column:1/-1;'; // 상세패널은 전체 너비
-    wrap.appendChild(detail);
-
-    grid.appendChild(folder);
-    folder._detailWrap = wrap;
-    folder._detail = detail;
-    folder._idx = i;
+    box.appendChild(grid);
   });
-
-  box.appendChild(grid);
 }
 
 function toggleDay(i, folder, detail) {
@@ -2974,10 +3088,10 @@ window.addEventListener('popstate', function(e) {
 /* ★ 푸터에 버전 표시 + 콘솔 로그 (배포 확인용) */
 (function() {
   const el = document.getElementById('footer-version');
-  if (el) el.textContent = APP_VERSION + ' · ' + APP_VERSION_DATE;
-  console.log('%cBarog English ' + APP_VERSION,
-    'color:#7036e3;font-weight:600;font-size:13px',
-    '· ' + APP_VERSION_DATE);
+  const versionText = APP_VERSION_DATE ? (APP_VERSION + ' · ' + APP_VERSION_DATE) : APP_VERSION;
+  if (el) el.textContent = versionText;
+  console.log('%cBarog English ' + versionText,
+    'color:#7036e3;font-weight:600;font-size:13px');
 })();
 
 /* ★ 페이지 진입 시 첫 화면이 'Daily Test' 이므로 관련 데이터 로딩 트리거 */
