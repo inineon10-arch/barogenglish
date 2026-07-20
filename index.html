@@ -2,11 +2,12 @@
 <!--
 ═══════════════════════════════════════════════════════════════════
   BAROG English · 학습 자료실
-  현재 버전: v3.4  (2026-07-13)
+  현재 버전: v3.5  (2026-07-13)
 ─────────────────────────────────────────────────────────────────
   변경 이력 (v3.x ~):
-  v3.4 — SLOTS 통합 리팩토링 2단계: renderMockQuizBanners / renderWeakQuizBanners 를 슬롯 색상·라벨 인라인 주입 방식으로 통합. 하드코딩된 mock-banner/weak-banner 클래스 부여 제거. WEAK_STYLE 상수 도입.
-  v3.3.1 — parseVocabCsv 필터 정규식 엄격화 ("(21번) suspect" 처럼 문제 번호가 앞에 붙은 단어가 필터에 걸리던 버그 수정)
+  v3.5 — SLOTS 통합 리팩토링 3단계: 퀴즈 오버레이(.qz-*) 색상을 슬롯 기반으로 통합. mock/weak 하드코딩 CSS 클래스(.qz-card-line.mock, .qz-pill.weak-pill 등 10개) 완전 제거. startQuiz/startMockQuiz 에서 오버레이에 --fg-color 인라인 주입. HTML의 mock-name/mock-pill 클래스 정리.
+  v3.4 — SLOTS 통합 리팩토링 2단계: renderMockQuizBanners / renderWeakQuizBanners 를 슬롯 색상·라벨 인라인 주입 방식으로 통합. WEAK_STYLE 상수 도입.
+  v3.3.1 — parseVocabCsv 필터 정규식 엄격화
   v3.3 — quiz_config 에 오타/미매칭 Day 가 있을 때 학생 화면 배너에서 자동 제외 + 콘솔 경고 (선생님 오타 은폐 방지). getDaySource 의 fallback 정규식 제거.
   v3.2 — SLOTS 통합 리팩토링 1단계: dead code 정리 (renderMockVocab·renderSchoolVocab 옛 정의 + 관련 toggle/close/flip 함수 제거, 총 -203줄). 렌더링·Daily Test·퀴즈 동작은 그대로 유지.
   v3.1.1 — vocab-groups-container 아래 여백 보정
@@ -145,12 +146,12 @@
   /* ── 퀴즈 풀스크린 오버레이 ── */
   .qz-overlay{position:fixed;inset:0;z-index:500;background:#f5f0eb;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
   .qz-header{flex-shrink:0;padding:12px 16px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
-  .qz-header-left .qz-name{font-family:'Inter',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#7036e3;}
+  .qz-header-left .qz-name{font-family:'Inter',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--fg-color,#7036e3);}
   .qz-header-left .qz-title{font-family:'Inter',sans-serif;font-size:1.15rem;font-weight:700;color:#1a1a2e;margin-top:2px;letter-spacing:-.5px;}
   .qz-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
   .qz-idx{font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;color:#1a1a2e;}
   .qz-idx span{color:#b0aab8;font-weight:400;}
-  .qz-pill{font-family:'Inter',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:#eef3ff;color:#7036e3;border:1px solid #d0c8ff;}
+  .qz-pill{font-family:'Inter',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:rgba(var(--fg-rgb,112,54,227),.1);color:var(--fg-color,#7036e3);border:1px solid rgba(var(--fg-rgb,112,54,227),.3);}
   .qz-pill.retry{background:#fce7f3;color:#be185d;border-color:#fbcfe8;}
   .qz-pill.done{background:#ecfdf5;color:#1a9e6f;border-color:#a7f3d0;}
   .qz-prog{flex-shrink:0;padding:0 16px 10px;}
@@ -170,7 +171,7 @@
   /* 카드 */
   .qz-card{position:absolute;width:calc(100% - 24px);max-width:430px;height:100%;max-height:640px;background:#fff;border-radius:22px;border:1.5px solid #e2dcd8;box-shadow:0 8px 40px rgba(112,54,227,.08),0 2px 8px rgba(0,0,0,.05);display:flex;flex-direction:column;overflow:hidden;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;will-change:transform,opacity;touch-action:none;}
   .qz-card.no-tr{transition:none!important;} .qz-card.dragging{transition:none!important;}
-  .qz-card-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,#7036e3 0%,#a78bfa 100%);}
+  .qz-card-line{height:4px;flex-shrink:0;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--fg-color,#7036e3) 0%,rgba(var(--fg-rgb,112,54,227),.55) 100%);}
   .qz-card-line.retry{background:linear-gradient(90deg,#be185d 0%,#f472b6 100%);}
   .qz-card-line.result{background:linear-gradient(90deg,#1a9e6f 0%,#6ee7b7 100%);}
 
@@ -227,12 +228,12 @@
   .qz-stat-num{font-family:'Inter',sans-serif;font-size:1.35rem;font-weight:700;}
   .qz-stat-num.c{color:#1a9e6f;} .qz-stat-num.w{color:#d94040;}
   .qz-stat-lbl{font-family:'Inter',sans-serif;font-size:.53rem;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#b0aab8;margin-top:3px;}
-  .qz-start-btn{background:#7036e3;color:#fff;border:none;border-radius:16px;padding:13px 30px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(112,54,227,.25);min-height:46px;margin-top:4px;transition:transform .15s;touch-action:manipulation;}
+  .qz-start-btn{background:var(--fg-color,#7036e3);color:#fff;border:none;border-radius:16px;padding:13px 30px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(var(--fg-rgb,112,54,227),.25);min-height:46px;margin-top:4px;transition:transform .15s;touch-action:manipulation;}
   .qz-start-btn:active{transform:scale(.97);}
   .qz-start-btn.retry{background:#be185d;box-shadow:0 4px 16px rgba(190,24,93,.25);}
 
   /* 제출 버튼 */
-  .qz-submit-btn{width:100%;padding:13px 30px;background:#1a9e6f;color:#fff;border:none;border-radius:16px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(26,158,111,.25);min-height:46px;margin-top:8px;transition:transform .15s,opacity .2s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .qz-submit-btn{width:100%;padding:13px 30px;background:var(--fg-color,#1a9e6f);color:#fff;border:none;border-radius:16px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(var(--fg-rgb,26,158,111),.25);min-height:46px;margin-top:8px;transition:transform .15s,opacity .2s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:6px;}
   .qz-submit-btn:active{transform:scale(.97);}
   .qz-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
   .qz-submit-btn.submitted{background:#b0aab8;box-shadow:none;cursor:default;}
@@ -405,20 +406,12 @@
   /* ── mock/weak/school 배너 override CSS 는 v3.4 에서 제거됨 (총 -18줄) —
      .quiz-banner 기본 스타일이 --fg-color/--fg-rgb 변수 참조 방식으로 리팩토링됐고,
      각 배너 렌더 지점(renderQuizBanners, loadMockQuizBanners, loadWeakQuizBanners)에서
-     인라인 style 로 슬롯 색상을 주입하는 방식으로 통일됨. */
-
-  .qz-card-line.mock{background:linear-gradient(90deg,var(--green-mock) 0%,var(--green-mock-soft) 100%);}
-  .qz-pill.mock-pill{background:#e6f7f3;color:var(--green-mock);border:1px solid #b3dfd4;}
-  .qz-start-btn.mock-start{background:var(--green-mock);box-shadow:0 4px 16px rgba(26,122,94,.25);}
-  .qz-submit-btn.mock-submit{background:var(--green-mock);box-shadow:0 4px 16px rgba(26,122,94,.25);}
-  .qz-name.mock-name{color:var(--green-mock) !important;}
-
-  /* ── 추가 단어 퀴즈 오버레이 — 앰버 ── */
-  .qz-card-line.weak{background:linear-gradient(90deg,var(--amber-weak) 0%,var(--amber-weak-soft) 100%);}
-  .qz-pill.weak-pill{background:#fef3e6;color:var(--amber-weak);border:1px solid #fad9a8;}
-  .qz-start-btn.weak-start{background:var(--amber-weak);box-shadow:0 4px 16px rgba(217,119,6,.25);}
-  .qz-submit-btn.weak-submit{background:var(--amber-weak);box-shadow:0 4px 16px rgba(217,119,6,.25);}
-  .qz-name.weak-name{color:var(--amber-weak) !important;}
+     인라인 style 로 슬롯 색상을 주입하는 방식으로 통일됨.
+     ────
+     v3.5 (3단계): 퀴즈 오버레이(.qz-*) 도 동일한 방식으로 리팩토링됨.
+     .qz-card-line / .qz-pill / .qz-start-btn / .qz-submit-btn / .qz-name 이 base 에서
+     var(--fg-color) 참조. mock/weak/school-mode 하드코딩 클래스 완전 제거.
+     오버레이 여는 지점(startQuiz, startMockQuiz)에서 인라인 --fg-color 주입. */
 
   @media(max-width:768px){
     .mock-day-grid{grid-template-columns:repeat(2,1fr) !important;gap:.55rem;}
@@ -788,11 +781,11 @@
 <div class="qz-overlay" id="mock-qz-overlay" style="display:none">
   <div class="qz-header">
     <div class="qz-header-left">
-      <div class="qz-name mock-name">바로그영어 · 모의고사</div>
+      <div class="qz-name">바로그영어 · 모의고사</div>
       <div class="qz-title" id="mock-qz-title">객관식 퀴즈</div>
     </div>
     <div class="qz-header-right">
-      <span class="qz-pill mock-pill" id="mock-qz-pill">객관식</span>
+      <span class="qz-pill" id="mock-qz-pill">객관식</span>
       <div class="qz-idx"><span id="mock-qz-cur">0</span><span> / <span id="mock-qz-tot">0</span></span></div>
     </div>
   </div>
@@ -837,7 +830,7 @@
    APP_VERSION_DATE : 같은 날 나온 패치 번호(선택). 안 쓰면 빈 문자열 ''
                        → 푸터에는 '3 · 1'만 표시, 채우면 '3 · 1 · 2'처럼 표시
    ════════════════════════════════════════════════════════════ */
-const APP_VERSION      = '3 · 4';
+const APP_VERSION      = '3 · 5';
 const APP_VERSION_DATE = '0';
 
 const STUDENT_NAME = '김현수';
@@ -874,7 +867,7 @@ const SLOTS = [
   },
   {
     id:'idioms', name:'숙어장',
-    csv:'1671929824',
+    csv:'https://docs.google.com/spreadsheets/d/1oGar-eFGhSHCORf5HnqyGEoYuVEO6hb2QK73UvF9lRE/export?format=csv&gid=1671929824',
     color:'#d97706', icon:'💬',
     unit:'표현', subUnit:'ID', dayLabel:'오늘의 숙어', quizName:'숙어장'
   },
@@ -2002,7 +1995,20 @@ function startQuiz() {
   qzOriginalTotal = selected.length;
   qzStartTime = Date.now();
   document.getElementById('qz-title').textContent=`${QUIZ_CONFIG.day} · 객관식`;
-  document.getElementById('qz-overlay').style.display='flex';
+  /* ★ 슬롯 색상·이름 인라인 주입 (v3.5) — CSS var 로 자동 전파 */
+  const _overlay = document.getElementById('qz-overlay');
+  const _slot    = getSlotForDay(QUIZ_CONFIG.day);
+  if (_slot) {
+    _overlay.style.setProperty('--fg-color', _slot.color);
+    _overlay.style.setProperty('--fg-rgb', hexToRgb(_slot.color));
+    const _nameEl = _overlay.querySelector('.qz-name');
+    if (_nameEl) _nameEl.textContent = `바로그영어 · ${_slot.quizName || _slot.name}`;
+  } else {
+    /* fallback (v3.3 필터링 덕분에 도달할 일 거의 없음) */
+    _overlay.style.setProperty('--fg-color', '#7036e3');
+    _overlay.style.setProperty('--fg-rgb', '112,54,227');
+  }
+  _overlay.style.display='flex';
   // 뒤로가기 감지용 history 상태 추가
   history.pushState({ quiz: true }, '', location.href);
   qzUpdatePill();
@@ -2535,17 +2541,22 @@ function startMockQuiz() {
   mqOriginalTotal = selected.length;
   mqStartTime = Date.now();
 
-  /* ★ 헤더 표시 — 모드별 분기 */
+  /* ★ 헤더 표시 — 모드별 색상·라벨 (v3.5: CSS 클래스 토글 대신 인라인 var 주입) */
   const overlay = document.getElementById('mock-qz-overlay');
   const nameEl  = overlay.querySelector('.qz-name');
   const titleEl = document.getElementById('mock-qz-title');
   if (mqMode === 'weak') {
     nameEl.textContent  = '바로그영어 · 추가 단어';
-    nameEl.classList.remove('mock-name'); nameEl.classList.add('weak-name');
+    overlay.style.setProperty('--fg-color', WEAK_STYLE.color);
+    overlay.style.setProperty('--fg-rgb', WEAK_STYLE.rgb);
     titleEl.textContent = `${mockQzConfig.day} · 객관식`;   // 세트명 표시
   } else {
-    nameEl.textContent  = '바로그영어 · 모의고사';
-    nameEl.classList.remove('weak-name'); nameEl.classList.add('mock-name');
+    const mockSlot = getSlotById('mock');
+    const mockColor = mockSlot?.color                    || '#1a7a5e';
+    const mockRgb   = mockSlot ? hexToRgb(mockSlot.color) : '26,122,94';
+    nameEl.textContent  = `바로그영어 · ${mockSlot?.quizName || '모의고사'}`;
+    overlay.style.setProperty('--fg-color', mockColor);
+    overlay.style.setProperty('--fg-rgb', mockRgb);
     titleEl.textContent = `${mockQzConfig.day} · 객관식`;
   }
 
@@ -2629,7 +2640,7 @@ async function mqRenderQ(dir=1) {
     : '';
 
   await mqRenderStage(`
-    <div class="qz-card-line ${mqMode === 'weak' ? 'weak' : 'mock'}"></div>
+    <div class="qz-card-line"></div>
     <button class="qz-tts qz-tts-corner" type="button" data-word="${esc(q.word)}">🔊</button>
     <div class="qz-content">
       <div class="qz-badges"><span class="qz-badge qz-badge-num">${esc(mqMode === 'weak' ? '추가 단어' : q.day)}</span></div>
@@ -2744,7 +2755,7 @@ function mqRenderResult() {
           <div class="qz-wrong-detail">'${esc(w._picked)}' 선택</div>
         </div>`).join('')}</div>`;
   mqRenderStage(`
-    <div class="qz-card-line ${mqMode === 'weak' ? 'weak' : 'mock'}"></div>
+    <div class="qz-card-line"></div>
     <div class="qz-result">
       <div class="qz-score-circle" style="background:conic-gradient(${col} 0deg ${deg}deg,#e2dcd8 ${deg}deg 360deg)">
         <div class="qz-score-inner"><div class="qz-score-num">${pct}<span style="font-size:1.1rem">%</span></div><div class="qz-score-tot">${correct}/${allTotal}</div></div>
@@ -2753,10 +2764,10 @@ function mqRenderResult() {
       <div class="qz-result-sub">정답률 ${pct}%</div>
       ${wrongHTML}
       <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-        <button class="qz-submit-btn ${mqMode === 'weak' ? 'weak-submit' : 'mock-submit'}" id="mock-qz-submit-btn" onclick="submitMockResult(${correct}, ${allTotal})">
+        <button class="qz-submit-btn" id="mock-qz-submit-btn" onclick="submitMockResult(${correct}, ${allTotal})">
           📤 선생님께 제출하기
         </button>
-        <button class="qz-start-btn ${mqMode === 'weak' ? 'weak-start' : 'mock-start'}" style="width:100%" onclick="startMockQuiz()">↻ 다시 풀기</button>
+        <button class="qz-start-btn" style="width:100%" onclick="startMockQuiz()">↻ 다시 풀기</button>
       </div>
     </div>`,1);
 }
